@@ -15,7 +15,13 @@ class Game:
         self.points = []
     
     def draw_board(self):
-        pass ### TODO: Implement
+        starting_point = self.get_point(0, 0)
+        hexagon = self.draw_hexagon(starting_point, 0)
+        while len(self.hexagons) < self.num_hexagons:
+            starting_point = hexagon.last_free_point() if len(self.hexagons) > 1 else hexagon.points[2]
+            starting_angle = starting_point.starting_angle()
+            hexagon = self.draw_hexagon(starting_point, starting_angle)
+        self.assign_ports()
 
     def draw_hexagon(self, point, angle):
         lines, points = [], [point]
@@ -59,13 +65,30 @@ class Game:
         resource_types = copy.deepcopy(self.config['resource_types'])
         while len(resources) < self.num_hexagons:
             random_resource_type = random.choice(
-                [resource_type for resource_type, info in resource_types.items() if info['count'] > 0])
+                [resource_type for resource_type, info in resource_types.items() if info['count'] > 0]
+            )
             resources.append(random_resource_type)
             resource_types[random_resource_type]['count'] -= 1
             if sum([info['count'] for info in resource_types.values()]) == 0:
                 resource_types = copy.deepcopy(self.config['resource_types'])
         random.shuffle(resources)
-        return resources
+        return resources        
 
     def get_resource_type(self):
         return self.resources.pop()
+    
+    def assign_ports(self):
+        coast_points = [point for point in self.points if point.on_coast]
+        iterator = 0
+        port_types = copy.deepcopy(self.config['port_types'])
+        while True:
+            random_port_type = random.choice(
+                [port_type for port_type, info in port_types.items() if info['count'] > 0]
+            )
+            port_types[random_port_type]['count'] -= 1
+            coast_points[iterator].port_type = random_port_type
+            if sum([info['count'] for info in port_types.values()]) == 0:
+                port_types = copy.deepcopy(self.config['port_types'])
+            iterator += random.randint(2, 4)
+            if iterator >= len(coast_points) - 1:
+                break

@@ -6,6 +6,8 @@ class Point:
         self.y = y
         self.hexagons = []
         self.lines = []
+        self.on_coast = True
+        self.port_type = None
     
     def __eq__(self, other):
         if not isinstance(other, Point):

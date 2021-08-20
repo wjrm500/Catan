@@ -10,6 +10,8 @@ class Hexagon:
             line.hexagons.append(self)
         for point in self.points:
             point.hexagons.append(self)
+            if len(point.hexagons) == 3:
+                point.on_coast = False
         
     def last_free_point(self):
         for point in self.points[::-1]:
