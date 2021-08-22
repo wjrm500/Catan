@@ -1,16 +1,18 @@
 import numpy as np
 
 class Hexagon:
-    def __init__(self, lines, nodes, resource_type):
+    def __init__(self, lines, nodes):
         self.lines = lines
         self.nodes = nodes
-        self.resource_type = resource_type
         for line in self.lines:
             line.hexagons.append(self)
         for node in self.nodes:
             node.hexagons.append(self)
             if len(node.hexagons) == 3:
                 node.on_coast = False
+    
+    def set_resource_type(self, resource_type):
+        self.resource_type = resource_type
         
     def last_free_node(self):
         for node in self.nodes[::-1]:

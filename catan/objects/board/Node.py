@@ -14,7 +14,7 @@ class Node:
             return False
         return round(self.x, 2) == round(other.x, 2) and round(self.y, 2) == round(other.y, 2)
     
-    def starting_angle(self):
+    def start_angle(self):
         if len(self.lines) != 2:
             raise Exception('Starting angle can only be found if node is associated with two lines')
         angle = self.lines[0].angle()
