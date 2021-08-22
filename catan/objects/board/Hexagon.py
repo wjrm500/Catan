@@ -7,6 +7,7 @@ class Hexagon:
         self.resource_type = None
         self.roll_num = None
         self.num_pips = 0
+        self.robber = False
         for line in self.lines:
             line.hexagons.append(self)
         for node in self.nodes:

@@ -8,9 +8,7 @@ class Matplotlib():
         average_node_y_position = np.mean([node.y for node in game.distributor.nodes]) * scale
         x_shift, y_shift = -average_node_x_position, -average_node_y_position
         _, ax = plt.subplots()
-        # ax.set_xlim(-10, 10)
-        # ax.set_ylim(-10, 10)
-        ax.set_aspect('equal', adjustable='box')
+        ax.set_aspect('equal', adjustable = 'box')
         for hexagon in game.hexagons:
             nodes = hexagon.nodes + [hexagon.nodes[0]]
             port_nodes = [node for node in nodes if node.port]
@@ -28,20 +26,22 @@ class Matplotlib():
                 [node.y * scale + y_shift for node in nodes],
                 color = 'black'
             )
+        text_scale = ax.get_xlim()[1] / 10
+        for hexagon in game.hexagons:
             text_dicts = [
                 {
-                    'font_size': 'medium',
+                    'font_size': round(16 / text_scale),
                     'font_weight': 'bold',
                     'text': hexagon.roll_num,
-                    'y_shift': 0.75
+                    'y_shift': 0.5
                 },
                 {
-                    'font_size': 'x-small',
+                    'font_size': round(8 / text_scale),
                     'text': hexagon.resource_type,
-                    'y_shift': 0
+                    'y_shift': -0.25
                 },
                 {
-                    'font_size': 'large',
+                    'font_size': round(12 / text_scale),
                     'text': ''.join(['·' for _ in range(hexagon.num_pips)]),
                     'y_shift': -0.75
                 },
@@ -56,5 +56,5 @@ class Matplotlib():
                     ha = 'center',
                     va = 'center',
                     color = game.config['resource_types'][hexagon.resource_type]['color']
-                )
+                ) 
         plt.show()
