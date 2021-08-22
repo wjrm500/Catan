@@ -4,6 +4,9 @@ class Hexagon:
     def __init__(self, lines, nodes):
         self.lines = lines
         self.nodes = nodes
+        self.resource_type = None
+        self.roll_num = None
+        self.num_pips = 0
         for line in self.lines:
             line.hexagons.append(self)
         for node in self.nodes:
@@ -13,6 +16,10 @@ class Hexagon:
     
     def set_resource_type(self, resource_type):
         self.resource_type = resource_type
+    
+    def set_roll_num(self, roll_num):
+        self.roll_num = roll_num
+        self.num_pips = 6 - abs(self.roll_num - 7)
         
     def last_free_node(self):
         for node in self.nodes[::-1]:

@@ -15,6 +15,7 @@ class Game:
     def setup_board(self):
         self.hexagons = HexagonDrawing.draw_hexagons(self)
         self.assign_resource_types_to_hexagons()
+        self.assign_roll_nums_to_hexagons()
         self.assign_ports_to_coast_nodes()
     
     def assign_resource_types_to_hexagons(self):
@@ -30,6 +31,21 @@ class Game:
             if sum([info['count'] for info in resource_types.values()]) == 0:
                 resource_types = copy.deepcopy(self.config['resource_types'])   
     
+    def assign_roll_nums_to_hexagons(self):
+        roll_num_counts = copy.deepcopy(self.config['roll_num_counts'])
+        for hexagon in self.hexagons:
+            if hexagon.resource_type == 'desert':
+                continue
+            random_roll_num = random.choices(
+                population = [roll_num for roll_num in roll_num_counts.keys()],
+                weights = [count for count in roll_num_counts.values()],
+                k = 1
+            )[0]
+            hexagon.set_roll_num(random_roll_num)
+            roll_num_counts[random_roll_num] -= 1
+            if sum(roll_num_counts.values()) == 0:
+                roll_num_counts = copy.deepcopy(self.config['roll_num_counts']) 
+
     def assign_ports_to_coast_nodes(self):
         coast_nodes = [node for node in self.distributor.nodes if node.on_coast]
         iterator = 0
