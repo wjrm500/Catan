@@ -33,9 +33,11 @@ class Game:
         resources = []
         resource_types = copy.deepcopy(self.config['resource_types'])
         while len(resources) < self.num_hexagons:
-            random_resource_type = random.choice(
-                [resource_type for resource_type, info in resource_types.items() if info['count'] > 0]
-            )
+            random_resource_type = random.choices(
+                population = [resource_type for resource_type in resource_types.keys()],
+                weights = [info['count'] for info in resource_types.values()],
+                k = 1
+            )[0]
             resources.append(random_resource_type)
             resource_types[random_resource_type]['count'] -= 1
             if sum([info['count'] for info in resource_types.values()]) == 0:
@@ -51,9 +53,11 @@ class Game:
         iterator = 0
         port_types = copy.deepcopy(self.config['port_types'])
         while True:
-            random_port_type = random.choice(
-                [port_type for port_type, info in port_types.items() if info['count'] > 0]
-            )
+            random_port_type = random.choices(
+                population = [port_type for port_type in port_types.keys()],
+                weights = [info['count'] for info in port_types.values()],
+                k = 1
+            )[0]
             port_types[random_port_type]['count'] -= 1
             coast_nodes[iterator].port = Port(random_port_type)
             if sum([info['count'] for info in port_types.values()]) == 0:
