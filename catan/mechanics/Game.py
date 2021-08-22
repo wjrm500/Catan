@@ -1,7 +1,7 @@
 from .drawing.HexagonDrawing import HexagonDrawing
 import random
 import copy
-from ..objects.board.Hexagon import Hexagon
+
 from ..objects.board.Port import Port
 from .Distributor import Distributor
 
@@ -13,20 +13,9 @@ class Game:
         self.distributor = Distributor()
     
     def setup_board(self):
-        start_node = self.distributor.get_node(0, 0)
-        hexagon = self.create_hexagon(start_node, 0)
-        while len(self.hexagons) < self.num_hexagons:
-            start_node = hexagon.last_free_node() if len(self.hexagons) > 1 else hexagon.nodes[2]
-            start_angle = start_node.start_angle()
-            hexagon = self.create_hexagon(start_node, start_angle)
+        self.hexagons = HexagonDrawing.draw_hexagons(self)
         self.assign_resource_types_to_hexagons()
         self.assign_ports_to_coast_nodes()
-
-    def create_hexagon(self, node, angle):
-        lines, nodes = HexagonDrawing.draw_hexagon(node, angle, self.distributor)
-        hexagon = Hexagon(lines, nodes)
-        self.hexagons.append(hexagon)
-        return hexagon
     
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])
@@ -40,9 +29,6 @@ class Game:
             resource_types[random_resource_type]['count'] -= 1
             if sum([info['count'] for info in resource_types.values()]) == 0:
                 resource_types = copy.deepcopy(self.config['resource_types'])   
-
-    def get_resource_type(self):
-        return self.resources.pop()
     
     def assign_ports_to_coast_nodes(self):
         coast_nodes = [node for node in self.distributor.nodes if node.on_coast]
