@@ -62,5 +62,12 @@ config = {
         10: 2,
         11: 2,
         12: 1
+    },
+    'development_card_type_counts': {
+        'knight': 14,
+        'monopoly': 2,
+        'road_building': 2,
+        'victory_point': 5,
+        'year_of_plenty': 2
     }
 }

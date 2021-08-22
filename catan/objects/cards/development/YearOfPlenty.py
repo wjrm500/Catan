@@ -1,5 +1,5 @@
-from DevelopmentCard import DevelopmentCard
+from .DevelopmentCard import DevelopmentCard
 
 class YearOfPlenty(DevelopmentCard):
     def __init__(self):
-        pass
+        self.name = 'year_of_plenty'

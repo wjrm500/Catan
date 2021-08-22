@@ -4,4 +4,5 @@ from frontend.Matplotlib import Matplotlib
 
 game = Game(config)
 game.setup_board()
-Matplotlib.draw_board(game, 2)
+game.setup_cards()
+Matplotlib.draw_board(game)

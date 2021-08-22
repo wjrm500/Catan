@@ -1,3 +1,8 @@
+from catan.objects.cards.development.YearOfPlenty import YearOfPlenty
+from catan.objects.cards.development.VictoryPoint import VictoryPoint
+from catan.objects.cards.development.RoadBuilding import RoadBuilding
+from catan.objects.cards.development.Monopoly import Monopoly
+from catan.objects.cards.development.Knight import Knight
 from ..objects.board.Line import Line
 from ..objects.board.Node import Node
 
@@ -21,3 +26,13 @@ class Distributor:
         node = Node(x, y)
         self.nodes.append(node)
         return node
+    
+    def get_development_card(self, type):
+        type_class_mapping = {
+            'knight': Knight,
+            'monopoly': Monopoly,
+            'road_building': RoadBuilding,
+            'victory_point': VictoryPoint,
+            'year_of_plenty': YearOfPlenty
+        }
+        return type_class_mapping[type]()

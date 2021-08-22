@@ -3,7 +3,7 @@ import numpy as np
 
 class Matplotlib():
     @staticmethod
-    def draw_board(game, scale = 1):
+    def draw_board(game, scale = 2):
         average_node_x_position = np.mean([node.x for node in game.distributor.nodes]) * scale
         average_node_y_position = np.mean([node.y for node in game.distributor.nodes]) * scale
         x_shift, y_shift = -average_node_x_position, -average_node_y_position

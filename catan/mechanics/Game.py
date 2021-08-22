@@ -1,9 +1,9 @@
 from .drawing.HexagonDrawing import HexagonDrawing
 import random
 import copy
-
 from ..objects.board.Port import Port
 from .Distributor import Distributor
+from ..objects.cards.ResourceCard import ResourceCard
 
 class Game:
     def __init__(self, config, num_hexagons = 19):
@@ -17,6 +17,27 @@ class Game:
         self.assign_resource_types_to_hexagons()
         self.assign_roll_nums_to_hexagons()
         self.assign_ports_to_coast_nodes()
+    
+    def setup_cards(self):
+        self.resource_cards = {
+            resource_type: [
+                ResourceCard(resource_type) for _ in range(self.num_hexagons)
+            ] for resource_type in self.config['resource_types'].keys()
+            if resource_type != 'desert'
+        }
+        self.development_cards = []
+        development_card_type_counts = copy.deepcopy(self.config['development_card_type_counts'])
+        for _ in range(round(self.num_hexagons * 25 / 19)):
+            development_card_type = random.choices(
+                population = [development_card_type for development_card_type in development_card_type_counts.keys()],
+                weights = [count for count in development_card_type_counts.values()],
+                k = 1
+            )[0]
+            development_card = self.distributor.get_development_card(development_card_type)
+            self.development_cards.append(development_card)
+            development_card_type_counts[development_card_type] -= 1
+            if sum(development_card_type_counts.values()) == 0:
+                development_card_type_counts = copy.deepcopy(self.config['development_card_type_counts']) 
     
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])

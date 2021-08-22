@@ -1,5 +1,5 @@
-from DevelopmentCard import DevelopmentCard
+from .DevelopmentCard import DevelopmentCard
 
 class VictoryPoint(DevelopmentCard):
     def __init__(self):
-        pass
+        self.name = 'victory_point'
