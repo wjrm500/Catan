@@ -1,13 +1,15 @@
-from catan.objects.cards.development.YearOfPlenty import YearOfPlenty
-from catan.objects.cards.development.VictoryPoint import VictoryPoint
-from catan.objects.cards.development.RoadBuilding import RoadBuilding
-from catan.objects.cards.development.Monopoly import Monopoly
-from catan.objects.cards.development.Knight import Knight
+from ..objects.board.Hexagon import Hexagon
 from ..objects.board.Line import Line
 from ..objects.board.Node import Node
+from catan.objects.cards.development.Knight import Knight
+from catan.objects.cards.development.Monopoly import Monopoly
+from catan.objects.cards.development.RoadBuilding import RoadBuilding
+from catan.objects.cards.development.VictoryPoint import VictoryPoint
+from catan.objects.cards.development.YearOfPlenty import YearOfPlenty
 
 class Distributor:
     def __init__(self):
+        self.hexagons = []
         self.lines = []
         self.nodes = []
     
@@ -15,7 +17,7 @@ class Distributor:
         for line in self.lines:
             if line.test(start_node, end_node):
                 return line
-        line = Line(start_node, end_node)
+        line = Line(len(self.lines) + 1, start_node, end_node)
         self.lines.append(line)
         return line
     
@@ -23,9 +25,12 @@ class Distributor:
         for node in self.nodes:
             if node.test(x, y):
                 return node
-        node = Node(x, y)
+        node = Node(len(self.nodes) + 1, x, y)
         self.nodes.append(node)
         return node
+    
+    def get_hexagon(self, nodes, lines):
+        return Hexagon(len(self.hexagons) + 1, nodes, lines)
     
     def get_development_card(self, type):
         type_class_mapping = {

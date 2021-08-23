@@ -1,7 +1,8 @@
 import numpy as np
 
 class Hexagon:
-    def __init__(self, lines, nodes):
+    def __init__(self, hexagon_id, lines, nodes):
+        self.id = hexagon_id
         self.lines = lines
         self.nodes = nodes
         self.resource_type = None

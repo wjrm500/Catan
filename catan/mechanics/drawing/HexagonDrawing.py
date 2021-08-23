@@ -1,5 +1,4 @@
 import math
-from ...objects.board.Hexagon import Hexagon
 
 class HexagonDrawing:
     @classmethod
@@ -32,4 +31,4 @@ class HexagonDrawing:
             nodes.append(node)
             lines.append(line)
             angle += math.pi / 3
-        return Hexagon(lines, nodes)
+        return distributor.get_hexagon(lines, nodes)

@@ -4,11 +4,16 @@ import copy
 from ..objects.board.Port import Port
 from .Distributor import Distributor
 from ..objects.cards.ResourceCard import ResourceCard
+from .Player import Player
+from ..objects.movable_pieces.City import City
+from ..objects.movable_pieces.Road import Road
+from ..objects.movable_pieces.Settlement import Settlement
 
 class Game:
-    def __init__(self, config, num_hexagons = 19):
+    def __init__(self, config, player_names, num_hexagons = 19):
         self.config = config
         self.num_hexagons = num_hexagons
+        self.players = [Player(player_name) for player_name in player_names]
         self.hexagons = []
         self.distributor = Distributor()
     
@@ -39,6 +44,12 @@ class Game:
             if sum(development_card_type_counts.values()) == 0:
                 development_card_type_counts = copy.deepcopy(self.config['development_card_type_counts']) 
     
+    def setup_movable_pieces(self):
+        for player in self.players:
+            player.cities = [City() for _ in range(round(self.num_hexagons * 4 / 19))]
+            player.roads = [Road() for _ in range(round(self.num_hexagons * 15 / 19))]
+            player.settlements = [Settlement() for _ in range(round(self.num_hexagons * 5 / 19))]
+
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])
         for hexagon in self.hexagons:
