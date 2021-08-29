@@ -56,5 +56,6 @@ class Matplotlib():
                     ha = 'center',
                     va = 'center',
                     color = game.config['resource_types'][hexagon.resource_type]['color']
-                ) 
+                )
+        plt.axis('off')
         plt.show()
