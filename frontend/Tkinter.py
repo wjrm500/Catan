@@ -5,11 +5,11 @@ class TkinterFrontend():
         self.game = game
         self.root = tkinter.Tk()
         self.root.title('Catan')
-        canvas_width = canvas_height = 500
+        initial_canvas_width = initial_canvas_height = 500
         self.canvas = tkinter.Canvas(
             self.root,
-            width = canvas_width,
-            height = canvas_height,
+            width = initial_canvas_width,
+            height = initial_canvas_height,
         )
         self.canvas.pack(fill = "both", expand = True)
     
@@ -27,14 +27,26 @@ class TkinterFrontend():
         y_shift = -min(node_y_values)
         x_max = max(node_x_values) + x_shift
         y_max = max(node_y_values) + y_shift
-        scale = min(self.canvas.winfo_width() / x_max, self.canvas.winfo_height() / y_max)
+        canvas_width = self.canvas.winfo_width()
+        canvas_height = self.canvas.winfo_height()
+        canvas_x_max_ratio = canvas_width / x_max
+        canvas_y_max_ratio = canvas_height / y_max
+        scale = min(canvas_x_max_ratio, canvas_y_max_ratio) * 0.95
+
+        x_centre_shift = (canvas_width - x_max * scale) / 2
+        y_centre_shift = (canvas_height - y_max * scale) / 2
+
+        ### Centre horizontally when canvas_x_max_ratio > canvas_y_max_ratio
+        ### Centre vertically when canvas_x_max_ratio < canvas_y_max_ratio
+
         for hexagon in self.game.hexagons:
             for line in hexagon.lines:
+                x_start_point = (line.start_node.x + x_shift) * scale + x_centre_shift
+                y_start_point = (line.start_node.y + y_shift) * scale + y_centre_shift
+                x_end_point = (line.end_node.x + x_shift) * scale + x_centre_shift
+                y_end_point = (line.end_node.y + y_shift) * scale + y_centre_shift
                 self.canvas.create_line(
-                    (line.start_node.x + x_shift) * scale,
-                    (line.start_node.y + y_shift) * scale,
-                    (line.end_node.x + x_shift) * scale,
-                    (line.end_node.y + y_shift) * scale
+                    x_start_point, y_start_point, x_end_point, y_end_point
                 )
 
     def resize(self, event):
