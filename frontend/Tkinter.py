@@ -1,32 +1,48 @@
 import tkinter
-import numpy as np
 
 class TkinterFrontend():
-    @staticmethod
-    def draw_board(game, scale = 25):
-        window = tkinter.Tk()
-        window.title('Catan')
-        canvas_height = canvas_width = 500
-        c = tkinter.Canvas(window, height = canvas_height, width = canvas_width)
-        c.pack()
-        
-
-        node_x_values = [node.x for node in game.distributor.nodes]
-        node_y_values = [node.y for node in game.distributor.nodes]
-        print(min(node_x_values))
-        print(min(node_y_values))
-
-        ### TODO: Scale and centre board in Tkinter window
-
-        average_node_x_position = np.mean(node_x_values) * scale
-        average_node_y_position = np.mean(node_y_values) * scale
-        x_shift, y_shift = -average_node_x_position, -average_node_y_position
-        for hexagon in game.hexagons:
+    def __init__(self, game):
+        self.game = game
+        self.root = tkinter.Tk()
+        self.root.title('Catan')
+        canvas_width = canvas_height = 500
+        self.canvas = tkinter.Canvas(
+            self.root,
+            width = canvas_width,
+            height = canvas_height,
+        )
+        self.canvas.pack(fill = "both", expand = True)
+    
+    def run(self):
+        self.draw_board()
+        self.root.bind('<Configure>', self.resize)
+        self.root.bind('<Button-1>', self.get_origin)
+        self.root.mainloop()
+    
+    def draw_board(self):
+        self.canvas.delete('all')
+        node_x_values = [node.x for node in self.game.distributor.nodes]
+        node_y_values = [node.y for node in self.game.distributor.nodes]
+        x_shift = -min(node_x_values)
+        y_shift = -min(node_y_values)
+        x_max = max(node_x_values) + x_shift
+        y_max = max(node_y_values) + y_shift
+        scale = min(self.canvas.winfo_width() / x_max, self.canvas.winfo_height() / y_max)
+        for hexagon in self.game.hexagons:
             for line in hexagon.lines:
-                c.create_line(
-                    line.start_node.x * scale + x_shift + (canvas_width / 2),
-                    line.start_node.y * scale + y_shift + (canvas_height / 2),
-                    line.end_node.x * scale + x_shift + (canvas_width / 2),
-                    line.end_node.y * scale + y_shift + (canvas_height / 2)
+                self.canvas.create_line(
+                    (line.start_node.x + x_shift) * scale,
+                    (line.start_node.y + y_shift) * scale,
+                    (line.end_node.x + x_shift) * scale,
+                    (line.end_node.y + y_shift) * scale
                 )
-        window.mainloop()
+
+    def resize(self, event):
+        self.canvas.pack(fill = "both", expand = True)
+        self.draw_board()
+    
+    def get_origin(self, event_origin):
+        global x, y
+        x = event_origin.x
+        y = event_origin.y
+        print(x,y)
