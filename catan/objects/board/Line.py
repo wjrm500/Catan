@@ -23,4 +23,5 @@ class Line:
         return angle
 
     def test(self, start_node, end_node):
-        return self.start_node == start_node and self.end_node == end_node
+        # return self.start_node.test(start_node.x, start_node.y) and self.end_node.test(end_node.x, end_node.y)
+        return (self.start_node is start_node and self.end_node is end_node) or (self.start_node is end_node and self.end_node is start_node)

@@ -15,6 +15,7 @@ class Hexagon:
             node.hexagons.append(self)
             if len(node.hexagons) == 3:
                 node.on_coast = False
+        self.selected = False
     
     def set_resource_type(self, resource_type):
         self.resource_type = resource_type
@@ -28,7 +29,7 @@ class Hexagon:
             if len(node.lines) < 3:
                 return node
     
-    def centre_point(self):
-        centre_point_x = np.mean([node.x for node in self.nodes])
-        centre_point_y = np.mean([node.y for node in self.nodes])
+    def centre_point(self, real = False):
+        centre_point_x = np.mean([node.real_x if real else node.x for node in self.nodes])
+        centre_point_y = np.mean([node.real_y if real else node.y for node in self.nodes])
         return (centre_point_x, centre_point_y)
