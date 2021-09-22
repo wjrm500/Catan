@@ -14,11 +14,13 @@ class TkinterFrontend():
             cursor = 'X_cursor'
         )
         self.canvas.pack(fill = "both", expand = True)
+        self.tk_lines = [] ### Tkinter line objects from create_line
+        self.tk_ovals = [] ### Tkinter oval objects from create_oval
     
     def run(self):
-        # self.draw_board()
         self.root.bind('<Configure>', self.resize)
         self.root.bind('<Button-1>', self.colour_hexagon)
+        self.root.bind('<Motion>', self.node_bubbles)
         self.root.mainloop()
     
     def draw_board(self):
@@ -70,10 +72,11 @@ class TkinterFrontend():
             x_end_point = (end_node.x + x_shift) * scale + x_centre_shift
             y_end_point = (end_node.y + y_shift) * scale + y_centre_shift
             hexagon_selected = any(hexagon.selected for hexagon in line.hexagons)
-            self.canvas.create_line(
-                start_node.real_x, start_node.real_y, x_end_point, y_end_point, fill = 'red' if hexagon_selected else 'black'
+            tk_line = self.canvas.create_line(
+                start_node.real_x, start_node.real_y, x_end_point, y_end_point, fill = 'red' if hexagon_selected else 'black', tags = 'tk_line'
             )
-        for hexagon in self.game.hexagons:
+            self.tk_lines.append(tk_line)
+        for hexagon in self.game.hexagons: ### For colour_hexagon binding
             self.centre_points.append(hexagon.centre_point(True))
 
     def resize(self, event):
@@ -91,3 +94,14 @@ class TkinterFrontend():
             hexagon.selected = False
         hexagon_to_colour.selected = True
         self.draw_board()
+    
+    def node_bubbles(self, event_origin):
+        self.canvas.delete('tk_oval')
+        x1 = event_origin.x
+        y1 = event_origin.y
+        node_dists = [(node, math.sqrt(pow(node.real_x - x1, 2) + pow(node.real_y - y1, 2))) for node in self.game.distributor.nodes]
+        for node, dist in node_dists:
+            rev_dist = max(100 - dist, 0)
+            circle_radius = rev_dist / 5
+            tk_oval = self.canvas.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = 'tk_oval')
+            self.tk_ovals.append(tk_oval)
