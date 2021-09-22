@@ -14,11 +14,10 @@ class Game:
         self.config = config
         self.num_hexagons = num_hexagons
         self.players = [Player(player_name) for player_name in player_names]
-        self.hexagons = []
         self.distributor = Distributor()
     
     def setup_board(self):
-        self.hexagons = HexagonDrawing.draw_hexagons(self)
+        HexagonDrawing.draw_hexagons(self)
         self.assign_resource_types_to_hexagons()
         self.assign_roll_nums_to_hexagons()
         self.assign_ports_to_coast_nodes()
@@ -52,7 +51,7 @@ class Game:
 
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])
-        for hexagon in self.hexagons:
+        for hexagon in self.distributor.hexagons:
             random_resource_type = random.choices(
                 population = [resource_type for resource_type in resource_types.keys()],
                 weights = [info['count'] for info in resource_types.values()],
@@ -65,7 +64,7 @@ class Game:
     
     def assign_roll_nums_to_hexagons(self):
         roll_num_counts = copy.deepcopy(self.config['roll_num_counts'])
-        for hexagon in self.hexagons:
+        for hexagon in self.distributor.hexagons:
             if hexagon.resource_type == 'desert':
                 continue
             random_roll_num = random.choices(
