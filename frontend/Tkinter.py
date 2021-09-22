@@ -31,13 +31,13 @@ class TkinterFrontend():
         y_shift = -min(node_y_values)
         x_max = max(node_x_values) + x_shift
         y_max = max(node_y_values) + y_shift
-        canvas_width = self.canvas.winfo_width()
-        canvas_height = self.canvas.winfo_height()
-        canvas_x_max_ratio = canvas_width / x_max
-        canvas_y_max_ratio = canvas_height / y_max
-        scale = min(canvas_x_max_ratio, canvas_y_max_ratio) * 0.95
-        x_centre_shift = (canvas_width - x_max * scale) / 2
-        y_centre_shift = (canvas_height - y_max * scale) / 2
+        self.canvas_width = self.canvas.winfo_width()
+        self.canvas_height = self.canvas.winfo_height()
+        canvas_x_max_ratio = self.canvas_width / x_max
+        canvas_y_max_ratio = self.canvas_height / y_max
+        self.scale = min(canvas_x_max_ratio, canvas_y_max_ratio) * 0.95
+        x_centre_shift = (self.canvas_width - x_max * self.scale) / 2
+        y_centre_shift = (self.canvas_height - y_max * self.scale) / 2
         self.centre_points = []
         # for hexagon in self.game.hexagons:
         #     for line in hexagon.lines:
@@ -67,10 +67,10 @@ class TkinterFrontend():
         for line in self.game.distributor.lines:
             start_node = line.start_node
             end_node = line.end_node
-            start_node.real_x = (start_node.x + x_shift) * scale + x_centre_shift
-            start_node.real_y = (start_node.y + y_shift) * scale + y_centre_shift
-            x_end_point = (end_node.x + x_shift) * scale + x_centre_shift
-            y_end_point = (end_node.y + y_shift) * scale + y_centre_shift
+            start_node.real_x = (start_node.x + x_shift) * self.scale + x_centre_shift
+            start_node.real_y = (start_node.y + y_shift) * self.scale + y_centre_shift
+            x_end_point = (end_node.x + x_shift) * self.scale + x_centre_shift
+            y_end_point = (end_node.y + y_shift) * self.scale + y_centre_shift
             hexagon_selected = any(hexagon.selected for hexagon in line.hexagons)
             tk_line = self.canvas.create_line(
                 start_node.real_x, start_node.real_y, x_end_point, y_end_point, fill = 'red' if hexagon_selected else 'black', tags = 'tk_line'
@@ -100,8 +100,10 @@ class TkinterFrontend():
         x1 = event_origin.x
         y1 = event_origin.y
         node_dists = [(node, math.sqrt(pow(node.real_x - x1, 2) + pow(node.real_y - y1, 2))) for node in self.game.distributor.nodes]
+        min_node_dist = min(map(lambda x: x[1], node_dists))
         for node, dist in node_dists:
-            rev_dist = max(100 - dist, 0)
-            circle_radius = rev_dist / 5
-            tk_oval = self.canvas.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = 'tk_oval')
+            reversed_dist = max(self.scale - dist, 0)
+            circle_radius = reversed_dist / 5
+            fill_color = 'limegreen' if dist == min_node_dist else 'darkgrey'
+            tk_oval = self.canvas.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = 'tk_oval', fill = fill_color)
             self.tk_ovals.append(tk_oval)
