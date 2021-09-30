@@ -104,7 +104,11 @@ class TkinterFrontend():
             self.canvas.delete(hexagon_tag)
         points = [[node.real_x, node.real_y] for node in hexagon.nodes]
         points = [item for sublist in points for item in sublist]
-        tk_hexagon = self.canvas.create_polygon(points, fill = '', outline = 'black', tags = ['tk_hexagon', hexagon_tag], width = 5 * lw_factor if lw_factor else 1)
+        fill_color = self.game.config['resource_types'][hexagon.resource_type]['color']
+        x, y = hexagon.centre_point(True)
+        
+        tk_hexagon = self.canvas.create_polygon(points, fill = fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag], width = 5 * lw_factor if lw_factor else 1)
+        self.canvas.create_text(x, y, fill = 'white', font = "Arial 14 bold", text = hexagon.roll_num)
         self.tk_hexagons.append(tk_hexagon)
 
     def draw_tk_oval(self, node, circle_radius, fill = 'white', width = 1):
