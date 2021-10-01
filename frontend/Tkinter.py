@@ -120,8 +120,8 @@ class TkinterFrontend():
         hex_fill_color = self.game.config['resource_types'][hexagon.resource_type]['color']
         if focused: ### Darken color
             color_utils = ColorUtils()
-            (r, g, b) = color_utils.hex_to_rgb(hex_fill_color)
-            rgb_fill_color = color_utils.darken_color(r, g, b, 0.2)
+            rgb = color_utils.hex_to_rgb(hex_fill_color)
+            rgb_fill_color = color_utils.darken_color(rgb, 0.2)
             hex_fill_color = color_utils.rgb_to_hex(rgb_fill_color)
         tk_hexagon = self.canvas.create_polygon(points, fill = hex_fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag], width = 5 if focused else 1)
         x, y = hexagon.centre_point(True)
