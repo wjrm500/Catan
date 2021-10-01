@@ -1,17 +1,11 @@
 import tkinter
-from .MainLoop import MainLoop
-from catan.mechanics.Game import Game
-from config import config
+from .Phase import Phase
 
-class Home:
-    def __init__(self):
-        self.root = tkinter.Tk()
+class SetupPhase(Phase):
+    def __init__(self, chaperone):
+        super().__init__(chaperone)
         self.root.geometry('500x500')
-        self.root.title('Catan')
         self.root.minsize(250, 250)
-        self.FONT_NAME = 'Arial' ### Could belong to a base class
-        self.FONT_SIZE = '10'
-        self.FONT_WEIGHT = 'bold'
         label = 'Number of hexagons:'
         self.num_hexagons_label = tkinter.Text(self.root, font = self.get_font(), foreground = 'black', background = '#eeeeee', width = 25, height = 2, bd = 0)
         self.num_hexagons_label.tag_configure('tag-center', justify = 'center')
@@ -22,9 +16,6 @@ class Home:
         self.num_hexagons_input.focus()
         self.enter_button = tkinter.Button(self.root, text = 'SUBMIT', font = self.get_font(), foreground = 'white', background = 'red', width = 10, height = 1)
         self.enter_button.place(relx = 0.5, rely = 0.55, anchor = tkinter.CENTER)    
-    
-    def get_font(self):
-        return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
 
     def run(self):
         self.enter_button.bind('<Button-1>', self.go_to_main_loop)
@@ -37,13 +28,7 @@ class Home:
         if num_hexagons.isnumeric():
             num_hexagons = int(num_hexagons)
             if num_hexagons in range(5, 51):
-                self.root.destroy()
-                game = Game(config, ['Will', 'Kate'], num_hexagons = num_hexagons)
-                game.setup_board()
-                game.setup_cards()
-                game.setup_movable_pieces()
-                tk = MainLoop(game)
-                tk.run()
+                self.chaperone.start_main_phase(num_hexagons)
             else:
                 error = 'Number of hexagons must be between 5 and 50'
         else:
@@ -53,5 +38,3 @@ class Home:
             error_text.tag_configure('tag-center', justify = 'center')
             error_text.insert(tkinter.END, error, 'tag-center')
             error_text.place(relx = 0.5, rely = 0.6, anchor = tkinter.CENTER)
-
-        

@@ -1,13 +1,12 @@
 from catan.mechanics.drawing.ColorUtils import ColorUtils
 import tkinter
 import math
+from .Phase import Phase
 
-class MainLoop():
-    def __init__(self, game):
-        self.game = game
-        self.root = tkinter.Tk()
+class MainPhase(Phase):
+    def __init__(self, chaperone):
+        super().__init__(chaperone)
         self.root.geometry('1000x500')
-        self.root.title('Catan')
         self.left_frame = tkinter.Frame(self.root)
         self.right_frame = tkinter.Frame(self.root, background = 'white')
         self.left_frame.grid(row = 0, column = 0, sticky = 'nsew')
@@ -20,6 +19,9 @@ class MainLoop():
         self.focused_hexagons = []
         self.color_utils = ColorUtils()
         self.set_colors()
+    
+    def set_game(self, game):
+        self.game = game
 
     def set_colors(self):
         self.background_colors = self.set_background_colors()
@@ -29,25 +31,25 @@ class MainLoop():
     
     def set_background_colors(self):
         d = {}
-        for resource_type, data in self.game.config['resource_types'].items():
+        for resource_type, data in self.chaperone.config['resource_types'].items():
             d[resource_type] = data['color']
         return d
     
     def set_focused_background_colors(self):
         d = {}
-        for resource_type, data in self.game.config['resource_types'].items():
+        for resource_type, data in self.chaperone.config['resource_types'].items():
             d[resource_type] = self.color_utils.darken_hex(data['color'], 0.2)
         return d
     
     def set_text_colors(self):
         d = {}
-        for resource_type, data in self.game.config['resource_types'].items():
+        for resource_type, data in self.chaperone.config['resource_types'].items():
             d[resource_type] = self.color_utils.darken_hex(data['color'], 0.4)
         return d
     
     def set_focused_text_colors(self):
         d = {}
-        for resource_type, data in self.game.config['resource_types'].items():
+        for resource_type, data in self.chaperone.config['resource_types'].items():
             d[resource_type] = self.color_utils.darken_hex(data['color'], 0.6)
         return d
     
