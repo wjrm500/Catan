@@ -1,3 +1,4 @@
+from catan.mechanics.drawing.ColorUtils import ColorUtils
 import tkinter
 import math
 from types import SimpleNamespace
@@ -107,21 +108,26 @@ class TkinterFrontend():
         cursor = 'hand2' if min_node_dist / self.scale < 0.2 else ''
         self.canvas.config(cursor = cursor)
             
-    def draw_tk_hexagon(self, hexagon, thicken = False):
+    def draw_tk_hexagon(self, hexagon, focused = False):
         self.hexagons_drawn += 1
         print(self.hexagons_drawn)
 
         hexagon_tag = self.hexagon_tag(hexagon)
-        if thicken:
+        if focused:
             self.canvas.delete(hexagon_tag)
         points = [[node.real_x, node.real_y] for node in hexagon.nodes]
         points = [item for sublist in points for item in sublist]
-        fill_color = self.game.config['resource_types'][hexagon.resource_type]['color']
-        tk_hexagon = self.canvas.create_polygon(points, fill = fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag], width = 5 if thicken else 1)
+        hex_fill_color = self.game.config['resource_types'][hexagon.resource_type]['color']
+        if focused: ### Darken color
+            color_utils = ColorUtils()
+            (r, g, b) = color_utils.hex_to_rgb(hex_fill_color)
+            rgb_fill_color = color_utils.darken_color(r, g, b, 0.2)
+            hex_fill_color = color_utils.rgb_to_hex(rgb_fill_color)
+        tk_hexagon = self.canvas.create_polygon(points, fill = hex_fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag], width = 5 if focused else 1)
         x, y = hexagon.centre_point(True)
         self.canvas.create_text(x, y, fill = 'white', font = "Arial 14 bold", text = hexagon.roll_num)
         self.tk_hexagons.append(tk_hexagon)
-        if thicken:
+        if focused:
             self.thickened_hexagons.append(hexagon)
 
     def draw_tk_oval(self, node, circle_radius, fill = 'white', width = 1):
