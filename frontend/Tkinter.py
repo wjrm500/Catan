@@ -7,16 +7,17 @@ class TkinterFrontend():
     def __init__(self, game):
         self.game = game
         self.root = tkinter.Tk()
+        self.root.geometry('1000x500')
         self.root.title('Catan')
-        initial_canvas_width = initial_canvas_height = 500
-        self.canvas = tkinter.Canvas(
-            self.root,
-            width = initial_canvas_width,
-            height = initial_canvas_height
-        )
-        self.canvas.pack(fill = "both", expand = True)
-        self.tk_hexagons = [] ### Tkinter polygon objects from create_polygon
-        self.tk_ovals = [] ### Tkinter oval objects from create_oval
+        self.left_frame = tkinter.Frame(self.root)
+        self.right_frame = tkinter.Frame(self.root, background = 'white')
+        self.left_frame.grid(row = 0, column = 0, sticky = 'nsew')
+        self.right_frame.grid(row = 0, column = 1, sticky = 'nsew')
+        self.root.grid_columnconfigure(0, weight = 1, uniform = 'group1')
+        self.root.grid_columnconfigure(1, weight = 1, uniform = 'group1')
+        self.root.grid_rowconfigure(0, weight = 1)
+        self.canvas = tkinter.Canvas(self.left_frame, background = 'lightblue')
+        self.canvas.pack(expand = True)
         self.focused_hexagons = []
         self.color_utils = ColorUtils()
         self.set_colors()
@@ -53,7 +54,8 @@ class TkinterFrontend():
     
     def run(self):
         self.root.bind('<Configure>', self.resize)
-        self.root.bind('<Motion>', self.node_bubbles)
+        self.right_frame.bind('<Motion>', self.reset_transformed_hexagons)
+        self.canvas.bind('<Motion>', self.transform_hexagons)
         self.root.mainloop()
     
     def draw_board(self):
@@ -87,7 +89,12 @@ class TkinterFrontend():
         for hexagon in self.focused_hexagons:
             self.remove_hexagon_border(hexagon)
     
-    def node_bubbles(self, event_origin):
+    def reset_transformed_hexagons(self, event):
+        self.draw_board()
+        for hexagon in self.focused_hexagons:
+            self.remove_hexagon_border(hexagon)
+    
+    def transform_hexagons(self, event_origin):
         ########################
         # Reset canvas objects #
         ########################
@@ -109,7 +116,6 @@ class TkinterFrontend():
             reversed_dist = max(self.scale - dist, 0)
             if closest_to_cursor:
                 hexagons_to_focus = [hexagon for hexagon in node.hexagons]
-            # if reversed_dist > 0: ### Add this line back in if you want multiple white bubbles near cursor
                 circle_radius = reversed_dist / 5
                 fill_color = 'limegreen' if dist / self.scale < 0.2 else 'white'
                 line_width = reversed_dist / 10
@@ -145,7 +151,7 @@ class TkinterFrontend():
         points = [[node.real_x, node.real_y] for node in hexagon.nodes]
         points = [item for sublist in points for item in sublist]
         fill = self.focused_background_colors[hexagon.resource_type] if focused else self.background_colors[hexagon.resource_type]
-        tk_hexagon = self.canvas.create_polygon(points, fill = fill, outline = 'black', tags = ['tk_hexagon', hexagon_tag])
+        self.canvas.create_polygon(points, fill = fill, outline = 'black', tags = ['tk_hexagon', hexagon_tag])
 
         ### Add text elements
         x, y = hexagon.centre_point(True)
@@ -153,7 +159,7 @@ class TkinterFrontend():
         roll_num_offset = -(self.scale / 4) if show_resource_type else 0
         resource_type_offset = self.scale / 4 if show_resource_type and hexagon.resource_type != 'desert' else 0
         pips_offset = self.scale / 2 if show_resource_type else self.scale / 2
-        font_size = round(self.scale / 4)
+        font_size = round(self.scale / 3.5) if focused else round(self.scale / 4)
         roll_num_text = hexagon.roll_num
         self.canvas.create_text(x, y + roll_num_offset, fill = 'black', font = 'Arial {} bold'.format(font_size), text = roll_num_text)
         if show_resource_type:
@@ -164,24 +170,15 @@ class TkinterFrontend():
         pips_fill = self.focused_text_colors[hexagon.resource_type] if focused else self.text_colors[hexagon.resource_type]
         self.canvas.create_text(x, y + pips_offset, fill = pips_fill, font = 'Arial {} bold'.format(font_size), text = pips_text)
 
-        self.tk_hexagons.append(tk_hexagon)
         if focused:
             self.add_hexagon_border(hexagon)
     
-    def remove_hexagon_border(self, hexagon, hexagons_to_focus = []):
-        all_focused_lines = [line for hexagon in hexagons_to_focus for line in hexagon.lines]
-        for line in hexagon.focused_lines:
-            line_tag = self.line_tag(line)
-            self.canvas.delete(line_tag)
-            if line in all_focused_lines:
-                self.canvas.create_line(line.start_node.real_x, line.start_node.real_y, line.end_node.real_x, line.end_node.real_y, tags = line_tag, fill = 'black', width = 5)
-        hexagon.focused_lines = [line for line in hexagon.focused_lines if line in all_focused_lines]
-    
     def add_hexagon_border(self, hexagon):
         show_line_ids = False
+        line_width = round(self.scale / 10)
         for line in hexagon.lines:
             line_tag = self.line_tag(line)
-            self.canvas.create_line(line.start_node.real_x, line.start_node.real_y, line.end_node.real_x, line.end_node.real_y, tags = line_tag, fill = 'black', width = 5)
+            self.canvas.create_line(line.start_node.real_x, line.start_node.real_y, line.end_node.real_x, line.end_node.real_y, tags = line_tag, fill = 'black', width = line_width)
             if show_line_ids:
                 (x, y) = line.centre_point(True)
                 circle_radius = 10
@@ -190,10 +187,19 @@ class TkinterFrontend():
                 self.canvas.create_text(x, y, fill = 'black', font = 'Arial {} bold'.format(font_size), text = line.id)
             if line not in hexagon.focused_lines:
                 hexagon.focused_lines.append(line)
+    
+    def remove_hexagon_border(self, hexagon, hexagons_to_focus = []):
+        all_focused_lines = [line for hexagon in hexagons_to_focus for line in hexagon.lines]
+        line_width = round(self.scale / 10)
+        for line in hexagon.focused_lines:
+            line_tag = self.line_tag(line)
+            self.canvas.delete(line_tag)
+            if line in all_focused_lines:
+                self.canvas.create_line(line.start_node.real_x, line.start_node.real_y, line.end_node.real_x, line.end_node.real_y, tags = line_tag, fill = 'black', width = line_width)
+        hexagon.focused_lines = [line for line in hexagon.focused_lines if line in all_focused_lines]
 
     def draw_tk_oval(self, node, circle_radius, fill = 'white', width = 1):
-        tk_oval = self.canvas.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = 'tk_oval', fill = fill, width = width)
-        self.tk_ovals.append(tk_oval)
+        self.canvas.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = 'tk_oval', fill = fill, width = width)
     
     def hexagon_tag(self, hexagon):
         return 'tk_hexagon_' + str(hexagon.id)
