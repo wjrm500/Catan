@@ -84,14 +84,16 @@ class MainLoop():
 
     def resize(self, event):
         self.canvas.pack(fill = "both", expand = True)
-        self.draw_board()
+        self.focused_hexagons = []
         for hexagon in self.focused_hexagons:
             self.remove_hexagon_border(hexagon)
+        self.draw_board()
     
     def reset_transformed_hexagons(self, event):
-        self.draw_board()
+        self.focused_hexagons = []
         for hexagon in self.focused_hexagons:
             self.remove_hexagon_border(hexagon)
+        self.draw_board()
     
     def transform_hexagons(self, event_origin):
         ########################
