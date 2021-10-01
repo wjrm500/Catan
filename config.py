@@ -5,7 +5,7 @@ config = {
             'count': 3
         },
         'desert': {
-            'color': '#000000',
+            'color': '#F0A055',
             'count': 1
         },
         'grain': {
@@ -13,7 +13,7 @@ config = {
             'count': 4
         },
         'lumber': {
-            'color': '#488C63',
+            'color': '#8BC38F',
             'count': 4
         },
         'ore': {

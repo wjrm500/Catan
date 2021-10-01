@@ -9,7 +9,7 @@ class Matplotlib():
         x_shift, y_shift = -average_node_x_position, -average_node_y_position
         _, ax = plt.subplots()
         ax.set_aspect('equal', adjustable = 'box')
-        for hexagon in game.hexagons:
+        for hexagon in game.distributor.hexagons:
             nodes = hexagon.nodes + [hexagon.nodes[0]]
             port_nodes = [node for node in nodes if node.port]
             for port_node in port_nodes:
@@ -27,7 +27,7 @@ class Matplotlib():
                 color = 'black'
             )
         text_scale = ax.get_xlim()[1] / 10
-        for hexagon in game.hexagons:
+        for hexagon in game.distributor.hexagons:
             text_dicts = [
                 {
                     'font_size': round(16 / text_scale),

@@ -35,7 +35,6 @@ class TkinterFrontend():
             y_shift = -min(node_y_values)
             x_max = max(node_x_values) + x_shift
             y_max = max(node_y_values) + y_shift
-            print('Canvas width and height is: ' + str(self.canvas_width) + ' ' + str(self.canvas_height))
             canvas_x_max_ratio = self.canvas_width / x_max
             canvas_y_max_ratio = self.canvas_height / y_max
             self.scale = min(canvas_x_max_ratio, canvas_y_max_ratio) * 0.95
@@ -79,7 +78,7 @@ class TkinterFrontend():
             if closest_to_cursor:
                 # a = 1
                 hexagons_to_focus = [hexagon for hexagon in node.hexagons]
-            if reversed_dist > 0:
+            # if reversed_dist > 0: ### Add this line back in if you want multiple white bubbles near cursor
                 circle_radius = reversed_dist / 5
                 fill_color = 'limegreen' if dist / self.scale < 0.2 else 'white'
                 line_width = reversed_dist / 10
@@ -122,14 +121,17 @@ class TkinterFrontend():
             hex_fill_color = color_utils.rgb_to_hex(rgb_fill_color)
         tk_hexagon = self.canvas.create_polygon(points, fill = hex_fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag])
         x, y = hexagon.centre_point(True)
-        ###TODO: Adjust font size depending on scale
-        text = hexagon.id ### hexagon.roll_num
-        self.canvas.create_text(x, y, fill = 'white', font = "Arial 10 bold", text = text)
+        roll_num_font_size = round(self.scale / 4)
+        roll_num_text = hexagon.roll_num
+        self.canvas.create_text(x, y, fill = 'black', font = 'Arial {} bold'.format(roll_num_font_size), text = roll_num_text)
+        pips_text = ''.join(['·' for _ in range(hexagon.num_pips)])
+        pips_offset = self.scale / 3
+        self.canvas.create_text(x, y + pips_offset, fill = 'black', font = 'Arial {} bold'.format(roll_num_font_size), text = pips_text)
         self.tk_hexagons.append(tk_hexagon)
         if focused:
             self.add_hexagon_border(hexagon)
     
-    def remove_hexagon_border(self, hexagon, hexagons_to_focus):
+    def remove_hexagon_border(self, hexagon, hexagons_to_focus = []):
         all_focused_lines = [line for hexagon in hexagons_to_focus for line in hexagon.lines]
         for line in hexagon.focused_lines:
             line_tag = self.line_tag(line)
@@ -147,7 +149,8 @@ class TkinterFrontend():
                 (x, y) = line.centre_point(True)
                 circle_radius = 10
                 self.canvas.create_oval(x - circle_radius, y - circle_radius, x + circle_radius, y + circle_radius, fill = 'white', width = 1)
-                self.canvas.create_text(x, y, fill = 'black', font = "Arial 10 bold", text = line.id)
+                font_size = round(self.scale / 4)
+                self.canvas.create_text(x, y, fill = 'black', font = 'Arial {} bold'.format(font_size), text = line.id)
             if line not in hexagon.focused_lines:
                 hexagon.focused_lines.append(line)
 
