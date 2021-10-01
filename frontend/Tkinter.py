@@ -18,6 +18,38 @@ class TkinterFrontend():
         self.tk_hexagons = [] ### Tkinter polygon objects from create_polygon
         self.tk_ovals = [] ### Tkinter oval objects from create_oval
         self.focused_hexagons = []
+        self.color_utils = ColorUtils()
+        self.set_colors()
+
+    def set_colors(self):
+        self.background_colors = self.set_background_colors()
+        self.focused_background_colors = self.set_focused_background_colors()
+        self.text_colors = self.set_text_colors()
+        self.focused_text_colors = self.set_focused_text_colors()
+    
+    def set_background_colors(self):
+        d = {}
+        for resource_type, data in self.game.config['resource_types'].items():
+            d[resource_type] = data['color']
+        return d
+    
+    def set_focused_background_colors(self):
+        d = {}
+        for resource_type, data in self.game.config['resource_types'].items():
+            d[resource_type] = self.color_utils.darken_hex(data['color'], 0.2)
+        return d
+    
+    def set_text_colors(self):
+        d = {}
+        for resource_type, data in self.game.config['resource_types'].items():
+            d[resource_type] = self.color_utils.darken_hex(data['color'], 0.4)
+        return d
+    
+    def set_focused_text_colors(self):
+        d = {}
+        for resource_type, data in self.game.config['resource_types'].items():
+            d[resource_type] = self.color_utils.darken_hex(data['color'], 0.6)
+        return d
     
     def run(self):
         self.root.bind('<Configure>', self.resize)
@@ -76,7 +108,6 @@ class TkinterFrontend():
             closest_to_cursor = dist == min_node_dist
             reversed_dist = max(self.scale - dist, 0)
             if closest_to_cursor:
-                # a = 1
                 hexagons_to_focus = [hexagon for hexagon in node.hexagons]
             # if reversed_dist > 0: ### Add this line back in if you want multiple white bubbles near cursor
                 circle_radius = reversed_dist / 5
@@ -113,20 +144,26 @@ class TkinterFrontend():
             self.canvas.delete(hexagon_tag)
         points = [[node.real_x, node.real_y] for node in hexagon.nodes]
         points = [item for sublist in points for item in sublist]
-        hex_fill_color = self.game.config['resource_types'][hexagon.resource_type]['color']
-        if focused: ### Darken color
-            color_utils = ColorUtils()
-            rgb = color_utils.hex_to_rgb(hex_fill_color)
-            rgb_fill_color = color_utils.darken_color(rgb, 0.2)
-            hex_fill_color = color_utils.rgb_to_hex(rgb_fill_color)
-        tk_hexagon = self.canvas.create_polygon(points, fill = hex_fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag])
+        fill = self.focused_background_colors[hexagon.resource_type] if focused else self.background_colors[hexagon.resource_type]
+        tk_hexagon = self.canvas.create_polygon(points, fill = fill, outline = 'black', tags = ['tk_hexagon', hexagon_tag])
+
+        ### Add text elements
         x, y = hexagon.centre_point(True)
-        roll_num_font_size = round(self.scale / 4)
+        show_resource_type = self.scale > 50
+        roll_num_offset = -(self.scale / 4) if show_resource_type else 0
+        resource_type_offset = self.scale / 4 if show_resource_type and hexagon.resource_type != 'desert' else 0
+        pips_offset = self.scale / 2 if show_resource_type else self.scale / 2
+        font_size = round(self.scale / 4)
         roll_num_text = hexagon.roll_num
-        self.canvas.create_text(x, y, fill = 'black', font = 'Arial {} bold'.format(roll_num_font_size), text = roll_num_text)
+        self.canvas.create_text(x, y + roll_num_offset, fill = 'black', font = 'Arial {} bold'.format(font_size), text = roll_num_text)
+        if show_resource_type:
+            resource_type_text = hexagon.resource_type.upper()
+            resource_type_fill = self.focused_text_colors[hexagon.resource_type] if focused else self.text_colors[hexagon.resource_type]
+            self.canvas.create_text(x, y + resource_type_offset, fill = resource_type_fill, font = 'Arial {} bold'.format(font_size - 4), text = resource_type_text)
         pips_text = ''.join(['·' for _ in range(hexagon.num_pips)])
-        pips_offset = self.scale / 3
-        self.canvas.create_text(x, y + pips_offset, fill = 'black', font = 'Arial {} bold'.format(roll_num_font_size), text = pips_text)
+        pips_fill = self.focused_text_colors[hexagon.resource_type] if focused else self.text_colors[hexagon.resource_type]
+        self.canvas.create_text(x, y + pips_offset, fill = pips_fill, font = 'Arial {} bold'.format(font_size), text = pips_text)
+
         self.tk_hexagons.append(tk_hexagon)
         if focused:
             self.add_hexagon_border(hexagon)
