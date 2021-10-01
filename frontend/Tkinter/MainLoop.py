@@ -156,20 +156,20 @@ class MainLoop():
 
         ### Add text elements
         x, y = hexagon.centre_point(True)
+        text_fill = self.focused_text_colors[hexagon.resource_type] if focused else self.text_colors[hexagon.resource_type]
         show_resource_type = self.scale > 50
         roll_num_offset = -(self.scale / 4) if show_resource_type else 0
         resource_type_offset = self.scale / 4 if show_resource_type and hexagon.resource_type != 'desert' else 0
         pips_offset = self.scale / 2 if show_resource_type else self.scale / 2
-        font_size = round(self.scale / 3.5) if focused else round(self.scale / 4)
+        font_size = round(self.scale / 3.5 if focused else self.scale / 4)
+        roll_num_font_size = round(font_size * 0.75 * math.sqrt(hexagon.num_pips))
         roll_num_text = hexagon.roll_num
-        self.canvas.create_text(x, y + roll_num_offset, fill = 'black', font = 'Arial {} bold'.format(font_size), text = roll_num_text)
+        self.canvas.create_text(x, y + roll_num_offset, fill = text_fill, font = 'Arial {} bold'.format(roll_num_font_size), text = roll_num_text)
         if show_resource_type:
             resource_type_text = hexagon.resource_type.upper()
-            resource_type_fill = self.focused_text_colors[hexagon.resource_type] if focused else self.text_colors[hexagon.resource_type]
-            self.canvas.create_text(x, y + resource_type_offset, fill = resource_type_fill, font = 'Arial {} bold'.format(font_size - 4), text = resource_type_text)
+            self.canvas.create_text(x, y + resource_type_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size - 4), text = resource_type_text)
         pips_text = ''.join(['·' for _ in range(hexagon.num_pips)])
-        pips_fill = self.focused_text_colors[hexagon.resource_type] if focused else self.text_colors[hexagon.resource_type]
-        self.canvas.create_text(x, y + pips_offset, fill = pips_fill, font = 'Arial {} bold'.format(font_size), text = pips_text)
+        self.canvas.create_text(x, y + pips_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size), text = pips_text)
 
         if focused:
             self.add_hexagon_border(hexagon)
@@ -188,6 +188,11 @@ class MainLoop():
                 self.canvas.create_text(x, y, fill = 'black', font = 'Arial {} bold'.format(font_size), text = line.id)
             if line not in hexagon.focused_lines:
                 hexagon.focused_lines.append(line)
+        ### Filler circles to bridge gap between lines, which is especially visible with larger hexagons
+        r = line_width / 2.5
+        for node in hexagon.nodes:
+            node_tag = self.node_tag(node)
+            self.canvas.create_oval(node.real_x - r, node.real_y - r, node.real_x + r, node.real_y + r, tags = node_tag, fill = 'black', outline = '')        
     
     def remove_hexagon_border(self, hexagon, hexagons_to_focus = []):
         all_focused_lines = [line for hexagon in hexagons_to_focus for line in hexagon.lines]
@@ -195,8 +200,15 @@ class MainLoop():
         for line in hexagon.focused_lines:
             line_tag = self.line_tag(line)
             self.canvas.delete(line_tag)
+            for node in line.nodes:
+                node_tag = self.node_tag(node)
+                self.canvas.delete(node_tag)
             if line in all_focused_lines:
                 self.canvas.create_line(line.start_node.real_x, line.start_node.real_y, line.end_node.real_x, line.end_node.real_y, tags = line_tag, fill = 'black', width = line_width)
+                r = line_width / 2.5
+                for node in line.nodes:
+                    node_tag = self.node_tag(node)
+                    self.canvas.create_oval(node.real_x - r, node.real_y - r, node.real_x + r, node.real_y + r, tags = node_tag, fill = 'black', outline = '')
         hexagon.focused_lines = [line for line in hexagon.focused_lines if line in all_focused_lines]
 
     def draw_tk_oval(self, node, circle_radius, fill = 'white', width = 1):
@@ -207,3 +219,6 @@ class MainLoop():
 
     def line_tag(self, line):
         return 'tk_line_' + str(line.id)
+
+    def node_tag(self, node):
+        return 'tk_node_' + str(node.id)
