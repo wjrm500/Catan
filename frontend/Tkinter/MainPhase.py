@@ -1,4 +1,4 @@
-from catan.mechanics.drawing.ColorUtils import ColorUtils
+from frontend.ColorUtils import ColorUtils
 import tkinter
 import math
 from .Phase import Phase
@@ -144,7 +144,7 @@ class MainPhase(Phase):
         for args in draw_tk_oval_args_list:
             self.draw_tk_oval(args['node'], args['circle_radius'], fill = args['fill'], width = args['width'])
         
-        cursor = 'hand2' if min_node_dist / self.scale < 0.2 else ''
+        cursor = self.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
         self.canvas.config(cursor = cursor)
             
     def draw_tk_hexagon(self, hexagon, focused = False):

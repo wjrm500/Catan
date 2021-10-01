@@ -1,6 +1,8 @@
 import tkinter
 
 class Phase:
+    CURSOR_HAND = 'hand2'
+
     def __init__(self, chaperone):
         self.chaperone = chaperone
         self.root = tkinter.Tk()
