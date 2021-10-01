@@ -49,13 +49,12 @@ class TkinterFrontend():
 
             for hexagon in self.game.distributor.hexagons:
                 self.draw_tk_hexagon(hexagon)
-            
-            self.node_bubbles(SimpleNamespace(x = 350, y = 200))
-            self.node_bubbles(SimpleNamespace(x = 300, y = 225))
 
     def resize(self, event):
         self.canvas.pack(fill = "both", expand = True)
         self.draw_board()
+        for hexagon in self.focused_hexagons:
+            self.remove_hexagon_border(hexagon)
     
     def node_bubbles(self, event_origin):
         ########################
@@ -131,7 +130,6 @@ class TkinterFrontend():
             self.add_hexagon_border(hexagon)
     
     def remove_hexagon_border(self, hexagon, hexagons_to_focus):
-        print('Removing hexagon border for: ' + str(hexagon.id))
         all_focused_lines = [line for hexagon in hexagons_to_focus for line in hexagon.lines]
         for line in hexagon.focused_lines:
             line_tag = self.line_tag(line)
@@ -142,7 +140,6 @@ class TkinterFrontend():
     
     def add_hexagon_border(self, hexagon):
         show_line_ids = False
-        print('Adding hexagon border for: ' + str(hexagon.id))
         for line in hexagon.lines:
             line_tag = self.line_tag(line)
             self.canvas.create_line(line.start_node.real_x, line.start_node.real_y, line.end_node.real_x, line.end_node.real_y, tags = line_tag, fill = 'black', width = 5)
