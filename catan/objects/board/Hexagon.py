@@ -16,6 +16,7 @@ class Hexagon:
             if len(node.hexagons) == 3:
                 node.on_coast = False
         self.selected = False
+        self.focused_lines = []
     
     def set_resource_type(self, resource_type):
         self.resource_type = resource_type
