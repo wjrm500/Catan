@@ -1,27 +1,27 @@
 config = {
     'resource_types': {
         'brick': {
-            'color': 'red',
+            'color': '#E56C63',
             'count': 3
         },
         'desert': {
-            'color': 'black',
+            'color': '#000000',
             'count': 1
         },
         'grain': {
-            'color': 'goldenrod',
+            'color': '#F0DA6C',
             'count': 4
         },
         'lumber': {
-            'color': 'darkgreen',
+            'color': '#488C63',
             'count': 4
         },
         'ore': {
-            'color': 'darkgrey',
+            'color': '#DBDCDD',
             'count': 3
         },
         'wool': {
-            'color': 'limegreen',
+            'color': '#D7F0B8',
             'count': 4
         }
     },

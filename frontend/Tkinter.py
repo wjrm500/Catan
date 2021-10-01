@@ -1,5 +1,6 @@
 import tkinter
 import math
+from types import SimpleNamespace
 
 class TkinterFrontend():
     def __init__(self, game):
@@ -15,7 +16,9 @@ class TkinterFrontend():
         self.canvas.pack(fill = "both", expand = True)
         self.tk_hexagons = [] ### Tkinter polygon objects from create_polygon
         self.tk_ovals = [] ### Tkinter oval objects from create_oval
-        self.thickened_tk_hexagons = []
+        self.thickened_hexagons = []
+
+        self.hexagons_drawn = 0
     
     def run(self):
         self.root.bind('<Configure>', self.resize)
@@ -45,6 +48,8 @@ class TkinterFrontend():
 
         for hexagon in self.game.distributor.hexagons:
             self.draw_tk_hexagon(hexagon)
+        
+        # self.node_bubbles(SimpleNamespace(x = 394, y = 222))
 
     def resize(self, event):
         self.canvas.pack(fill = "both", expand = True)
@@ -54,11 +59,6 @@ class TkinterFrontend():
         ########################
         # Reset canvas objects #
         ########################
-
-        ### Replace thickened hexagons with their non-thickened counterparts
-        for hexagon in self.thickened_tk_hexagons:
-            self.canvas.delete(self.hexagon_tag(hexagon))
-            self.draw_tk_hexagon(hexagon)
         
         self.canvas.delete('tk_oval')
 
@@ -76,8 +76,8 @@ class TkinterFrontend():
             closest_to_cursor = dist == min_node_dist
             reversed_dist = max(self.scale - dist, 0)
             if closest_to_cursor:
-                self.thickened_tk_hexagons = [hexagon for hexagon in node.hexagons]
-                for hexagon in self.thickened_tk_hexagons:
+                tk_hexagons_to_thicken = [hexagon for hexagon in node.hexagons]
+                for hexagon in tk_hexagons_to_thicken:
                     draw_tk_hexagon_args_list.append({'hexagon': hexagon, 'lw_factor': reversed_dist / self.scale})
             if reversed_dist > 0:
                 circle_radius = reversed_dist / 5
@@ -89,8 +89,17 @@ class TkinterFrontend():
         # Actually draw canvas objects #
         ################################
 
+        ### Replace thickened hexagons with their non-thickened counterparts
+        for hexagon in self.thickened_hexagons:
+            if hexagon not in tk_hexagons_to_thicken:
+                self.canvas.delete(self.hexagon_tag(hexagon))
+                self.draw_tk_hexagon(hexagon)
+        
+        self.thickened_hexagons = [hexagon for hexagon in self.thickened_hexagons if hexagon in tk_hexagons_to_thicken]
+
         for args in draw_tk_hexagon_args_list:
-            self.draw_tk_hexagon(args['hexagon'], lw_factor = args['lw_factor'])
+            if args['hexagon'] not in self.thickened_hexagons:
+                self.draw_tk_hexagon(args['hexagon'], True)
 
         for args in draw_tk_oval_args_list:
             self.draw_tk_oval(args['node'], args['circle_radius'], fill = args['fill'], width = args['width'])
@@ -98,18 +107,22 @@ class TkinterFrontend():
         cursor = 'hand2' if min_node_dist / self.scale < 0.2 else ''
         self.canvas.config(cursor = cursor)
             
-    def draw_tk_hexagon(self, hexagon, lw_factor = 0):
+    def draw_tk_hexagon(self, hexagon, thicken = False):
+        self.hexagons_drawn += 1
+        print(self.hexagons_drawn)
+
         hexagon_tag = self.hexagon_tag(hexagon)
-        if lw_factor:
+        if thicken:
             self.canvas.delete(hexagon_tag)
         points = [[node.real_x, node.real_y] for node in hexagon.nodes]
         points = [item for sublist in points for item in sublist]
         fill_color = self.game.config['resource_types'][hexagon.resource_type]['color']
+        tk_hexagon = self.canvas.create_polygon(points, fill = fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag], width = 5 if thicken else 1)
         x, y = hexagon.centre_point(True)
-        
-        tk_hexagon = self.canvas.create_polygon(points, fill = fill_color, outline = 'black', tags = ['tk_hexagon', hexagon_tag], width = 5 * lw_factor if lw_factor else 1)
         self.canvas.create_text(x, y, fill = 'white', font = "Arial 14 bold", text = hexagon.roll_num)
         self.tk_hexagons.append(tk_hexagon)
+        if thicken:
+            self.thickened_hexagons.append(hexagon)
 
     def draw_tk_oval(self, node, circle_radius, fill = 'white', width = 1):
         tk_oval = self.canvas.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = 'tk_oval', fill = fill, width = width)
