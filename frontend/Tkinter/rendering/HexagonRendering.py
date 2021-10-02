@@ -48,7 +48,7 @@ class HexagonRendering:
         self.update_canvas_object_count(self.OBJECT_TEXT, self.ACTION_CREATE)
     
     def delete_tag(self, tag):
-        ### DOES NOT WORK PROPERLY AS HEXAGON TAG PASSED IN FOR BOTH TEXT + POLYGONS
+        ### TODO: DOES NOT WORK PROPERLY AS HEXAGON TAG PASSED IN FOR BOTH TEXT + POLYGONS
         object_type = tag.split('.')[0]
         object_count = len(self.canvas.find_withtag(tag))
         self.canvas.delete(tag)
@@ -78,6 +78,8 @@ class HexagonRendering:
         self.draw_board()
     
     def focus_hexagons(self, event):
+        ### TODO: Refactor
+
         ########################
         # Reset canvas objects #
         ########################
@@ -131,6 +133,7 @@ class HexagonRendering:
         self.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = self.OBJECT_OVAL, fill = fill, width = width)
     
     def draw_board(self):
+        ### TODO: Refactor
         self.canvas_width = self.canvas.winfo_width()
         self.canvas_height = self.canvas.winfo_height()
         if self.canvas_width > 11: ### Width on initial render before resize

@@ -19,6 +19,7 @@ class HexagonBorderRender:
             if line not in self.render.hexagon.focused_lines:
                 self.render.hexagon.focused_lines.append(line)
         ### Filler circles to bridge gap between lines, which is especially visible with larger hexagons
+        ### TODO: Does not work as ovals getting deleted immediately in focus_hexagons method
         r = line_width / 2
         for node in self.render.hexagon.nodes:
             tags = [self.render.rendering.OBJECT_OVAL]
