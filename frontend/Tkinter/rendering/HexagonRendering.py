@@ -2,11 +2,57 @@ from frontend.Tkinter.rendering.HexagonRender import HexagonRender
 import math
 
 class HexagonRendering:
+    OBJECT_LINE = 'line'
+    OBJECT_POLYGON = 'polygon'
+    OBJECT_OVAL = 'oval'
+    OBJECT_TEXT = 'text'
+
+    ACTION_CREATE = 'create'
+    ACTION_DELETE = 'delete'
+
     def __init__(self, main_phase):
         self.main_phase = main_phase
         self.canvas = self.main_phase.canvas
         self.scale = 1
         self.focused_hexagons = []
+        self.reset_canvas_objects()
+    
+    def reset_canvas_objects(self):
+        self.canvas_objects = {
+            self.OBJECT_LINE: 0,
+            self.OBJECT_POLYGON: 0,
+            self.OBJECT_OVAL: 0,
+            self.OBJECT_TEXT: 0
+        }
+    
+    def update_canvas_object_count(self, object_type, action_type, step = 1):
+        if action_type == self.ACTION_DELETE:
+            step *= -1
+        self.canvas_objects[object_type] += step
+        print(self.canvas_objects)
+    
+    def create_line(self, *args, **kwargs):
+        self.canvas.create_line(*args, **kwargs)
+        self.update_canvas_object_count(self.OBJECT_LINE, self.ACTION_CREATE)
+    
+    def create_polygon(self, *args, **kwargs):
+        self.canvas.create_polygon(*args, **kwargs)
+        self.update_canvas_object_count(self.OBJECT_POLYGON, self.ACTION_CREATE)
+    
+    def create_oval(self, *args, **kwargs):
+        self.canvas.create_oval(*args, **kwargs)
+        self.update_canvas_object_count(self.OBJECT_OVAL, self.ACTION_CREATE)
+    
+    def create_text(self, *args, **kwargs):
+        self.canvas.create_text(*args, **kwargs)
+        self.update_canvas_object_count(self.OBJECT_TEXT, self.ACTION_CREATE)
+    
+    def delete_tag(self, tag):
+        ### DOES NOT WORK PROPERLY AS HEXAGON TAG PASSED IN FOR BOTH TEXT + POLYGONS
+        object_type = tag.split('.')[0]
+        object_count = len(self.canvas.find_withtag(tag))
+        self.canvas.delete(tag)
+        self.update_canvas_object_count(object_type, self.ACTION_DELETE, object_count)
     
     def set_scale(self, scale):
         self.scale = scale
@@ -36,7 +82,7 @@ class HexagonRendering:
         # Reset canvas objects #
         ########################
         
-        self.canvas.delete('tk_oval')
+        self.delete_tag(self.OBJECT_OVAL)
 
         ##########################################
         # Calculate arguments for canvas objects #
@@ -82,13 +128,14 @@ class HexagonRendering:
         self.canvas.config(cursor = cursor)
     
     def draw_tk_oval(self, node, circle_radius, fill = 'white', width = 1):
-        self.canvas.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = 'tk_oval', fill = fill, width = width)
+        self.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = self.OBJECT_OVAL, fill = fill, width = width)
     
     def draw_board(self):
         self.canvas_width = self.canvas.winfo_width()
         self.canvas_height = self.canvas.winfo_height()
         if self.canvas_width > 11: ### Width on initial render before resize
             self.canvas.delete('all')
+            self.reset_canvas_objects()
             node_x_values = [node.x for node in self.game.distributor.nodes]
             node_y_values = [node.y for node in self.game.distributor.nodes]
             x_shift = -min(node_x_values)

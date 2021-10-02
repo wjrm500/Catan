@@ -23,9 +23,11 @@ class HexagonBodyRender:
         points = [[node.real_x, node.real_y] for node in self.render.hexagon.nodes]
         points = [item for sublist in points for item in sublist]
         fill = FOCUSED_BACKGROUND_COLORS[self.render.hexagon.resource_type] if self.render.focused else BACKGROUND_COLORS[self.render.hexagon.resource_type]
-        self.render.rendering.canvas.create_polygon(points, fill = fill, outline = 'black', tags = ['tk_hexagon', self.render.hexagon_tag])
+        tags = [self.render.rendering.OBJECT_POLYGON, self.render.hexagon_tag]
+        self.render.rendering.create_polygon(points, fill = fill, outline = 'black', tags = tags)
     
     def render_text_elements(self):
+        tags = [self.render.rendering.OBJECT_TEXT, self.render.hexagon_tag]
         x, y = self.render.hexagon.centre_point(True)
         text_fill = FOCUSED_TEXT_COLORS[self.render.hexagon.resource_type] if self.render.focused else TEXT_COLORS[self.render.hexagon.resource_type]
         show_resource_type = self.render.rendering.scale > 50
@@ -35,9 +37,9 @@ class HexagonBodyRender:
         font_size = round(self.render.rendering.scale / 3.5 if self.render.focused else self.render.rendering.scale / 4)
         roll_num_font_size = round(font_size * 0.75 * math.sqrt(self.render.hexagon.num_pips))
         roll_num_text = self.render.hexagon.roll_num
-        self.render.rendering.canvas.create_text(x, y + roll_num_offset, fill = text_fill, font = 'Arial {} bold'.format(roll_num_font_size), text = roll_num_text)
+        self.render.rendering.create_text(x, y + roll_num_offset, fill = text_fill, font = 'Arial {} bold'.format(roll_num_font_size), text = roll_num_text, tags = tags)
         if show_resource_type:
             resource_type_text = self.render.hexagon.resource_type.upper()
-            self.render.rendering.canvas.create_text(x, y + resource_type_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size - 4), text = resource_type_text)
+            self.render.rendering.create_text(x, y + resource_type_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size - 4), text = resource_type_text, tags = tags)
         pips_text = ''.join(['·' for _ in range(self.render.hexagon.num_pips)])
-        self.render.rendering.canvas.create_text(x, y + pips_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size), text = pips_text)
+        self.render.rendering.create_text(x, y + pips_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size), text = pips_text, tags = tags)
