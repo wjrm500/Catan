@@ -2,6 +2,9 @@ import tkinter
 from .Phase import Phase
 
 class SetupPhase(Phase):
+    MIN_HEXAGONS = 5
+    MAX_HEXAGONS = 52
+
     def __init__(self, chaperone):
         super().__init__(chaperone)
         self.root.geometry('500x500')
@@ -27,10 +30,10 @@ class SetupPhase(Phase):
         error = None
         if num_hexagons.isnumeric():
             num_hexagons = int(num_hexagons)
-            if num_hexagons in range(5, 51):
+            if num_hexagons in range(self.MIN_HEXAGONS, self.MAX_HEXAGONS + 1):
                 self.chaperone.start_main_phase(num_hexagons)
             else:
-                error = 'Number of hexagons must be between 5 and 50'
+                error = 'Number of hexagons must be between {} and {}'.format(self.MIN_HEXAGONS, self.MAX_HEXAGONS)
         else:
             error = 'Input must be numeric'
         if error:
