@@ -19,10 +19,10 @@ class MainPhase(Phase):
     
     def set_game(self, game):
         self.game = game
-        self.hexagon_rendering.game = game
+        self.hexagon_rendering.set_game(game)
     
     def run(self):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
-        self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.focus_hexagons(evt))
-        self.right_frame.bind('<Motion>', self.hexagon_rendering.reset_focused_hexagons)
+        self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
+        self.right_frame.bind('<Motion>', self.hexagon_rendering.unfocus_focused_hexagons)
         self.root.mainloop()

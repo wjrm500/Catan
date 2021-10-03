@@ -19,17 +19,30 @@ class HexagonBodyRender:
     def __init__(self, render):
         self.render = render
 
-    def render_polygon(self):
+    def render_polygon(self, focused):
         points = [[node.real_x, node.real_y] for node in self.render.hexagon.nodes]
         points = [item for sublist in points for item in sublist]
-        fill = FOCUSED_BACKGROUND_COLORS[self.render.hexagon.resource_type] if self.render.focused else BACKGROUND_COLORS[self.render.hexagon.resource_type]
-        tags = [self.render.rendering.OBJECT_POLYGON, self.render.hexagon_tag]
+        if focused == self.render.FOCUSED:
+            fill = FOCUSED_BACKGROUND_COLORS[self.render.hexagon.resource_type]
+        else:
+            fill = BACKGROUND_COLORS[self.render.hexagon.resource_type]
+        tags = [
+            self.render.rendering.CT_OBJ_HEXAGON,
+            self.render.hexagon_tag,
+            '{}.{}'.format(self.render.hexagon_tag, focused),
+            self.render.rendering.CV_OBJ_POLYGON
+        ]
         self.render.rendering.create_polygon(points, fill = fill, outline = 'black', tags = tags)
     
-    def render_text_elements(self):
-        tags = [self.render.rendering.OBJECT_TEXT, self.render.hexagon_tag]
+    def render_text_elements(self, focused):
+        tags = [
+            self.render.rendering.CT_OBJ_HEXAGON,
+            self.render.hexagon_tag,
+            '{}.{}'.format(self.render.hexagon_tag, focused),
+            self.render.rendering.CV_OBJ_TEXT
+        ]
         x, y = self.render.hexagon.centre_point(True)
-        text_fill = FOCUSED_TEXT_COLORS[self.render.hexagon.resource_type] if self.render.focused else TEXT_COLORS[self.render.hexagon.resource_type]
+        text_fill = FOCUSED_TEXT_COLORS[self.render.hexagon.resource_type] if focused else TEXT_COLORS[self.render.hexagon.resource_type]
         show_resource_type = self.render.rendering.scale > 50
         roll_num_offset = -(self.render.rendering.scale / 4) if show_resource_type else 0
         resource_type_offset = self.render.rendering.scale / 4 if show_resource_type and self.render.hexagon.resource_type != 'desert' else 0
