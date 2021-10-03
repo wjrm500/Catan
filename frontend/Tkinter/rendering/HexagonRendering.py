@@ -17,6 +17,8 @@ class HexagonRendering:
     ACTION_CREATE = 'create'
     ACTION_DELETE = 'delete'
 
+    IN_DEVELOPMENT = False
+
     def __init__(self, main_phase):
         self.main_phase = main_phase
         self.canvas = self.main_phase.canvas
@@ -39,7 +41,8 @@ class HexagonRendering:
     def update_canvas_object_count(self, object_type, action_type):
         step = 1 if action_type == self.ACTION_CREATE else -1 
         self.canvas_objects[object_type] += step
-        print(self.canvas_objects)
+        if self.IN_DEVELOPMENT:
+            print(self.canvas_objects)
     
     def create_line(self, *args, **kwargs):
         self.canvas.create_line(*args, **kwargs)
@@ -58,20 +61,17 @@ class HexagonRendering:
         self.update_canvas_object_count(self.CV_OBJ_TEXT, self.ACTION_CREATE)
     
     def delete_tag(self, tag):
-        self.canvas.delete(tag)
-        # objects_with_tag = self.canvas.find_withtag(tag)
-        # is_broken = False
-        # for object_with_tag in objects_with_tag:
-        #     all_tags_on_object = self.canvas.itemcget(object_with_tag, 'tags')
-        #     for key in self.canvas_objects.keys():
-        #         if key in all_tags_on_object:
-        #             object_type = key
-        #             self.canvas.delete(object_with_tag)
-        #             self.update_canvas_object_count(object_type, self.ACTION_DELETE)
-        #             is_broken = True
-        #             break
-        #     if is_broken:
-                # break
+        if not self.IN_DEVELOPMENT:
+            self.canvas.delete(tag)
+        else:
+            objects_with_tag = self.canvas.find_withtag(tag)
+            for object_with_tag in objects_with_tag:
+                all_tags_on_object = self.canvas.itemcget(object_with_tag, 'tags')
+                for key in self.canvas_objects.keys():
+                    if key in all_tags_on_object:
+                        object_type = key
+                        self.canvas.delete(object_with_tag)
+                        self.update_canvas_object_count(object_type, self.ACTION_DELETE)
     
     def set_scale(self, scale):
         self.scale = scale
