@@ -1,6 +1,7 @@
 import tkinter
 
 class Phase:
+    BG_COLOR = '#ADD8E6'
     CURSOR_HAND = 'hand2'
 
     def __init__(self, chaperone):
