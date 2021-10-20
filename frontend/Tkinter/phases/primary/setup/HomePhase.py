@@ -16,6 +16,7 @@ class HomePhase(SetupPhase):
         self.num_hexagons_input.focus()
 
     def run(self):
+        ### New game vs existing game
         self.submit_button.bind('<Button-1>', self.submit_form)
         self.num_hexagons_input.bind('<Return>', self.submit_form)
         self.root.mainloop()
@@ -34,3 +35,4 @@ class HomePhase(SetupPhase):
             self.chaperone.start_lobby_phase()
         else:
             self.error_text = self.render_error_text(self.inner_frame, error)
+            self.error_text.pack(side = tkinter.TOP, pady = 10)

@@ -56,7 +56,6 @@ class SetupPhase(Phase):
         if hasattr(self, 'error_text'):
             self.error_text.pack_forget()
         error_text = tkinter.Text(where, font = self.get_font(), foreground = 'red', background = self.BG_COLOR, width = 25, height = 2, bd = 0)
-        error_text.pack(side = tkinter.TOP, pady = 10)
         error_text.tag_configure('tag-center', justify = 'center')
         error_text.insert(tkinter.END, text, 'tag-center')
         return error_text

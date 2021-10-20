@@ -21,25 +21,30 @@ class LobbyPhase(SetupPhase):
         self.root.mainloop()
     
     def add_name(self, event):
-        ### TODO: Prevent duplicate names
-        ### TODO: Player num limit
-        name = self.name_input.get()
+        name = self.player_name_input.get()
+        errors = []
         if len(self.chaperone.player_names) == self.MAX_PLAYER_COUNT:
-            return
-
-        self.chaperone.player_names.append(name)
-        self.show_player_names()
+            errors.append('Only {} players allowed'.format(self.MAX_PLAYER_COUNT))
+        if name in self.chaperone.player_names:
+            errors.append('The name {} is taken'.format(name))
+        if len(errors) == 0:
+            self.chaperone.player_names.append(name)
+            if hasattr(self, 'player_name_list'):
+                self.player_name_list.destroy()
+            self.player_name_list = self.render_player_name_list(self.inner_frame)
+            self.player_name_list.pack(side = tkinter.TOP, pady = 10)
+        else:
+            self.error_text = self.render_error_text(self.inner_frame, '\n'.join(errors))
+            self.error_text.pack(side = tkinter.TOP, pady = 10)
     
-    def show_player_names(self):
-        if hasattr(self, 'player_name_list'):
-            self.player_name_list.destroy()
-        player_name_list = tkinter.Text(self.inner_frame, font = self.get_font(), foreground = 'black', background = self.BG_COLOR, width = 25, height = len(self.player_names) + 1, bd = 0)
-        player_name_list.pack(side = tkinter.TOP, pady = 10)
+    def render_player_name_list(self, where):
+        player_names = self.chaperone.player_names
+        player_name_list = tkinter.Text(self.inner_frame, font = self.get_font(), foreground = 'black', background = self.BG_COLOR, width = 25, height = len(player_names) + 1, bd = 0)
         player_name_list.tag_configure('tag-center', justify = 'center')
         player_name_list.insert(tkinter.END, 'Players in lobby:\n', 'tag-center')
-        for player in self.player_names:
-            player_name_list.insert(tkinter.END, '{}\n'.format(player), 'tag-center')
-        self.player_name_list = player_name_list
+        for player_name in player_names:
+            player_name_list.insert(tkinter.END, '{}\n'.format(player_name), 'tag-center')
+        return player_name_list
     
     def go_to_main_loop(self, event):
         self.chaperone.start_main_phase()
