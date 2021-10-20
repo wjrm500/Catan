@@ -8,7 +8,7 @@ class Phase:
         self.chaperone = chaperone
         self.root = tkinter.Tk()
         self.root.title('Catan')
-        self.FONT_NAME = 'Arial' ### Could belong to a base class
+        self.FONT_NAME = 'Arial'
         self.FONT_SIZE = '10'
         self.FONT_WEIGHT = 'bold'
     

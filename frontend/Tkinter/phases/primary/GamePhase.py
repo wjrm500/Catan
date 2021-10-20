@@ -1,8 +1,8 @@
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 import tkinter
-from .Phase import Phase
+from frontend.Tkinter.phases.Phase import Phase
 
-class MainPhase(Phase):
+class GamePhase(Phase):
     def __init__(self, chaperone):
         super().__init__(chaperone)
         self.root.geometry('1000x500')

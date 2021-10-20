@@ -1,8 +1,8 @@
 from catan.mechanics.Game import Game
-from frontend.Tkinter.LobbyPhase import LobbyPhase
-from frontend.Tkinter.MainPhase import MainPhase
-from frontend.Tkinter.SettlePhase import SettlePhase
-from frontend.Tkinter.HomePhase import HomePhase
+from frontend.Tkinter.phases.primary.setup.HomePhase import HomePhase
+from frontend.Tkinter.phases.primary.setup.LobbyPhase import LobbyPhase
+from frontend.Tkinter.phases.primary.GamePhase import GamePhase
+from frontend.Tkinter.phases.primary.SettlePhase import SettlePhase
 from config import config
 
 class Chaperone:
@@ -29,7 +29,7 @@ class Chaperone:
     
     def start_main_phase(self):
         self.lobby_phase.root.destroy()
-        self.main_phase = MainPhase(self)
+        self.main_phase = GamePhase(self)
         game = Game(config, ['Will', 'Kate'], num_hexagons = self.num_hexagons)
         game.setup_board()
         game.setup_cards()
