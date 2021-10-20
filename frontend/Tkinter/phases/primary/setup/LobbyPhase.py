@@ -7,7 +7,6 @@ class LobbyPhase(SetupPhase):
 
     def __init__(self, chaperone):
         super().__init__(chaperone)
-        self.player_names = [] ### Game class?
         self.player_name_label = self.render_label(where = self.inner_frame, text = 'Please enter your name:')
         self.player_name_input = self.render_input(where = self.inner_frame)
         self.submit_button = self.render_submit_button(where = self.inner_frame)
@@ -18,16 +17,17 @@ class LobbyPhase(SetupPhase):
 
     def run(self):
         self.submit_button.bind('<Button-1>', self.add_name)
+        self.player_name_input.bind('<Return>', self.add_name)
         self.root.mainloop()
     
     def add_name(self, event):
         ### TODO: Prevent duplicate names
         ### TODO: Player num limit
         name = self.name_input.get()
-        if len(self.player_names) == self.MAX_PLAYER_COUNT:
+        if len(self.chaperone.player_names) == self.MAX_PLAYER_COUNT:
             return
 
-        self.player_names.append(name)
+        self.chaperone.player_names.append(name)
         self.show_player_names()
     
     def show_player_names(self):

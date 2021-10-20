@@ -48,6 +48,15 @@ class SetupPhase(Phase):
         resized_image_wh = max(canvas_width, canvas_height)
         img.thumbnail((resized_image_wh, resized_image_wh), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(img)
-        canvas.create_image(canvas_width / 5, canvas_height / 5, image = img, anchor = tkinter.CENTER)
+        canvas.create_image(canvas_width / 2, canvas_height / 2, image = img, anchor = tkinter.CENTER)
         canvas.image = img ### https://web.archive.org/web/20201111190625id_/http://effbot.org/pyfaq/why-do-my-tkinter-images-not-appear.htm
         return canvas
+    
+    def render_error_text(self, where, text):
+        if hasattr(self, 'error_text'):
+            self.error_text.pack_forget()
+        error_text = tkinter.Text(where, font = self.get_font(), foreground = 'red', background = self.BG_COLOR, width = 25, height = 2, bd = 0)
+        error_text.pack(side = tkinter.TOP, pady = 10)
+        error_text.tag_configure('tag-center', justify = 'center')
+        error_text.insert(tkinter.END, text, 'tag-center')
+        return error_text

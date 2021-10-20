@@ -1,3 +1,4 @@
+import tkinter
 from catan.mechanics.Game import Game
 from frontend.Tkinter.phases.primary.setup.HomePhase import HomePhase
 from frontend.Tkinter.phases.primary.setup.LobbyPhase import LobbyPhase
@@ -8,6 +9,9 @@ from config import config
 class Chaperone:
     def __init__(self):
         self.config = config
+        self.root = tkinter.Tk()
+        self.root.title('Catan')
+        self.player_names = []
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
@@ -20,7 +24,7 @@ class Chaperone:
         self.home_phase.run()
     
     def start_lobby_phase(self):
-        self.home_phase.root.destroy()
+        self.home_phase.outer_frame.destroy()
         self.lobby_phase = LobbyPhase(self)
         self.lobby_phase.run()
     

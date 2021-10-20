@@ -16,26 +16,21 @@ class HomePhase(SetupPhase):
         self.num_hexagons_input.focus()
 
     def run(self):
-        self.submit_button.bind('<Button-1>', self.go_to_main_loop)
-        self.num_hexagons_input.bind('<Return>', self.go_to_main_loop)
+        self.submit_button.bind('<Button-1>', self.submit_form)
+        self.num_hexagons_input.bind('<Return>', self.submit_form)
         self.root.mainloop()
     
-    def go_to_main_loop(self, event):
-        if hasattr(self, 'error_text'):
-            self.error_text.pack_forget()
+    def submit_form(self, event):
         num_hexagons = self.num_hexagons_input.get()
         error = None
-        if num_hexagons.isnumeric():
-            num_hexagons = int(num_hexagons)
-            if num_hexagons in range(self.MIN_HEXAGONS, self.MAX_HEXAGONS + 1):
-                self.chaperone.set_num_hexagons(num_hexagons)
-                self.chaperone.start_lobby_phase()
-            else:
-                error = 'Number of hexagons must be between {} and {}'.format(self.MIN_HEXAGONS, self.MAX_HEXAGONS)
-        else:
+        if not num_hexagons.isnumeric():
             error = 'Input must be numeric'
-        if error:
-            self.error_text = tkinter.Text(self.inner_frame, font = self.get_font(), foreground = 'red', background = self.BG_COLOR, width = 25, height = 2, bd = 0)
-            self.error_text.pack(side = tkinter.TOP, pady = 10)
-            self.error_text.tag_configure('tag-center', justify = 'center')
-            self.error_text.insert(tkinter.END, error, 'tag-center')
+        else:
+            num_hexagons = int(num_hexagons)
+            if not num_hexagons in range(self.MIN_HEXAGONS, self.MAX_HEXAGONS + 1):
+                error = 'Number of hexagons must be between {} and {}'.format(self.MIN_HEXAGONS, self.MAX_HEXAGONS)
+        if not error:
+            self.chaperone.set_num_hexagons(num_hexagons)
+            self.chaperone.start_lobby_phase()
+        else:
+            self.error_text = self.render_error_text(self.inner_frame, error)
