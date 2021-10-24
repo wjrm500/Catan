@@ -30,24 +30,30 @@ class SetupPhase(Phase):
     def render_submit_button(self, where):
         button_bg_color = ColorUtils().darken_hex(self.BG_COLOR, 0.5)
         return tkinter.Button(where, text = 'SUBMIT', font = self.get_font(), foreground = 'white', background = button_bg_color, width = 10, height = 1)
-
+    
     def render_outer_frame(self):
         outer_frame = tkinter.Frame(self.root, background = self.BG_COLOR)
         outer_frame.pack(fill = 'both', expand = True)
         return outer_frame
     
     def render_inner_frame(self, where, size):
-        self.root.update_idletasks()
-        frame_width = where.winfo_width() * size
-        frame_height = where.winfo_height() * size
-        inner_frame = tkinter.Frame(where, background = self.BG_COLOR, width = frame_width, height = frame_height)
+        inner_frame_size = self.SIDE_LENGTH * size
+        inner_frame = tkinter.Frame(where, background = self.BG_COLOR, width = inner_frame_size, height = inner_frame_size)
         inner_frame.place(in_ = where, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
         return inner_frame
     
+    def render_frame(self, where, size):
+        self.root.update_idletasks() ### https://stackoverflow.com/questions/34373533/winfo-width-returns-1-even-after-using-pack
+        frame_width = where.winfo_width() * size
+        frame_height = where.winfo_height() * size
+        frame = tkinter.Frame(where, background = self.BG_COLOR, width = frame_width, height = frame_height)
+        frame.place(in_ = where, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
+        return frame
+    
     def render_catan_logo_canvas(self, where, width, height):
         self.root.update_idletasks() ### https://stackoverflow.com/questions/34373533/winfo-width-returns-1-even-after-using-pack
-        canvas_width = self.inner_frame.winfo_width() * width
-        canvas_height = self.inner_frame.winfo_height() * height
+        canvas_width = where.winfo_width() * width
+        canvas_height = where.winfo_height() * height
         canvas = tkinter.Canvas(where, width = canvas_width, height = canvas_height, background = self.BG_COLOR, bd = 0, highlightthickness = 0)
         img = Image.open(self.CATAN_LOGO_IMG_FILEPATH)
         resized_image_wh = max(canvas_width, canvas_height)

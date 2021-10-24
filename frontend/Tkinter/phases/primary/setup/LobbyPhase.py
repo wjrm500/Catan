@@ -46,7 +46,7 @@ class LobbyPhase(SetupPhase):
             self.error_text.pack(side = tkinter.TOP, pady = 10)
 
     def render_new_player_panel(self, where, config):
-        new_player_panel = self.render_inner_frame(where = where, size = 1.0)
+        new_player_panel = self.render_frame(where = where, size = 1.0)
         new_player_panel.config(config)
         player_name_label = self.render_label(where = new_player_panel, text = 'Please enter your name:', config = GeneralUtils.filter_dict(config, ['background']))
         self.player_name_input = self.render_input(where = new_player_panel)
@@ -57,7 +57,7 @@ class LobbyPhase(SetupPhase):
         return new_player_panel
         
     def render_existing_players_panel(self, where, config):
-        existing_players_panel = self.render_inner_frame(where = where, size = 1.0)
+        existing_players_panel = self.render_frame(where = where, size = 1.0)
         existing_players_panel.config(config)
         existing_players_label = self.render_label(where = existing_players_panel, text = 'Players in lobby:', config = GeneralUtils.filter_dict(config, ['background']))
         self.existing_players_list = self.render_existing_players_list(where = existing_players_panel, config = GeneralUtils.filter_dict(config, ['background']))
