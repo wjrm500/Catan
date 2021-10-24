@@ -28,7 +28,7 @@ class SetupPhase(Phase):
         return tkinter.Entry(where)
     
     def render_submit_button(self, where):
-        button_bg_color = ColorUtils().darken_hex(self.BG_COLOR, 0.5)
+        button_bg_color = ColorUtils.darken_hex(self.BG_COLOR, 0.5)
         return tkinter.Button(where, text = 'SUBMIT', font = self.get_font(), foreground = 'white', background = button_bg_color, width = 10, height = 1)
     
     def render_outer_frame(self):
@@ -42,11 +42,12 @@ class SetupPhase(Phase):
         inner_frame.place(in_ = where, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
         return inner_frame
     
-    def render_frame(self, where, size):
+    def render_frame(self, where, size, config):
         self.root.update_idletasks() ### https://stackoverflow.com/questions/34373533/winfo-width-returns-1-even-after-using-pack
         frame_width = where.winfo_width() * size
         frame_height = where.winfo_height() * size
         frame = tkinter.Frame(where, background = self.BG_COLOR, width = frame_width, height = frame_height)
+        frame.config(config)
         frame.place(in_ = where, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
         return frame
     

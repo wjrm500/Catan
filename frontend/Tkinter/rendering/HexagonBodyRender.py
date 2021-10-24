@@ -2,12 +2,10 @@ from frontend.ColorUtils import ColorUtils
 import math
 from config import config
 
-color_utils = ColorUtils()
-
 def set_colors(darken):
     d = {}
     for resource_type, data in config['resource_types'].items():
-        d[resource_type] = color_utils.darken_hex(data['color'], darken)
+        d[resource_type] = ColorUtils.darken_hex(data['color'], darken)
     return d
 
 BACKGROUND_COLORS = set_colors(0.0)

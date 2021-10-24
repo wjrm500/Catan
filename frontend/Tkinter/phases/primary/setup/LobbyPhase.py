@@ -11,8 +11,8 @@ class LobbyPhase(SetupPhase):
         
         self.split_panel = self.render_inner_frame(where = self.inner_frame, size = 1.0)
         player_panel_config = {
-            'background': ColorUtils().lighten_hex(self.BG_COLOR, 0.1),
-            'highlightbackground': ColorUtils().darken_hex(self.BG_COLOR, 0.2),
+            'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1),
+            'highlightbackground': ColorUtils.darken_hex(self.BG_COLOR, 0.2),
             'highlightthickness': 1
         }
         self.new_player_panel = self.render_new_player_panel(where = self.split_panel, config = player_panel_config)
@@ -39,15 +39,14 @@ class LobbyPhase(SetupPhase):
             self.chaperone.player_names.append(name)
             if hasattr(self, 'existing_players_list'):
                 self.existing_players_list.destroy()
-            self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils().lighten_hex(self.BG_COLOR, 0.1)})
+            self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
             self.existing_players_list.pack(side = tkinter.TOP, pady = 10)
         else:
             self.error_text = self.render_error_text(self.inner_frame, '\n'.join(errors))
             self.error_text.pack(side = tkinter.TOP, pady = 10)
 
     def render_new_player_panel(self, where, config):
-        new_player_panel = self.render_frame(where = where, size = 1.0)
-        new_player_panel.config(config)
+        new_player_panel = self.render_frame(where = where, size = 1.0, config = config)
         player_name_label = self.render_label(where = new_player_panel, text = 'Please enter your name:', config = GeneralUtils.filter_dict(config, ['background']))
         self.player_name_input = self.render_input(where = new_player_panel)
         self.add_player_name_button = self.render_submit_button(where = new_player_panel)
@@ -57,8 +56,7 @@ class LobbyPhase(SetupPhase):
         return new_player_panel
         
     def render_existing_players_panel(self, where, config):
-        existing_players_panel = self.render_frame(where = where, size = 1.0)
-        existing_players_panel.config(config)
+        existing_players_panel = self.render_frame(where = where, size = 1.0, config = config)
         existing_players_label = self.render_label(where = existing_players_panel, text = 'Players in lobby:', config = GeneralUtils.filter_dict(config, ['background']))
         self.existing_players_list = self.render_existing_players_list(where = existing_players_panel, config = GeneralUtils.filter_dict(config, ['background']))
         existing_players_label.pack(side = tkinter.TOP, pady = 20)
