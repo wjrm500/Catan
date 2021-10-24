@@ -5,6 +5,11 @@ class ColorUtils:
     def __init__(self):
         pass
 
+    def lighten_hex(self, hex, factor):
+        rgb = self.hex_to_rgb(hex)
+        lightened_rgb = self.lighten_color(rgb, factor)
+        return self.rgb_to_hex(lightened_rgb)
+
     def darken_hex(self, hex, factor):
         rgb = self.hex_to_rgb(hex)
         darkened_rgb = self.darken_color(rgb, factor)

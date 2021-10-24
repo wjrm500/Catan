@@ -16,11 +16,13 @@ class SetupPhase(Phase):
         self.catan_logo_canvas = self.render_catan_logo_canvas(where = self.inner_frame, width = 1.0, height = 0.5)
         self.catan_logo_canvas.pack(side = tkinter.TOP, pady = 20)
     
-    def render_label(self, where, text):
-        player_name_label = tkinter.Text(where, font = self.get_font(), foreground = 'black', background = self.BG_COLOR, width = 25, height = 1, bd = 0)
-        player_name_label.tag_configure('tag-center', justify = 'center')
-        player_name_label.insert(tkinter.END, text, 'tag-center')
-        return player_name_label 
+    def render_label(self, where, text, config = None):
+        label = tkinter.Text(where, font = self.get_font(), foreground = 'black', background = self.BG_COLOR, width = 25, height = 1, bd = 0)
+        if config is not None:
+            label.config(config)
+        label.tag_configure('tag-center', justify = 'center')
+        label.insert(tkinter.END, text, 'tag-center')
+        return label 
     
     def render_input(self, where):
         return tkinter.Entry(where)
@@ -35,7 +37,10 @@ class SetupPhase(Phase):
         return outer_frame
     
     def render_inner_frame(self, where, size):
-        inner_frame = tkinter.Frame(where, background = self.BG_COLOR, width = self.SIDE_LENGTH * size, height = self.SIDE_LENGTH * size)
+        self.root.update_idletasks()
+        frame_width = where.winfo_width() * size
+        frame_height = where.winfo_height() * size
+        inner_frame = tkinter.Frame(where, background = self.BG_COLOR, width = frame_width, height = frame_height)
         inner_frame.place(in_ = where, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
         return inner_frame
     
@@ -55,7 +60,7 @@ class SetupPhase(Phase):
     def render_error_text(self, where, text):
         if hasattr(self, 'error_text'):
             self.error_text.pack_forget()
-        error_text = tkinter.Text(where, font = self.get_font(), foreground = 'red', background = self.BG_COLOR, width = 25, height = 2, bd = 0)
+        error_text = tkinter.Text(where, font = self.get_font(), foreground = 'red', background = self.BG_COLOR, width = 50, height = 2, bd = 0)
         error_text.tag_configure('tag-center', justify = 'center')
         error_text.insert(tkinter.END, text, 'tag-center')
         return error_text

@@ -11,5 +11,9 @@ class Phase:
         self.chaperone = chaperone
         self.root = chaperone.root
     
-    def get_font(self):
-        return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
+    def get_font(self, font_name = None, font_size = None, font_weight = None):
+        return (
+            font_name or self.FONT_NAME,
+            font_size or self.FONT_SIZE,
+            font_weight or self.FONT_WEIGHT
+        )
