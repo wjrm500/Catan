@@ -8,7 +8,6 @@ class LobbyPhase(SetupPhase):
 
     def __init__(self, chaperone):
         super().__init__(chaperone)
-        
         self.split_panel = self.render_inner_frame(where = self.inner_frame, size = 1.0)
         player_panel_config = {
             'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1),
@@ -21,19 +20,19 @@ class LobbyPhase(SetupPhase):
         self.split_panel.pack(side = tkinter.TOP, pady = 20)
         self.new_player_panel.pack(side = tkinter.LEFT, fill = 'y', padx = 10)
         self.existing_players_panel.pack(side = tkinter.RIGHT, fill = 'y', padx = 10)
-        
-        self.player_name_input.focus()
+        self.new_player_input.focus()
 
     def run(self):
-        self.add_player_name_button.bind('<Button-1>', self.add_name)
-        self.player_name_input.bind('<Return>', self.add_name)
+        self.add_new_player_button.bind('<Button-1>', self.add_player)
+        self.new_player_input.bind('<Return>', self.add_player)
         self.root.mainloop()
     
-    def add_name(self, event):
-        name = self.player_name_input.get()
+    def add_player(self, event):
+        name = self.new_player_input.get()
         errors = []
         if len(self.chaperone.player_names) == self.MAX_PLAYER_COUNT:
             errors.append('Only {} players allowed'.format(self.MAX_PLAYER_COUNT))
+        name = name.title()
         if name in self.chaperone.player_names:
             errors.append('The name {} is taken'.format(name))
         if len(errors) == 0:
@@ -49,9 +48,9 @@ class LobbyPhase(SetupPhase):
     def render_new_player_panel(self, where, config):
         new_player_panel = self.render_frame(where = where, size = 1.0, config = config)
         player_name_label = self.render_label(where = new_player_panel, text = 'Please enter your name:', config = GeneralUtils.filter_dict(config, ['background']))
-        self.player_name_input = self.render_input(where = new_player_panel)
-        self.add_player_name_button = self.render_submit_button(where = new_player_panel)
-        panel_components = [player_name_label, self.player_name_input, self.add_player_name_button]
+        self.new_player_input = self.render_input(where = new_player_panel)
+        self.add_new_player_button = self.render_submit_button(where = new_player_panel)
+        panel_components = [player_name_label, self.new_player_input, self.add_new_player_button]
         for component in panel_components:
             component.pack(side = tkinter.TOP, pady = 20)
         return new_player_panel
