@@ -13,6 +13,7 @@ class LobbyPhase(SetupPhase):
         player_panel_config = {
             'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1),
             'highlightbackground': ColorUtils.darken_hex(self.BG_COLOR, 0.2),
+            'highlightcolor': ColorUtils.darken_hex(self.BG_COLOR, 0.2), 
             'highlightthickness': 1
         }
         self.new_player_panel = self.render_new_player_panel(where = self.split_panel, config = player_panel_config)
