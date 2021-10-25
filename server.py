@@ -1,24 +1,48 @@
+from config import config
+from backend.mechanics.Game import Game
 import socket
-SERVER_ADDRESS = (HOST, PORT) = '', 8888
-REQUEST_QUEUE_SIZE = 5
+import threading
+import random
+import string
+import re
 
-def handle_request(client_connection):
-    request = client_connection.recv(1024)
-    print(request.decode())
-    http_response=b"""HTTP/1.1 200 OK\n\nHello World!"""
-    client_connection.sendall(http_response)
+class Server:
+    LOCAL_HOST = '127.0.0.1'
+    LOCAL_PORT = 9090
 
-def serve_forever():
-    listen_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listen_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    listen_sock.bind(SERVER_ADDRESS)
-    listen_sock.listen(REQUEST_QUEUE_SIZE)
-    print('Serving HTTP on port {port}'.format(port=PORT))
+    def __init__(self):
+        self.games = {}
+        self.host = self.LOCAL_HOST
+        self.port = self.LOCAL_PORT
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind((self.host, self.port))
+        self.socket.listen()
+        print(f'Listening for incoming connections at {(self.host, self.port)}')
     
-    while True:
-        client_conn, _ = listen_sock.accept()
-        handle_request(client_conn)
-        client_conn.close()
+    def serve(self):
+        while True:
+            client_conn, client_address = self.socket.accept()
+            print(f"{str(client_address)} connected")
+            thread = threading.Thread(target = self.handle, args = (client_conn,))
+            thread.start()
+            
+    def handle(self, client_conn):
+        while True:
+            from_client = client_conn.recv(1024).decode('utf-8')
+            print(from_client)
+            if re.search('^.+;.+$', from_client):
+                action, data = from_client.split(';')
+                if action == 'CREATE_NEW_GAME': ### TODO: Make constant
+                    game = Game(config)
+                    game_code = ''.join(random.choices(string.ascii_letters, k = 10))
+                    self.games[game_code] = {
+                        'clients': [client_conn],
+                        'game': game,
+                        'main_client': client_conn
+                    }
+                elif action == 'JOIN_EXISTING_GAME': ### TODO: Make constant
+                    game_code = data
+                    self.games[game_code]['clients'].append(client_conn)
 
-if __name__ == '__main__':
-    serve_forever()
+server = Server()
+server.serve()

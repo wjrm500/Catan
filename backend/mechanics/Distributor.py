@@ -1,11 +1,11 @@
 from ..objects.board.Hexagon import Hexagon
 from ..objects.board.Line import Line
 from ..objects.board.Node import Node
-from catan.objects.cards.development.Knight import Knight
-from catan.objects.cards.development.Monopoly import Monopoly
-from catan.objects.cards.development.RoadBuilding import RoadBuilding
-from catan.objects.cards.development.VictoryPoint import VictoryPoint
-from catan.objects.cards.development.YearOfPlenty import YearOfPlenty
+from backend.objects.cards.development.Knight import Knight
+from backend.objects.cards.development.Monopoly import Monopoly
+from backend.objects.cards.development.RoadBuilding import RoadBuilding
+from backend.objects.cards.development.VictoryPoint import VictoryPoint
+from backend.objects.cards.development.YearOfPlenty import YearOfPlenty
 
 class Distributor:
     def __init__(self):

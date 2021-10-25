@@ -4,17 +4,19 @@ import copy
 from ..objects.board.Port import Port
 from .Distributor import Distributor
 from ..objects.cards.ResourceCard import ResourceCard
-from .Player import Player
 from ..objects.movable_pieces.City import City
 from ..objects.movable_pieces.Road import Road
 from ..objects.movable_pieces.Settlement import Settlement
 
 class Game:
-    def __init__(self, config, player_names, num_hexagons = 19):
+    def __init__(self, config, num_hexagons = 19):
         self.config = config
         self.num_hexagons = num_hexagons
-        self.players = [Player(player_name) for player_name in player_names]
+        self.players = []
         self.distributor = Distributor()
+    
+    def add_player(self, player):
+        self.players.append(player)
     
     def setup_board(self):
         HexagonDrawing.draw_hexagons(self)
