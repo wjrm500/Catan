@@ -7,7 +7,7 @@ class ExistingGamePhase(SetupPhase):
         self.game_code_label = self.render_label(where = self.inner_frame, text = 'Game code:')
         self.game_code_input = self.render_input(where = self.inner_frame)
         self.submit_button = self.render_button(where = self.inner_frame, text = 'Submit')
-        inner_frame_components = [self.num_hexagons_label, self.game_code_input, self.submit_button]
+        inner_frame_components = [self.game_code_label, self.game_code_input, self.submit_button]
         for component in inner_frame_components:
             component.pack(side = tkinter.TOP, pady = 20)
         self.game_code_input.focus()
@@ -19,5 +19,5 @@ class ExistingGamePhase(SetupPhase):
     
     def submit_form(self, event):
         game_code = self.game_code_input.get()
-        self.chaperone.join_existing_game(self, game_code)
-        self.chaperone.start_lobby_phase()
+        self.chaperone.join_existing_game(game_code)
+        self.chaperone.start_lobby_phase(self)

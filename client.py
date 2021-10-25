@@ -12,18 +12,19 @@ class Client:
         self.port = self.LOCAL_PORT
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
-        self.receive_thread = threading.Thread(target = self.receive)
+        # self.receive_thread = threading.Thread(target = self.receive)
         self.gui_thread = threading.Thread(target = self.gui)
-        self.receive_thread.start()
+        # self.receive_thread.start()
         self.gui_thread.start()
     
-    def receive(self):
-        while True:
-            from_server = self.socket.recv(1024)
-            print(from_server)
+    ### NEED TO BE ABLE TO RECEIVE MESSAGES ASYNCHRONOUSLY WHILE ALSO BEING ABLE TO RECEIVE MESSAGES ON DEMAND
+    # def receive(self):
+    #     while True:
+    #         from_server = self.socket.recv(1024)
+    #         ### Receive broadcast from server and do something e.g. new player added
 
     def gui(self):
-        chaperone = Chaperone(self.socket)
-        chaperone.start_home_phase()
+        self.chaperone = Chaperone(self.socket)
+        self.chaperone.start_home_phase()
 
 client = Client()

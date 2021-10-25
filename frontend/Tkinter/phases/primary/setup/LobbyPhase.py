@@ -35,13 +35,14 @@ class LobbyPhase(SetupPhase):
     def add_player(self, event):
         name = self.new_player_input.get()
         errors = []
-        if len(self.chaperone.game.players) == self.MAX_PLAYER_COUNT:
+        players = self.chaperone.get_players()
+        if len(players) == self.MAX_PLAYER_COUNT:
             errors.append('Only {} players allowed'.format(self.MAX_PLAYER_COUNT))
         name = name.title()
-        if name in self.chaperone.game.players:
+        if name in players:
             errors.append('The name {} is taken'.format(name))
         if len(errors) == 0:
-            self.chaperone.game.players.append(name)
+            self.chaperone.add_player(name)
             if hasattr(self, 'existing_players_list'):
                 self.existing_players_list.destroy()
             self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
@@ -70,7 +71,7 @@ class LobbyPhase(SetupPhase):
         return existing_players_panel
     
     def render_existing_players_list(self, where, config):
-        players = self.chaperone.game.players
+        players = self.chaperone.get_players()
         existing_players_list = tkinter.Text(where, font = self.get_font(font_weight = 'normal'), foreground = 'black', background = self.BG_COLOR, width = 25, height = len(players) + 1, bd = 0)
         existing_players_list.config(config)
         existing_players_list.tag_configure('tag-center', justify = 'center')
