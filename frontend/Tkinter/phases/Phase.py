@@ -17,3 +17,6 @@ class Phase:
             font_size or self.FONT_SIZE,
             font_weight or self.FONT_WEIGHT
         )
+    
+    def update_gui(self):
+        pass

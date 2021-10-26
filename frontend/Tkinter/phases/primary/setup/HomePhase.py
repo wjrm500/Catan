@@ -1,5 +1,7 @@
 import tkinter
 from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
+from frontend.Tkinter.phases.primary.setup.ExistingGamePhase import ExistingGamePhase
+from frontend.Tkinter.phases.primary.setup.NewGamePhase import NewGamePhase
 
 class HomePhase(SetupPhase):
     def __init__(self, chaperone):
@@ -17,7 +19,7 @@ class HomePhase(SetupPhase):
         self.root.mainloop()
     
     def start_new_game(self, event):
-        self.chaperone.start_new_game_phase()
+        self.chaperone.start_phase(NewGamePhase)
 
     def join_existing_game(self, event):
-        self.chaperone.start_existing_game_phase()
+        self.chaperone.start_phase(ExistingGamePhase)

@@ -1,10 +1,10 @@
+from actions.ActionFactory import ActionFactory
 from config import config
 from backend.mechanics.Game import Game
 import socket
 import threading
 import random
 import string
-import re
 import json
 
 class Server:
@@ -30,29 +30,38 @@ class Server:
     def handle(self, client_conn):
         while True:
             from_client = client_conn.recv(1024).decode('utf-8')
+            from_client = json.loads(from_client)
             print(from_client)
-            if re.search('^.+;.+$', from_client):
-                action, data = from_client.split(';')
-                if action == 'CREATE_NEW_GAME': ### TODO: Make constant
-                    num_hexagons = data
-                    game = Game(config, num_hexagons)
-                    game_code = ''.join(random.choices(string.ascii_letters, k = 10))
-                    self.games[game_code] = {
-                        'clients': [client_conn],
-                        'game': game,
-                        'main_client': client_conn
-                    }
-                    client_conn.send(game_code.encode('utf-8'))
-                elif action == 'JOIN_EXISTING_GAME': ### TODO: Make constant
-                    game_code = data
-                    self.games[game_code]['clients'].append(client_conn)
-                elif action == 'ADD_PLAYER':
-                    player = data
-                    self.games[game_code]['game'].players.append(player)
-                elif action == 'GET_PLAYERS':
-                    game_code = data
-                    players = self.games[game_code]['game'].players
-                    client_conn.send(json.dumps(players).encode('utf-8'))
+            action = from_client['action']
+            if action == ActionFactory.ADD_PLAYER:
+                game_code = from_client['game_code']
+                player = from_client['player']
+                self.games[game_code]['game'].players.append(player)
+                self.broadcast(game_code, f'{action};{json.dumps(self.games[game_code]["game"].players)}')
+            elif action == ActionFactory.CREATE_NEW_GAME:
+                num_hexagons = from_client['num_hexagons']
+                game = Game(config, num_hexagons)
+                game_code = ''.join(random.choices(string.ascii_lowercase, k = 5))
+                self.games[game_code] = {
+                    'clients': [client_conn],
+                    'game': game,
+                    'main_client': client_conn
+                }
+                self.broadcast(game_code, f'{action};{game_code}')
+            elif action == ActionFactory.GET_PLAYERS:
+                game_code = from_client['game_code']
+                players = self.games[game_code]['game'].players
+                self.broadcast(game_code, f'{action};{json.dumps(players)}')
+            elif action == ActionFactory.JOIN_EXISTING_GAME:
+                game_code = from_client['game_code']
+                self.games[game_code]['clients'].append(client_conn)
+                self.broadcast(game_code, f'{action};{game_code}')
+    
+    def broadcast(self, game_code, message):
+        for client_conn in self.games[game_code]['clients']:
+            client_conn.send(message.encode('utf-8'))
+    
+    ### Handle client disconnect
 
 server = Server()
 server.serve()

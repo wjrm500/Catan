@@ -1,5 +1,6 @@
 import tkinter
 from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
+from frontend.Tkinter.phases.primary.setup.LobbyPhase import LobbyPhase
 
 class NewGamePhase(SetupPhase):
     MIN_HEXAGONS = 5
@@ -31,7 +32,7 @@ class NewGamePhase(SetupPhase):
                 error = 'Number of hexagons must be between {} and {}'.format(self.MIN_HEXAGONS, self.MAX_HEXAGONS)
         if not error:
             self.chaperone.create_new_game(num_hexagons)
-            self.chaperone.start_lobby_phase(self)
+            self.chaperone.start_phase(LobbyPhase)
         else:
             self.error_text = self.render_error_text(self.inner_frame, error)
             self.error_text.pack(side = tkinter.TOP, pady = 10)

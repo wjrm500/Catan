@@ -1,5 +1,6 @@
 import tkinter
 from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
+from frontend.Tkinter.phases.primary.setup.LobbyPhase import LobbyPhase
 
 class ExistingGamePhase(SetupPhase):
     def __init__(self, chaperone):
@@ -20,4 +21,4 @@ class ExistingGamePhase(SetupPhase):
     def submit_form(self, event):
         game_code = self.game_code_input.get()
         self.chaperone.join_existing_game(game_code)
-        self.chaperone.start_lobby_phase(self)
+        self.chaperone.start_phase(LobbyPhase)

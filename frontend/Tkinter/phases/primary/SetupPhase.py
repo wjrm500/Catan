@@ -22,7 +22,14 @@ class SetupPhase(Phase):
             label.config(config)
         label.tag_configure('tag-center', justify = 'center')
         label.insert(tkinter.END, text, 'tag-center')
-        return label 
+        return label
+    
+    def render_dynamic_label(self, where, textvariable, config = None):
+        label = tkinter.Label(where, textvariable = textvariable)
+        if config is not None:
+            label.config(config)
+        # label.tag_configure('tag-center', justify = 'center')
+        return label
     
     def render_input(self, where):
         return tkinter.Entry(where)

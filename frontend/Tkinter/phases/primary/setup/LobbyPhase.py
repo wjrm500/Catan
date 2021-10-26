@@ -18,7 +18,9 @@ class LobbyPhase(SetupPhase):
             'highlightcolor': ColorUtils.darken_hex(self.BG_COLOR, 0.2), 
             'highlightthickness': 1
         }
-        self.game_code_label = self.render_label(where = self.inner_frame, text = 'Game code: {}'.format(self.chaperone.game_code))
+        self.game_code_text = tkinter.StringVar()
+        self.game_code_text.set('Game code: ')
+        self.game_code_label = self.render_dynamic_label(where = self.inner_frame, textvariable = self.game_code_text)
         self.game_code_label.pack(side = tkinter.TOP, pady = 20)
         self.new_player_panel = self.render_new_player_panel(where = self.split_panel, config = player_panel_config)
         self.existing_players_panel = self.render_existing_players_panel(where = self.split_panel, config = player_panel_config)
@@ -35,7 +37,7 @@ class LobbyPhase(SetupPhase):
     def add_player(self, event):
         name = self.new_player_input.get()
         errors = []
-        players = self.chaperone.get_players()
+        players = self.chaperone.players
         if len(players) == self.MAX_PLAYER_COUNT:
             errors.append('Only {} players allowed'.format(self.MAX_PLAYER_COUNT))
         name = name.title()
@@ -43,11 +45,6 @@ class LobbyPhase(SetupPhase):
             errors.append('The name {} is taken'.format(name))
         if len(errors) == 0:
             self.chaperone.add_player(name)
-            if hasattr(self, 'existing_players_list'):
-                self.existing_players_list.destroy()
-            self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
-            self.existing_players_list.pack(side = tkinter.TOP, pady = 10)
-            self.new_player_input.delete(0, 'end')
         else:
             self.error_text = self.render_error_text(self.inner_frame, '\n'.join(errors))
             self.error_text.pack(side = tkinter.TOP, pady = 10)
@@ -71,7 +68,7 @@ class LobbyPhase(SetupPhase):
         return existing_players_panel
     
     def render_existing_players_list(self, where, config):
-        players = self.chaperone.get_players()
+        players = self.chaperone.players
         existing_players_list = tkinter.Text(where, font = self.get_font(font_weight = 'normal'), foreground = 'black', background = self.BG_COLOR, width = 25, height = len(players) + 1, bd = 0)
         existing_players_list.config(config)
         existing_players_list.tag_configure('tag-center', justify = 'center')
@@ -81,3 +78,11 @@ class LobbyPhase(SetupPhase):
 
     def go_to_main_loop(self, event):
         self.chaperone.start_main_phase()
+    
+    def update_gui(self):
+        self.game_code_text.set('Game code: {}'.format(self.chaperone.game_code))
+        if hasattr(self, 'existing_players_list'):
+            self.existing_players_list.destroy()
+        self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
+        self.existing_players_list.pack(side = tkinter.TOP, pady = 10)
+        self.new_player_input.delete(0, 'end')
