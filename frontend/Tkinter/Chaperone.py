@@ -24,17 +24,11 @@ class Chaperone:
     def check_queue(self):
         ### Might be better to avoid polling and use event_generate - https://stackoverflow.com/questions/7141509/tkinter-wait-for-item-in-queue
         while self.queue.empty() is False:
-            print(0)
             data = self.queue.get(timeout = 0.1)
-            print(1)
-            action_str, param = data.decode('utf-8').split(';')
-            print(2)
-            action = ActionFactory.get_action(action_str)
-            print(3)
-            action.callback(self, param)
-            print(4)
+            data = json.loads(data.decode('utf-8'))
+            action = ActionFactory.get_action(data['action'])
+            action.callback(self, data)
             self.update_gui()
-            print(5)
         self.root.after(100, self.check_queue)
     
     def update_gui(self):
@@ -58,13 +52,6 @@ class Chaperone:
         to_send = json.dumps({
             'action': ActionFactory.CREATE_NEW_GAME,
             'num_hexagons': num_hexagons
-        })
-        self.socket.send(to_send.encode('utf-8'))
-    
-    def get_players(self):
-        to_send = json.dumps({
-            'action': ActionFactory.GET_PLAYERS,
-            'game_code': self.game_code
         })
         self.socket.send(to_send.encode('utf-8'))
     

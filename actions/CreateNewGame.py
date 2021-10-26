@@ -5,5 +5,5 @@ class CreateNewGame(Action):
     def __init__(self):
         pass
 
-    def callback(self, chaperone, param):
-        chaperone.game_code = param
+    def callback(self, chaperone, data):
+        chaperone.game_code = data['game_code']

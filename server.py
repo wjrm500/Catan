@@ -31,13 +31,15 @@ class Server:
         while True:
             from_client = client_conn.recv(1024).decode('utf-8')
             from_client = json.loads(from_client)
-            print(from_client)
+            print(f'Client: {client_conn.getpeername()} || Data: {from_client}')
             action = from_client['action']
             if action == ActionFactory.ADD_PLAYER:
                 game_code = from_client['game_code']
                 player = from_client['player']
                 self.games[game_code]['game'].players.append(player)
-                self.broadcast(game_code, f'{action};{json.dumps(self.games[game_code]["game"].players)}')
+                players = self.games[game_code]['game'].players
+                data = {'action': action, 'players': players}
+                self.broadcast(game_code, data)
             elif action == ActionFactory.CREATE_NEW_GAME:
                 num_hexagons = from_client['num_hexagons']
                 game = Game(config, num_hexagons)
@@ -47,19 +49,18 @@ class Server:
                     'game': game,
                     'main_client': client_conn
                 }
-                self.broadcast(game_code, f'{action};{game_code}')
-            elif action == ActionFactory.GET_PLAYERS:
-                game_code = from_client['game_code']
-                players = self.games[game_code]['game'].players
-                self.broadcast(game_code, f'{action};{json.dumps(players)}')
+                data = {'action': action, 'game_code': game_code}
+                self.broadcast(game_code, data)
             elif action == ActionFactory.JOIN_EXISTING_GAME:
                 game_code = from_client['game_code']
                 self.games[game_code]['clients'].append(client_conn)
-                self.broadcast(game_code, f'{action};{game_code}')
+                players = self.games[game_code]['game'].players
+                data = {'action': action, 'game_code': game_code, 'players': players}
+                self.broadcast(game_code, data)
     
     def broadcast(self, game_code, message):
         for client_conn in self.games[game_code]['clients']:
-            client_conn.send(message.encode('utf-8'))
+            client_conn.send(json.dumps(message).encode('utf-8'))
     
     ### Handle client disconnect
 

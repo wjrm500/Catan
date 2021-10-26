@@ -5,5 +5,5 @@ class AddPlayer(Action):
     def __init__(self):
         pass
 
-    def callback(self, chaperone, param):
-        chaperone.players = json.loads(param)
+    def callback(self, chaperone, data):
+        chaperone.players = data['players']
