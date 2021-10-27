@@ -39,8 +39,8 @@ class LobbyPhase(SetupPhase):
         name = self.new_player_input.get()
         errors = []
         players = self.chaperone.players
-        if not re.match('^[A-Za-z]$', name):
-            errors.append(f'Invalid name')
+        if not re.match('^[A-Za-z]{1,20}$', name):
+            errors.append(f'Invalid name: use only alphabetic characters and limit to 20 characters')
         if len(players) == self.MAX_PLAYER_COUNT:
             errors.append(f'Only {self.MAX_PLAYER_COUNT} players allowed')
         name = name.title()
