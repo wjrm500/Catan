@@ -64,17 +64,21 @@ class LobbyPhase(SetupPhase):
         existing_players_label = self.render_label(where = existing_players_panel, text = 'Players in lobby:', config = GeneralUtils.filter_dict(config, ['background']))
         self.existing_players_list = self.render_existing_players_list(where = existing_players_panel, config = GeneralUtils.filter_dict(config, ['background']))
         existing_players_label.pack(side = tkinter.TOP, pady = 20)
-        self.existing_players_list.pack(side = tkinter.TOP, pady = 20)
+        for i, list_item in enumerate(self.existing_players_list):
+            list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))
         return existing_players_panel
     
     def render_existing_players_list(self, where, config):
-        players = self.chaperone.players
-        existing_players_list = tkinter.Text(where, font = self.get_font(font_weight = 'normal'), foreground = 'black', background = self.BG_COLOR, width = 25, height = len(players) + 1, bd = 0)
-        existing_players_list.config(config)
-        existing_players_list.tag_configure('tag-center', justify = 'center')
-        for player in players:
-            existing_players_list.insert(tkinter.END, '{}\n'.format(player), 'tag-center')
+        existing_players_list = []
+        for player in self.chaperone.players:
+            list_item = tkinter.Text(where, font = self.get_font(font_weight = 'normal'), foreground = 'black', background = self.BG_COLOR, width = 25, height = 1, bd = 0)
+            list_item.config(config)
+            list_item.tag_configure('tag-center', justify = 'center')
+            you_text = ' (you)' if player == self.chaperone.player else ''
+            list_item.insert(tkinter.END, f'{player}{you_text}', 'tag-center')
+            existing_players_list.append(list_item)
         return existing_players_list
+
 
     def go_to_main_loop(self, event):
         self.chaperone.start_main_phase()
@@ -82,7 +86,9 @@ class LobbyPhase(SetupPhase):
     def update_gui(self):
         self.game_code_text.set('Game code: {}'.format(self.chaperone.game_code))
         if hasattr(self, 'existing_players_list'):
-            self.existing_players_list.destroy()
+            for list_item in self.existing_players_list:
+                list_item.destroy()
         self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
-        self.existing_players_list.pack(side = tkinter.TOP, pady = 10)
+        for i, list_item in enumerate(self.existing_players_list):
+            list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))
         self.new_player_input.delete(0, 'end')

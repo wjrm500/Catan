@@ -44,11 +44,7 @@ class Server:
                 num_hexagons = from_client['num_hexagons']
                 game = Game(config, num_hexagons)
                 game_code = ''.join(random.choices(string.ascii_lowercase, k = 5))
-                self.games[game_code] = {
-                    'clients': [client_conn],
-                    'game': game,
-                    'main_client': client_conn
-                }
+                self.games[game_code] = {'clients': [client_conn], 'game': game, 'main_client': client_conn}
                 data = {'action': action, 'game_code': game_code}
                 self.broadcast(game_code, data)
             elif action == ActionFactory.JOIN_EXISTING_GAME:

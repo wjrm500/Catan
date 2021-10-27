@@ -22,12 +22,10 @@ class Client:
         self.receive_thread.start()
         self.gui_thread.start()
     
-    ### NEED TO BE ABLE TO RECEIVE MESSAGES ASYNCHRONOUSLY WHILE ALSO BEING ABLE TO RECEIVE MESSAGES ON DEMAND
     def receive(self):
         while True:
             from_server = self.socket.recv(1024)
             self.queue.put(from_server)
-            ### Receive broadcast from server and do something e.g. new player added
 
     def gui(self):
         self.chaperone = Chaperone(self.socket, self.queue)

@@ -17,6 +17,7 @@ class Chaperone:
         self.root.title('Catan')
         self.current_phase = None
         self.players = []
+        self.player = ''
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
@@ -41,6 +42,7 @@ class Chaperone:
         self.current_phase.run()
     
     def add_player(self, name):
+        self.player = name
         to_send = json.dumps({
             'action': ActionFactory.ADD_PLAYER,
             'game_code': self.game_code,
