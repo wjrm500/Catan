@@ -17,18 +17,14 @@ class SetupPhase(Phase):
         self.catan_logo_canvas.pack(side = tkinter.TOP, pady = 20)
     
     def render_label(self, where, text, config = None):
-        label = tkinter.Text(where, font = self.get_font(), foreground = 'black', background = self.BG_COLOR, width = 25, height = 1, bd = 0)
+        param_dict = {'font': self.get_font(), 'foreground': 'black', 'background': self.BG_COLOR, 'width': 25, 'height': 1, 'bd': 0}
+        if isinstance(text, tkinter.StringVar):
+            label = tkinter.Label(where, textvariable = text, **param_dict)
+        else:
+            label = tkinter.Label(where, text = text, **param_dict)
         if config is not None:
             label.config(config)
-        label.tag_configure('tag-center', justify = 'center')
-        label.insert(tkinter.END, text, 'tag-center')
-        return label
-    
-    def render_dynamic_label(self, where, textvariable, config = None):
-        label = tkinter.Label(where, textvariable = textvariable)
-        if config is not None:
-            label.config(config)
-        # label.tag_configure('tag-center', justify = 'center')
+        label.configure(anchor = 'center')
         return label
     
     def render_input(self, where):

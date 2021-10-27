@@ -21,7 +21,7 @@ class LobbyPhase(SetupPhase):
         }
         self.game_code_text = tkinter.StringVar()
         self.game_code_text.set('Game code: ')
-        self.game_code_label = self.render_dynamic_label(where = self.inner_frame, textvariable = self.game_code_text)
+        self.game_code_label = self.render_label(where = self.inner_frame, text = self.game_code_text)
         self.game_code_label.pack(side = tkinter.TOP, pady = 20)
         self.new_player_panel = self.render_new_player_panel(where = self.split_panel, config = player_panel_config)
         self.existing_players_panel = self.render_existing_players_panel(where = self.split_panel, config = player_panel_config)
@@ -48,16 +48,22 @@ class LobbyPhase(SetupPhase):
             errors.append(f'The name {name} is taken')
         if len(errors) == 0:
             self.chaperone.add_player(name)
+            ### Want the following code and not in update_gui because we do not want to re-render left panel every time any other player enters name
+            self.new_player_label_text.set('Name successfully submitted!')
+            self.new_player_input.config(state = 'disabled')
+            self.add_new_player_button.config(state = 'disabled')
         else:
             self.error_text = self.render_error_text(self.inner_frame, '\n'.join(errors))
             self.error_text.pack(side = tkinter.TOP, pady = 10)
 
     def render_new_player_panel(self, where, config):
         new_player_panel = self.render_frame(where = where, size = 1.0, config = config)
-        player_name_label = self.render_label(where = new_player_panel, text = 'Please enter your name:', config = GeneralUtils.filter_dict(config, ['background']))
+        self.new_player_label_text = tkinter.StringVar()
+        self.new_player_label_text.set('Please enter your name:')
+        self.new_player_label = self.render_label(where = new_player_panel, text = self.new_player_label_text, config = GeneralUtils.filter_dict(config, ['background']))
         self.new_player_input = self.render_input(where = new_player_panel)
         self.add_new_player_button = self.render_button(where = new_player_panel, text = 'Submit')
-        panel_components = [player_name_label, self.new_player_input, self.add_new_player_button]
+        panel_components = [self.new_player_label, self.new_player_input, self.add_new_player_button]
         for component in panel_components:
             component.pack(side = tkinter.TOP, pady = 20)
         return new_player_panel
@@ -94,4 +100,3 @@ class LobbyPhase(SetupPhase):
         self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
         for i, list_item in enumerate(self.existing_players_list):
             list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))
-        self.new_player_input.delete(0, 'end')
