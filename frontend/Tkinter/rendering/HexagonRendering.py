@@ -19,16 +19,14 @@ class HexagonRendering:
 
     IN_DEVELOPMENT = False
 
-    def __init__(self, main_phase):
-        self.main_phase = main_phase
-        self.canvas = self.main_phase.canvas
+    def __init__(self, parent_phase):
+        self.parent_phase = parent_phase
+        self.canvas = self.parent_phase.canvas
         self.scale = 1
         self.focused_hexagons = []
         self.reset_canvas_objects()
-    
-    def set_game(self, game):
-        self.game = game
-        self.hexagon_renders = {hexagon.id: HexagonRender(self, hexagon) for hexagon in game.distributor.hexagons}
+        self.distributor = self.parent_phase.chaperone.distributor
+        self.hexagon_renders = {hexagon.id: HexagonRender(self, hexagon) for hexagon in self.distributor.hexagons}
     
     def reset_canvas_objects(self):
         self.canvas_objects = {
@@ -102,7 +100,7 @@ class HexagonRendering:
         ### Find closest node to cursor and collect arguments for rendering
         x1 = event.x
         y1 = event.y
-        node_dists = [(node, math.sqrt(pow(node.real_x - x1, 2) + pow(node.real_y - y1, 2))) for node in self.game.distributor.nodes]
+        node_dists = [(node, math.sqrt(pow(node.real_x - x1, 2) + pow(node.real_y - y1, 2))) for node in self.distributor.nodes]
         min_node_dist = min(map(lambda x: x[1], node_dists))
         for node, dist in node_dists:
             closest_to_cursor = dist == min_node_dist
@@ -140,7 +138,7 @@ class HexagonRendering:
         self.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)
         
         ### Change cursor pointer to hand icon if cursor near node
-        cursor = self.main_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
+        cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
         self.canvas.config(cursor = cursor)
     
     def unfocus_focused_hexagons(self, event):
@@ -156,8 +154,8 @@ class HexagonRendering:
         if self.canvas_width > 11: ### Width on initial render before resize
             self.canvas.delete('all')
             self.reset_canvas_objects()
-            node_x_values = [node.x for node in self.game.distributor.nodes]
-            node_y_values = [node.y for node in self.game.distributor.nodes]
+            node_x_values = [node.x for node in self.distributor.nodes]
+            node_y_values = [node.y for node in self.distributor.nodes]
             x_shift = -min(node_x_values)
             y_shift = -min(node_y_values)
             x_max = max(node_x_values) + x_shift
@@ -169,11 +167,11 @@ class HexagonRendering:
             y_centre_shift = (self.canvas_height - y_max * self.scale) / 2
             self.centre_points = []
 
-            for node in self.game.distributor.nodes:
+            for node in self.distributor.nodes:
                 node.real_x = (node.x + x_shift) * self.scale + x_centre_shift
                 node.real_y = (node.y + y_shift) * self.scale + y_centre_shift
 
-            for hexagon in self.game.distributor.hexagons:
+            for hexagon in self.distributor.hexagons:
                 self.init_render(hexagon)
     
     def ct_line_tag(self, line):

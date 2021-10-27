@@ -6,6 +6,8 @@ import threading
 import random
 import string
 import json
+from pympler.asizeof import asizeof
+import pickle
 
 class Server:
     LOCAL_HOST = '127.0.0.1'
@@ -35,10 +37,10 @@ class Server:
             action = from_client['action']
             if action == ActionFactory.ADD_PLAYER:
                 game_code = from_client['game_code']
-                player = from_client['player']
-                self.games[game_code]['game'].players.append(player)
-                players = self.games[game_code]['game'].players
-                data = {'action': action, 'players': players}
+                player_name = from_client['player']
+                game = self.games[game_code]['game']
+                game.add_player(player_name)
+                data = {'action': action, 'players': [player.name for player in game.players]}
                 self.broadcast(game_code, data)
             elif action == ActionFactory.CREATE_NEW_GAME:
                 num_hexagons = from_client['num_hexagons']
@@ -51,12 +53,25 @@ class Server:
                 game_code = from_client['game_code']
                 self.games[game_code]['clients'].append(client_conn)
                 players = self.games[game_code]['game'].players
-                data = {'action': action, 'game_code': game_code, 'players': players}
+                data = {'action': action, 'game_code': game_code, 'players': [player.name for player in players]}
                 self.broadcast(game_code, data)
+            elif action == ActionFactory.START_GAME:
+                game_code = from_client['game_code']
+                game = self.games[game_code]['game']
+                game.setup_board()
+                game.setup_cards()
+                game.setup_movable_pieces()
+                self.broadcast(game_code, {'action': action, 'distributor': game.distributor})
     
     def broadcast(self, game_code, message):
         for client_conn in self.games[game_code]['clients']:
-            client_conn.send(json.dumps(message).encode('utf-8'))
+            try:
+                encoded_message = json.dumps(message).encode('utf-8')
+            except:
+                encoded_message = pickle.dumps(message)
+            bytes_to_send = str(asizeof(encoded_message)).encode('utf-8')
+            client_conn.send(bytes_to_send) ### Header
+            client_conn.send(encoded_message)
     
     ### Handle client disconnect
 

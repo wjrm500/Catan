@@ -1,3 +1,4 @@
+from backend.mechanics.Player import Player
 from .drawing.HexagonDrawing import HexagonDrawing
 import random
 import copy
@@ -15,8 +16,8 @@ class Game:
         self.players = []
         self.distributor = Distributor()
     
-    def add_player(self, player):
-        self.players.append(player)
+    def add_player(self, name):
+        self.players.append(Player(name))
     
     def setup_board(self):
         HexagonDrawing.draw_hexagons(self)

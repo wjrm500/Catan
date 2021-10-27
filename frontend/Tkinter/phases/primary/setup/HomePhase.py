@@ -14,11 +14,11 @@ class HomePhase(SetupPhase):
         self.existing_game_button.pack(side = tkinter.RIGHT, padx = 10)
 
     def run(self):
-        self.new_game_button.bind('<Button-1>', self.start_new_game)
+        self.new_game_button.bind('<Button-1>', self.create_new_game)
         self.existing_game_button.bind('<Button-1>', self.join_existing_game)
         self.root.mainloop()
     
-    def start_new_game(self, event):
+    def create_new_game(self, event):
         self.chaperone.start_phase(NewGamePhase)
 
     def join_existing_game(self, event):

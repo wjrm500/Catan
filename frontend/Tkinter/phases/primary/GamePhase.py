@@ -17,9 +17,9 @@ class GamePhase(Phase):
         self.canvas.pack(expand = True)
         self.hexagon_rendering = HexagonRendering(self)
     
-    def set_game(self, game):
-        self.game = game
-        self.hexagon_rendering.set_game(game)
+    def set_distributor(self, distributor):
+        self.distributor = distributor
+        self.hexagon_rendering.set_distributor(distributor)
     
     def run(self):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)

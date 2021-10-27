@@ -18,6 +18,7 @@ class Chaperone:
         self.current_phase = None
         self.players = []
         self.player = ''
+        self.main = False ### User is main client i.e. created game
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
@@ -26,7 +27,6 @@ class Chaperone:
         ### Might be better to avoid polling and use event_generate - https://stackoverflow.com/questions/7141509/tkinter-wait-for-item-in-queue
         while self.queue.empty() is False:
             data = self.queue.get(timeout = 0.1)
-            data = json.loads(data.decode('utf-8'))
             action = ActionFactory.get_action(data['action'])
             action.callback(self, data)
             self.update_gui()
@@ -35,9 +35,10 @@ class Chaperone:
     def update_gui(self):
         self.current_phase.update_gui()
     
-    def start_phase(self, phase):
+    def start_phase(self, phase, destroy_root = False):
         if self.current_phase is not None:
-            self.current_phase.outer_frame.destroy()
+            to_destroy = self.current_phase.root if destroy_root else self.current_phase.outer_frame
+            to_destroy.destroy()
         self.current_phase = phase(self)
         self.current_phase.run()
     
@@ -51,6 +52,7 @@ class Chaperone:
         self.socket.send(to_send.encode('utf-8'))
     
     def create_new_game(self, num_hexagons):
+        self.main = True
         to_send = json.dumps({
             'action': ActionFactory.CREATE_NEW_GAME,
             'num_hexagons': num_hexagons
@@ -64,14 +66,12 @@ class Chaperone:
         })
         self.socket.send(to_send.encode('utf-8'))
     
+    def start_game(self):
+        to_send = json.dumps({
+            'action': ActionFactory.START_GAME,
+            'game_code': self.game_code
+        })
+        self.socket.send(to_send.encode('utf-8'))
+    
     def start_settle_phase(self):
         self.settle_phase = SettlePhase(self)
-    
-    def start_main_phase(self):
-        self.lobby_phase.root.destroy()
-        self.main_phase = GamePhase(self)
-        self.game.setup_board()
-        self.game.setup_cards()
-        self.game.setup_movable_pieces()
-        self.main_phase.set_game(self.game)
-        self.main_phase.run()

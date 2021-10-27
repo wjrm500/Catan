@@ -1,5 +1,6 @@
 import tkinter
 from GeneralUtils import GeneralUtils
+from frontend.Tkinter.phases.primary.GamePhase import GamePhase
 from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
 from frontend.ColorUtils import ColorUtils
 import re
@@ -48,7 +49,7 @@ class LobbyPhase(SetupPhase):
             errors.append(f'The name {name} is taken')
         if len(errors) == 0:
             self.chaperone.add_player(name)
-            ### Want the following code and not in update_gui because we do not want to re-render left panel every time any other player enters name
+            ### Want the following code here and not in update_gui because we do not want to re-render left panel every time any other player enters name
             self.new_player_label_text.set('Name successfully submitted!')
             self.new_player_input.config(state = 'disabled')
             self.add_new_player_button.config(state = 'disabled')
@@ -88,9 +89,9 @@ class LobbyPhase(SetupPhase):
             existing_players_list.append(list_item)
         return existing_players_list
 
-
     def go_to_main_loop(self, event):
-        self.chaperone.start_main_phase()
+        self.chaperone.start_game()
+        # self.chaperone.start_phase(GamePhase)
     
     def update_gui(self):
         self.game_code_text.set('Game code: {}'.format(self.chaperone.game_code))
@@ -100,3 +101,7 @@ class LobbyPhase(SetupPhase):
         self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
         for i, list_item in enumerate(self.existing_players_list):
             list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))
+        if self.chaperone.main and len(self.chaperone.players) > 1:
+            proceed_button = self.render_button(where = self.inner_frame, text = 'Start game')
+            proceed_button.pack(side = tkinter.TOP, pady = 10)
+            proceed_button.bind('<Button-1>', self.go_to_main_loop)
