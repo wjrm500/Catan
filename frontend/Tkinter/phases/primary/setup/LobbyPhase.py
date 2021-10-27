@@ -2,6 +2,7 @@ import tkinter
 from GeneralUtils import GeneralUtils
 from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
 from frontend.ColorUtils import ColorUtils
+import re
 
 ### Lobby game code needs to be visible
 ### LobbyPhase can be accessed by creator and joiners, should appear differently to both. For creator, option to proceed
@@ -38,11 +39,13 @@ class LobbyPhase(SetupPhase):
         name = self.new_player_input.get()
         errors = []
         players = self.chaperone.players
+        if not re.match('^[A-Za-z]$', name):
+            errors.append(f'Invalid name')
         if len(players) == self.MAX_PLAYER_COUNT:
-            errors.append('Only {} players allowed'.format(self.MAX_PLAYER_COUNT))
+            errors.append(f'Only {self.MAX_PLAYER_COUNT} players allowed')
         name = name.title()
         if name in players:
-            errors.append('The name {} is taken'.format(name))
+            errors.append(f'The name {name} is taken')
         if len(errors) == 0:
             self.chaperone.add_player(name)
         else:
