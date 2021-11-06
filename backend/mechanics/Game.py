@@ -1,3 +1,4 @@
+import string
 from backend.mechanics.Player import Player
 from .drawing.HexagonDrawing import HexagonDrawing
 import random
@@ -15,6 +16,8 @@ class Game:
         self.num_hexagons = num_hexagons
         self.players = []
         self.distributor = Distributor()
+        self.started = False
+        self.code = ''.join(random.choices(string.ascii_lowercase, k = 5))
     
     def add_player(self, name):
         self.players.append(Player(name))
