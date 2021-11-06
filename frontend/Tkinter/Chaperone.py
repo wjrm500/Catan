@@ -1,12 +1,9 @@
 import tkinter
+from tkinter import messagebox
 from actions.ActionFactory import ActionFactory
-from frontend.Tkinter.phases.primary.setup.ExistingGamePhase import ExistingGamePhase
-from frontend.Tkinter.phases.primary.setup.HomePhase import HomePhase
-from frontend.Tkinter.phases.primary.setup.NewGamePhase import NewGamePhase
-from frontend.Tkinter.phases.primary.setup.LobbyPhase import LobbyPhase
-from frontend.Tkinter.phases.primary.GamePhase import GamePhase
 from frontend.Tkinter.phases.primary.SettlePhase import SettlePhase
 import json
+import os
 
 class Chaperone:
     def __init__(self, socket, queue):
@@ -15,6 +12,7 @@ class Chaperone:
         self.root = tkinter.Tk()
         self.root.after(100, self.check_queue)
         self.root.title('Catan')
+        self.root.protocol('WM_DELETE_WINDOW', self.on_closing)
         self.current_phase = None
         self.players = []
         self.player = ''
@@ -75,3 +73,8 @@ class Chaperone:
     
     def start_settle_phase(self):
         self.settle_phase = SettlePhase(self)
+    
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.root.destroy()
+            os._exit(0)

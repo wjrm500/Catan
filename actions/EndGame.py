@@ -1,8 +1,10 @@
 from actions.Action import Action
+import os
 
-class AddPlayer(Action):
+class EndGame(Action):
     def __init__(self):
         pass
 
     def callback(self, chaperone, data):
-        chaperone.players = data['players']
+        chaperone.root.destroy()
+        os._exit(0)

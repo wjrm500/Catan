@@ -28,35 +28,34 @@ class Server:
             thread = threading.Thread(target = self.handle, args = (client_conn,))
             thread.start()
             
-    def handle(self, client_conn):
+    def handle(self, client):
         while True:
             try:
-                client_address = client_conn.getpeername()
-                from_client = client_conn.recv(1024).decode('utf-8')
+                client_address = client.getpeername()
+                from_client = client.recv(1024).decode('utf-8')
                 from_client = json.loads(from_client)
-                print(f'Client: {client_address} || Data: {from_client}')
+                print(f'Incoming... Client: {client_address} || Data: {from_client}')
                 action = from_client['action']
                 if action == ActionFactory.ADD_PLAYER:
                     game_code = from_client['game_code']
                     game = self.games[game_code]
-                    player = Player(from_client['player'], client_address)
+                    player = Player(from_client['player'], client)
                     game.add_player(player)
                     data = {'action': action, 'players': [player.name for player in game.players]}
-                    self.broadcast(game_code, data)
+                    self.broadcast(game.code, data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = from_client['num_hexagons']
                     game = Game(config, num_hexagons)
-                    game.main_client_address = client_address ### Use setter
-                    game.clients = [client_address] ### Use add_client method and if first client set as creator (remove line above)
-                    self.games[game.code] = game ###{'clients': [client_conn], 'delete': False, 'game': game, 'main_client': client_conn}
+                    game.add_client(client)
+                    self.games[game.code] = game
                     data = {'action': action, 'game_code': game.code}
-                    self.broadcast(game_code, data)
+                    self.broadcast(game.code, data)
                 elif action == ActionFactory.JOIN_EXISTING_GAME:
                     game_code = from_client['game_code']
                     game = self.games[game_code]
-                    game.clients.append(client_address) ### Use add_client method as above
-                    data = {'action': action, 'game_code': game_code, 'players': [player.name for player in game.players]}
-                    self.broadcast(game_code, data)
+                    game.add_client(client)
+                    data = {'action': action, 'game_code': game.code, 'players': [player.name for player in game.players]}
+                    self.broadcast(game.code, data)
                 elif action == ActionFactory.START_GAME:
                     game_code = from_client['game_code']
                     game = self.games[game_code]
@@ -64,12 +63,13 @@ class Server:
                     game.setup_cards()
                     game.setup_movable_pieces()
                     game.started = True
-                    self.broadcast(game_code, {'action': action, 'distributor': game.distributor})
+                    self.broadcast(game.code, {'action': action, 'distributor': game.distributor})
             except:                    
                 ### End any games for which the client was the main client
                 game_codes_to_delete = []
                 for game_code, game in self.games.items():
-                    if game.main_client_address == client_address:
+                    if game.main_client == client:
+                        game.delete_client_and_corresponding_player_if_applicable(client_address)
                         self.broadcast(game.code, {'action': ActionFactory.END_GAME})
                         game_codes_to_delete.append(game_code)
 
@@ -77,28 +77,31 @@ class Server:
                 ### If game not yet started, simply remove client from game
                 for game_code, game in self.games.items():
                     if client_address in game.clients:
+                        player = game.get_player(client_address)
+                        game.delete_client_and_corresponding_player_if_applicable(client_address)
                         if game.started:
                             self.broadcast(game.code, {'action': ActionFactory.END_GAME})
                             game_codes_to_delete.append(game_code)
                         else:
-                            player = [player.name for player in game.players if player.address == client_address][0]
-                            self.broadcast(game_code, {'action': ActionFactory.REMOVE_PLAYER, 'player': player})
+                            self.broadcast(game_code, {'action': ActionFactory.REMOVE_PLAYER, 'player': player.name})
 
                 for game_code in game_codes_to_delete:
                     del self.games[game_code]
 
-                
-
+                client.shutdown(2)
+                client.close()
+                break
     
     def broadcast(self, game_code, message):
-        for client_conn in self.games[game_code]['clients']:
+        for client in self.games[game_code].clients.values():
             try:
                 encoded_message = json.dumps(message).encode('utf-8')
             except:
                 encoded_message = pickle.dumps(message)
             bytes_to_send = str(asizeof(encoded_message)).encode('utf-8')
-            client_conn.send(bytes_to_send) ### Header
-            client_conn.send(encoded_message)
+            client.send(bytes_to_send) ### Header
+            client.send(encoded_message)
+            print(f'Outgoing... {message["action"]}')
     
     ### Handle client disconnect
 

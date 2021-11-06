@@ -14,13 +14,28 @@ class Game:
     def __init__(self, config, num_hexagons = 19):
         self.config = config
         self.num_hexagons = num_hexagons
+        self.clients = {}
         self.players = []
         self.distributor = Distributor()
         self.started = False
         self.code = ''.join(random.choices(string.ascii_lowercase, k = 5))
     
-    def add_player(self, name):
-        self.players.append(Player(name))
+    def add_client(self, client):
+        if len(self.clients) == 0:
+            self.main_client = client
+        self.clients[client.getpeername()] = client
+    
+    def delete_client_and_corresponding_player_if_applicable(self, client_address):
+        player = self.get_player(client_address)
+        if player is not None:
+            self.players.remove(player)
+        del self.clients[client_address]
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def get_player(self, client_address):
+        return next((player for player in self.players if player.get_address() == client_address), None)
     
     def setup_board(self):
         HexagonDrawing.draw_hexagons(self)

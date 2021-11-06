@@ -22,7 +22,7 @@ class LobbyPhase(SetupPhase):
         }
         self.game_code_text = tkinter.StringVar()
         self.game_code_text.set('Game code: ')
-        self.game_code_label = self.render_label(where = self.inner_frame, text = self.game_code_text, config = {'background': '#cccccc', 'fontweight': 'normal'})
+        self.game_code_label = self.render_label(where = self.inner_frame, text = self.game_code_text, config = {'background': '#eeeeee', 'font': ('Arial', '10', 'normal')})
         self.game_code_label.pack(side = tkinter.TOP, pady = 20)
         self.new_player_panel = self.render_new_player_panel(where = self.split_panel, config = player_panel_config)
         self.existing_players_panel = self.render_existing_players_panel(where = self.split_panel, config = player_panel_config)
@@ -101,8 +101,10 @@ class LobbyPhase(SetupPhase):
         self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
         for i, list_item in enumerate(self.existing_players_list):
             list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))
+        if hasattr(self, 'proceed_button'):
+            self.proceed_button.destroy()
         # if self.chaperone.main and len(self.chaperone.players) > 1:
         if self.chaperone.main and len(self.chaperone.players) > 0: ### TODO: Replace with commented line above - temporary change for testing
-            proceed_button = self.render_button(where = self.inner_frame, text = 'Start game')
-            proceed_button.pack(side = tkinter.TOP, pady = 10)
-            proceed_button.bind('<Button-1>', self.go_to_main_loop)
+            self.proceed_button = self.render_button(where = self.inner_frame, text = 'Start game')
+            self.proceed_button.pack(side = tkinter.TOP, pady = 10)
+            self.proceed_button.bind('<Button-1>', self.go_to_main_loop)
