@@ -21,4 +21,9 @@ class ExistingGamePhase(SetupPhase):
     def submit_form(self, event):
         game_code = self.game_code_input.get()
         self.chaperone.join_existing_game(game_code)
-        self.chaperone.start_phase(LobbyPhase)
+    
+    def display_error_text(self, error_text):
+        if hasattr(self, 'error_text'):
+            self.error_text.destroy()
+        self.error_text = self.render_error_text(self.inner_frame, error_text)
+        self.error_text.pack(side = tkinter.TOP, pady = 10)

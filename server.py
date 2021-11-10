@@ -42,20 +42,25 @@ class Server:
                     player = Player(from_client['player'], client)
                     game.add_player(player)
                     data = {'action': action, 'players': [player.name for player in game.players]}
-                    self.broadcast(game.code, data)
+                    self.broadcast_to_game(game.code, data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = from_client['num_hexagons']
                     game = Game(config, num_hexagons)
                     game.add_client(client)
                     self.games[game.code] = game
                     data = {'action': action, 'game_code': game.code}
-                    self.broadcast(game.code, data)
+                    self.broadcast_to_game(game.code, data)
                 elif action == ActionFactory.JOIN_EXISTING_GAME:
                     game_code = from_client['game_code']
-                    game = self.games[game_code]
-                    game.add_client(client)
-                    data = {'action': action, 'game_code': game.code, 'players': [player.name for player in game.players]}
-                    self.broadcast(game.code, data)
+                    data = {'action': action}
+                    if game_code in self.games:
+                        game = self.games[game_code]
+                        game.add_client(client)
+                        data.update({'game_code': game.code, 'players': [player.name for player in game.players]})
+                        self.broadcast_to_game(game.code, data)
+                    else:
+                        data['error'] = f'"{game_code}" is not a valid game code'
+                        self.broadcast_to_client(client, data)
                 elif action == ActionFactory.START_GAME:
                     game_code = from_client['game_code']
                     game = self.games[game_code]
@@ -63,14 +68,14 @@ class Server:
                     game.setup_cards()
                     game.setup_movable_pieces()
                     game.started = True
-                    self.broadcast(game.code, {'action': action, 'distributor': game.distributor})
+                    self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor})
             except:                    
                 ### End any games for which the client was the main client
                 game_codes_to_delete = []
                 for game_code, game in self.games.items():
                     if game.main_client == client:
                         game.delete_client_and_corresponding_player_if_applicable(client_address)
-                        self.broadcast(game.code, {'action': ActionFactory.END_GAME})
+                        self.broadcast_to_game(game.code, {'action': ActionFactory.END_GAME})
                         game_codes_to_delete.append(game_code)
 
                 ### If game started, end any games involving the client
@@ -80,10 +85,10 @@ class Server:
                         player = game.get_player(client_address)
                         game.delete_client_and_corresponding_player_if_applicable(client_address)
                         if game.started:
-                            self.broadcast(game.code, {'action': ActionFactory.END_GAME})
+                            self.broadcast_to_game(game.code, {'action': ActionFactory.END_GAME})
                             game_codes_to_delete.append(game_code)
                         else:
-                            self.broadcast(game_code, {'action': ActionFactory.REMOVE_PLAYER, 'player': player.name})
+                            self.broadcast_to_game(game_code, {'action': ActionFactory.REMOVE_PLAYER, 'player': player.name})
 
                 for game_code in game_codes_to_delete:
                     del self.games[game_code]
@@ -91,17 +96,20 @@ class Server:
                 client.shutdown(2)
                 client.close()
                 break
+        
+    def broadcast_to_client(self, client, message):
+        try:
+            encoded_message = json.dumps(message).encode('utf-8')
+        except:
+            encoded_message = pickle.dumps(message)
+        bytes_to_send = str(asizeof(encoded_message)).encode('utf-8')
+        client.send(bytes_to_send) ### Header
+        client.send(encoded_message)
+        print(f'Outgoing... {message}')
     
-    def broadcast(self, game_code, message):
+    def broadcast_to_game(self, game_code, message):
         for client in self.games[game_code].clients.values():
-            try:
-                encoded_message = json.dumps(message).encode('utf-8')
-            except:
-                encoded_message = pickle.dumps(message)
-            bytes_to_send = str(asizeof(encoded_message)).encode('utf-8')
-            client.send(bytes_to_send) ### Header
-            client.send(encoded_message)
-            print(f'Outgoing... {message["action"]}')
+            self.broadcast_to_client(client, message)
     
     ### Handle client disconnect
 

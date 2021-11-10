@@ -33,6 +33,9 @@ class Chaperone:
     def update_gui(self):
         self.current_phase.update_gui()
     
+    def display_error_text(self, error_text):
+        self.current_phase.display_error_text(error_text)
+    
     def start_phase(self, phase, destroy_root = False):
         if self.current_phase is not None:
             to_destroy = self.current_phase.root if destroy_root else self.current_phase.outer_frame
