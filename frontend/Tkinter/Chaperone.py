@@ -17,8 +17,8 @@ class Chaperone:
         self.players = []
         self.player = ''
         self.main = False ### User is main client i.e. created game
-        # self.start_phase(SettlingPhase)
-        # exit()
+        self.start_phase(SettlingPhase)
+        exit()
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)

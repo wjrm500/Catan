@@ -4,6 +4,7 @@ from frontend.ColorUtils import ColorUtils
 
 class Phase:
     BG_COLOR = '#ADD8E6'
+    CATAN_LOGO_IMG_FILEPATH = './frontend/assets/images/catan_logo.png'
     CURSOR_HAND = 'hand2'
     FONT_NAME = 'Arial'
     FONT_SIZE = '10'

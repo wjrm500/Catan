@@ -2,7 +2,6 @@ import tkinter
 from frontend.Tkinter.phases.Phase import Phase
 
 class SetupPhase(Phase):
-    CATAN_LOGO_IMG_FILEPATH = './frontend/assets/images/catan_logo.png'
     SIDE_LENGTH = 500
 
     def __init__(self, chaperone):
