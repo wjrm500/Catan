@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import messagebox
 from actions.ActionFactory import ActionFactory
-from frontend.Tkinter.phases.primary.SettlePhase import SettlePhase
+from frontend.Tkinter.phases.primary.SettlingPhase import SettlingPhase
 import json
 import os
 
@@ -17,6 +17,8 @@ class Chaperone:
         self.players = []
         self.player = ''
         self.main = False ### User is main client i.e. created game
+        self.start_phase(SettlingPhase)
+        exit()
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
@@ -75,7 +77,7 @@ class Chaperone:
         self.socket.send(to_send.encode('utf-8'))
     
     def start_settle_phase(self):
-        self.settle_phase = SettlePhase(self)
+        self.settle_phase = SettlingPhase(self)
     
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):

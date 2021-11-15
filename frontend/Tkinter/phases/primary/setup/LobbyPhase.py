@@ -91,7 +91,6 @@ class LobbyPhase(SetupPhase):
 
     def go_to_main_loop(self, event):
         self.chaperone.start_game()
-        # self.chaperone.start_phase(GamePhase)
     
     def update_gui(self):
         self.game_code_text.set('Game code: {}'.format(self.chaperone.game_code))
