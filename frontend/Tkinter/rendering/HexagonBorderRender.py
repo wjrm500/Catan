@@ -37,7 +37,7 @@ class HexagonBorderRender:
                 self.render.rendering.CV_OBJ_OVAL ### Canvas oval
             ]
             self.render.rendering.create_oval(node.real_x - r, node.real_y - r, node.real_x + r, node.real_y + r, tags = tags, fill = 'black', outline = '') 
-    
+        
     def remove_hexagon_border(self, hexagons_to_focus = []):
         focus_retaining_lines = [line for hexagon in hexagons_to_focus for line in hexagon.lines]
         line_width = round(self.render.rendering.scale / 10)

@@ -1,5 +1,16 @@
-from frontend.Tkinter.rendering.HexagonRender import HexagonRender
 import math
+
+from config import config
+from frontend.ColorUtils import ColorUtils
+from frontend.Tkinter.rendering.HexagonRender import HexagonRender
+
+def set_colors(darken): ### TODO: Factor out - duplicate on HexagonBodyRender
+    d = {}
+    for resource_type, data in config['resource_types'].items():
+        d[resource_type] = ColorUtils.darken_hex(data['color'], darken)
+    return d
+
+BACKGROUND_COLORS = set_colors(0.0)
 
 class HexagonRendering:
     ### Catan object constants
@@ -93,6 +104,7 @@ class HexagonRendering:
             hexagon_render.unfocus()
         self.focused_hexagons = []
         self.draw_board()
+        self.draw_ports()
     
     def handle_motion(self, event):
         self.delete_tag(self.CT_OBJ_NODE)
@@ -124,6 +136,8 @@ class HexagonRendering:
                 hexagon_render = self.hexagon_renders[hexagon.id]
                 hexagon_render.focus()
                 self.focused_hexagons.append(hexagon)
+        
+        self.draw_ports()
 
         ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
         node = draw_oval_args['node']
@@ -135,7 +149,7 @@ class HexagonRendering:
             self.ct_node_tag(node),
             self.CV_OBJ_OVAL
         ]
-        self.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)
+        self.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)    
         
         ### Change cursor pointer to hand icon if cursor near node
         cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
@@ -145,7 +159,8 @@ class HexagonRendering:
         for hexagon in self.focused_hexagons:
             hexagon_render = self.hexagon_renders[hexagon.id]
             hexagon_render.unfocus()
-        self.focused_hexagons = []    
+        self.focused_hexagons = []
+        self.draw_ports()
     
     def draw_board(self):
         ### TODO: Refactor
@@ -182,3 +197,18 @@ class HexagonRendering:
 
     def ct_node_tag(self, node):
         return '{}.{}'.format(self.CT_OBJ_NODE, node.id)
+
+    def draw_ports(self):
+        port_nodes = [node for node in self.distributor.nodes if node.port]
+        for port_node in port_nodes:
+            port_type = port_node.port.type
+            circle_color = '#87CEFA' if port_type == 'any_resource' else BACKGROUND_COLORS[port_node.port.type]
+            circle_radius = round(self.scale / 5)
+            tags = [ ### TODO: Change these - do we need a new port tag? Ports getting deleted on board exit
+                self.CT_OBJ_NODE,
+                self.ct_node_tag(port_node),
+                self.CV_OBJ_OVAL
+            ]
+            x = port_node.real_x
+            y = port_node.real_y
+            self.create_oval(x - circle_radius, y - circle_radius, x + circle_radius, y + circle_radius, tags = tags, fill = circle_color, width = 2)

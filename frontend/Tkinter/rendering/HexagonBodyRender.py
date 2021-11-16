@@ -31,7 +31,7 @@ class HexagonBodyRender:
             self.render.rendering.CV_OBJ_POLYGON
         ]
         self.render.rendering.create_polygon(points, fill = fill, outline = 'black', tags = tags)
-    
+
     def render_text_elements(self, focused):
         tags = [
             self.render.rendering.CT_OBJ_HEXAGON,
