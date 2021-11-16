@@ -45,7 +45,7 @@ class SettlingPhase(Phase):
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
         
         ### Specific to settling phase (the rest isn't)
-        self.text_area = tkinter.scrolledtext.ScrolledText(inner_frame_middle_right, font = ('Arial', 12), padx = 10, wrap = 'word')
+        self.text_area = tkinter.scrolledtext.ScrolledText(inner_frame_middle_right, font = ('Arial', 12), padx = 10, wrap = 'word', background = ColorUtils.lighten_hex(self.BG_COLOR, 0.2))
         self.text_area.pack(padx = 10, pady = 10)
         self.text_area.config(state = 'normal')
         self.text_area.insert('end', self.get_introductory_text())

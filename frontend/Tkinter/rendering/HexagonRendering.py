@@ -125,9 +125,9 @@ class HexagonRendering:
             if closest_to_cursor:
                 reversed_dist = max(self.scale - dist, 0)
                 hexagons_to_focus = [hexagon for hexagon in node.hexagons]
-                circle_radius = reversed_dist / 5
+                circle_radius = min(self.scale * 3 / 4, reversed_dist) / 5
                 fill_color = 'limegreen' if min_node_dist / self.scale < 0.2 else 'white'
-                line_width = reversed_dist / 10
+                line_width = min(self.scale * 3 / 4, reversed_dist) / 10
                 draw_oval_args = {'node': node, 'circle_radius': circle_radius, 'fill': fill_color, 'width': line_width}
                 break
         
