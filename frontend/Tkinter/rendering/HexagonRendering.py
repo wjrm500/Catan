@@ -22,6 +22,7 @@ class HexagonRendering:
     CV_OBJ_LINE = 'cv_line'
     CV_OBJ_POLYGON = 'cv_polygon'
     CV_OBJ_OVAL = 'cv_oval'
+    CV_OBJ_RECT = 'cv_rectangle'
     CV_OBJ_TEXT = 'cv_text'
 
     ### Action constants
@@ -44,6 +45,7 @@ class HexagonRendering:
             self.CV_OBJ_LINE: 0,
             self.CV_OBJ_POLYGON: 0,
             self.CV_OBJ_OVAL: 0,
+            self.CV_OBJ_RECT: 0,
             self.CV_OBJ_TEXT: 0
         }
     
@@ -64,6 +66,10 @@ class HexagonRendering:
     def create_oval(self, *args, **kwargs):
         self.canvas.create_oval(*args, **kwargs)
         self.update_canvas_object_count(self.CV_OBJ_OVAL, self.ACTION_CREATE)
+    
+    def create_rectangle(self, *args, **kwargs):
+        self.canvas.create_rectangle(*args, **kwargs)
+        self.update_canvas_object_count(self.CV_OBJ_RECT, self.ACTION_CREATE)
     
     def create_text(self, *args, **kwargs):
         self.canvas.create_text(*args, **kwargs)
@@ -149,7 +155,7 @@ class HexagonRendering:
             self.ct_node_tag(node),
             self.CV_OBJ_OVAL
         ]
-        self.create_oval(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)    
+        self.create_rectangle(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)    
         
         ### Change cursor pointer to hand icon if cursor near node
         cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
@@ -201,14 +207,17 @@ class HexagonRendering:
     def draw_ports(self):
         port_nodes = [node for node in self.distributor.nodes if node.port]
         for port_node in port_nodes:
+            if not hasattr(port_node, 'real_x') or not hasattr(port_node, 'real_y'):
+                continue
             port_type = port_node.port.type
             circle_color = '#87CEFA' if port_type == 'any_resource' else BACKGROUND_COLORS[port_node.port.type]
-            circle_radius = round(self.scale / 5)
-            tags = [ ### TODO: Change these - do we need a new port tag? Ports getting deleted on board exit
+            line_width = round(self.scale / 15)
+            circle_radius = line_width * 2
+            tags = [ ### TODO: Change these - do we need a new port tag?
                 self.CT_OBJ_NODE,
                 self.ct_node_tag(port_node),
                 self.CV_OBJ_OVAL
             ]
             x = port_node.real_x
             y = port_node.real_y
-            self.create_oval(x - circle_radius, y - circle_radius, x + circle_radius, y + circle_radius, tags = tags, fill = circle_color, width = 2)
+            self.create_oval(x - circle_radius, y - circle_radius, x + circle_radius, y + circle_radius, tags = tags, fill = circle_color, width = line_width)
