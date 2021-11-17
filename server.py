@@ -43,7 +43,7 @@ class Server:
                     game = self.games[game_code]
                     player = Player(from_client['player'], client)
                     game.add_player(player)
-                    data = {'action': action, 'players': game.players} ### Should we just send one player back and append client-side?
+                    data = {'action': action, 'player': player}
                     self.broadcast_to_game(game.code, data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = from_client['num_hexagons']
@@ -71,7 +71,7 @@ class Server:
                     game.setup_movable_pieces()
                     game.randomise_player_order_and_assign_colors()
                     game.started = True
-                    self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor, 'players': game.players}) ### Do we need to send back players here?
+                    self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor, 'players': game.players})
             except:                    
                 ### End any games for which the client was the main client
                 game_codes_to_delete = []

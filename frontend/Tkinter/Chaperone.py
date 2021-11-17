@@ -15,16 +15,23 @@ class Chaperone:
         self.root.protocol('WM_DELETE_WINDOW', self.on_closing)
         self.current_phase = None
         self.players = []
-        self.player = ''
+        self.player = None
         self.main = False ### User is main client i.e. created game
         self.active_player_index = 0
         self.game_code = ''
+
+    def update_players(self, players):
+        self.players = players
+        if self.player is not None:
+            for player in self.players:
+                if player.id == self.player.id:
+                    self.player = player
     
     def get_active_player(self):
         return self.players[self.active_player_index]
     
     def active(self):
-        return self.player == self.get_active_player()
+        return self.player is self.get_active_player()
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)

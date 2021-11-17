@@ -1,8 +1,12 @@
+import itertools
+
 from backend.Unserializable import Unserializable
 
-
 class Player(Unserializable):
+    new_id = next(itertools.count())
+
     def __init__(self, name, client_conn):
+        self.id = Player.new_id
         self.name = name
         self.client_conn = client_conn
         self.longest_road = False

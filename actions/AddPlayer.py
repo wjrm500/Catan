@@ -5,4 +5,6 @@ class AddPlayer(Action):
         pass
 
     def callback(self, chaperone, data):
-        chaperone.players = data['players']
+        chaperone.players.append(data['player'])
+        if isinstance(chaperone.player, str): ### If the receiving client was also the sending client
+            chaperone.player = data['player']

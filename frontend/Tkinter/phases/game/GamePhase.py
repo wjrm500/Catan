@@ -2,6 +2,7 @@ import abc
 from functools import partial
 import tkinter
 import tkinter.scrolledtext
+from frontend.ColorUtils import ColorUtils
 
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
@@ -11,6 +12,7 @@ class GamePhase(Phase, abc.ABC):
         super().__init__(chaperone)
         self.root.geometry('1000x500')
         self.frames = {}
+        self.place_widget = lambda what, where, anchor: what.place(in_ = where, anchor = anchor, relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
         self.setup_frames()
         self.setup_inner_frame_top_right()
         self.setup_inner_frame_middle_left()
@@ -19,50 +21,49 @@ class GamePhase(Phase, abc.ABC):
         self.setup_inner_frame_bottom_right()
     
     def setup_frames(self):
-        standard_frame = partial(tkinter.Frame, background = self.BG_COLOR, highlightbackground = self.BG_COLOR)
-        place_frame = lambda what, where, anchor: what.place(in_ = where, anchor = anchor, relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
+        frame_partial = partial(tkinter.Frame, background = self.BG_COLOR)#, highlightbackground = ColorUtils.darken_hex(self.BG_COLOR, 0.5), highlightthickness = 1)
 
         """
         Level 1 frames
         """
-        self.inner_frame = standard_frame(self.root)
+        self.inner_frame = frame_partial(self.root)
         self.inner_frame.pack(fill = 'both', expand = True, padx = 10, pady = 10)
 
         """
         Level 2 frames
         """
         # Top
-        self.inner_frame_top = standard_frame(self.inner_frame, height = 50)
+        self.inner_frame_top = frame_partial(self.inner_frame, height = 50)
         self.inner_frame_top.pack(side = tkinter.TOP, fill = 'x')
 
         # Middle
-        self.inner_frame_middle = standard_frame(self.inner_frame)
+        self.inner_frame_middle = frame_partial(self.inner_frame)
         self.inner_frame_middle.pack(side = tkinter.TOP, fill = 'both', expand = True)
 
         # Bottom
-        self.inner_frame_bottom = standard_frame(self.inner_frame, height = 50)
+        self.inner_frame_bottom = frame_partial(self.inner_frame, height = 50)
         self.inner_frame_bottom.pack(side = tkinter.BOTTOM, fill = 'x')
 
         """
         Level 3 frames
         """
         # Top
-        self.inner_frame_top_left = standard_frame(self.inner_frame_top, height = 50)
-        place_frame(self.inner_frame_top_left, where = self.inner_frame_top, anchor = tkinter.E)
-        self.inner_frame_top_right = standard_frame(self.inner_frame_top, height = 50)
-        place_frame(self.inner_frame_top_right, where = self.inner_frame_top, anchor = tkinter.W)
+        self.inner_frame_top_left = frame_partial(self.inner_frame_top, height = 50)
+        self.place_widget(self.inner_frame_top_left, where = self.inner_frame_top, anchor = tkinter.E)
+        self.inner_frame_top_right = frame_partial(self.inner_frame_top, height = 50)
+        self.place_widget(self.inner_frame_top_right, where = self.inner_frame_top, anchor = tkinter.W)
         
         #  Middle
-        self.inner_frame_middle_left = standard_frame(self.inner_frame_middle)
-        place_frame(self.inner_frame_middle_left, where = self.inner_frame_middle, anchor = tkinter.E)
-        self.inner_frame_middle_right = standard_frame(self.inner_frame_middle)
-        place_frame(self.inner_frame_middle_right, where = self.inner_frame_middle, anchor = tkinter.W)
+        self.inner_frame_middle_left = frame_partial(self.inner_frame_middle)
+        self.place_widget(self.inner_frame_middle_left, where = self.inner_frame_middle, anchor = tkinter.E)
+        self.inner_frame_middle_right = frame_partial(self.inner_frame_middle)
+        self.place_widget(self.inner_frame_middle_right, where = self.inner_frame_middle, anchor = tkinter.W)
         
         # Bottom
-        self.inner_frame_bottom_left = standard_frame(self.inner_frame_bottom, height = 50)
-        place_frame(self.inner_frame_bottom_left, where = self.inner_frame_bottom, anchor = tkinter.E)
-        self.inner_frame_bottom_right = standard_frame(self.inner_frame_bottom, height = 50, padx = 10)
-        place_frame(self.inner_frame_bottom_right, where = self.inner_frame_bottom, anchor = tkinter.W)
+        self.inner_frame_bottom_left = frame_partial(self.inner_frame_bottom, height = 50, padx = 10, pady = 5)
+        self.place_widget(self.inner_frame_bottom_left, where = self.inner_frame_bottom, anchor = tkinter.E)
+        self.inner_frame_bottom_right = frame_partial(self.inner_frame_bottom, height = 50, padx = 10, pady = 5)
+        self.place_widget(self.inner_frame_bottom_right, where = self.inner_frame_bottom, anchor = tkinter.W)
     
     def setup_inner_frame_top_right(self):
         block_under_title = tkinter.Frame(self.inner_frame_top_right, background = 'black', height = 5, bd = 0, highlightthickness = 0)
@@ -82,24 +83,34 @@ class GamePhase(Phase, abc.ABC):
         pass
     
     def setup_inner_frame_bottom_left(self, instruction_text, label_bg_color):
+        label_partial = partial(tkinter.Label, self.inner_frame_bottom_left, borderwidth = 1, font = ('Arial, 10'), padx = 5, pady = 5, relief = 'solid')
+
+        self.inner_frame_bottom_left.grid_rowconfigure(0, weight = 1)
+        self.inner_frame_bottom_left.grid_columnconfigure(0, weight = 1)
+        self.inner_frame_bottom_left.grid_columnconfigure(1, weight = 1)
+
+        self.root.update_idletasks()
+        frame_width = self.inner_frame_bottom_left.winfo_width()
+
         self.instruction_text = tkinter.StringVar()
         self.instruction_text.set(instruction_text)
-        self.instruction = tkinter.Label(self.inner_frame_bottom_left, textvariable = self.instruction_text, background = label_bg_color, font = ('Arial, 12'), borderwidth = 1, relief = 'solid')
-        self.instruction.place(anchor = tkinter.CENTER, relheight = 0.5, relwidth = 0.8, relx = 0.5, rely = 0.5)
-        lab = tkinter.Label(self.inner_frame_bottom_left, text = 'COLOR', height = 10, width = 10, background = self.chaperone.player.color)
-        lab.pack(side = tkinter.TOP)
+        self.instruction = label_partial(textvariable = self.instruction_text, background = label_bg_color, width = round(frame_width / 3))
+        self.instruction.grid(row = 0, column = 0, padx = 10)
+
+        player_data_text = f'Your color is {self.chaperone.player.color.upper()}'
+        player_data = label_partial(text = player_data_text, background = self.chaperone.player.color, width = round(frame_width / 3))
+        player_data.grid(row = 0, column = 1, padx = 10)
 
     def setup_inner_frame_bottom_right(self):
         self.button_text = tkinter.StringVar()
         self.button_text.set('N/A')
         self.button = tkinter.Button(self.inner_frame_bottom_right, textvariable = self.button_text)
-        self.button.place(anchor = tkinter.W, relheight = 0.5, relwidth = 0.5, relx = 0.5, rely = 0.5)
+        self.button.place(anchor = tkinter.W, relheight = 0.75, relwidth = 0.5, relx = 0.5, rely = 0.5)
     
     def run(self):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
         if self.chaperone.active():
             self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
-            # self.canvas.bind('<Button-1>', lambda evt: self.hexagon_rendering.handle_click(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.unfocus_focused_hexagons)
         self.root.mainloop()
     

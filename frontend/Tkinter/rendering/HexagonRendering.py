@@ -130,7 +130,7 @@ class HexagonRendering:
                 reversed_dist = max(self.scale - dist, 0)
                 hexagons_to_focus = [hexagon for hexagon in node.hexagons]
                 circle_radius = min(self.scale * 3 / 4, reversed_dist) / 5
-                fill_color = 'limegreen' if min_node_dist / self.scale < 0.2 else 'white'
+                fill_color = self.parent_phase.chaperone.player.color if min_node_dist / self.scale < 0.2 else 'white'
                 line_width = min(self.scale * 3 / 4, reversed_dist) / 10
                 draw_oval_args = {'node': node, 'circle_radius': circle_radius, 'fill': fill_color, 'width': line_width}
                 break
@@ -177,7 +177,7 @@ class HexagonRendering:
         ]
         node = self.rectangle_node_dict[rectangle_id]
         circle_radius = (self.scale * 3 / 4) / 5
-        fill = 'black'
+        fill = self.parent_phase.chaperone.player.color
         width = (self.scale * 3 / 4) / 10
         rectangle_id = self.create_rectangle(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)
         

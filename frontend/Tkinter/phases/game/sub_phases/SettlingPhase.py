@@ -24,8 +24,8 @@ class SettlingPhase(GamePhase):
         return super().setup_inner_frame_bottom_left(instruction_text, label_bg_color)
     
     def get_introductory_text(self):
-        settling_order_text = '\n\n'.join([f'{player} will settle {GeneralUtils.get_ordinal(i)}' for i, player in enumerate(self.chaperone.players, 1)])
-        return f"""Hi {self.chaperone.player}, and welcome to Catan!
+        settling_order_text = '\n\n'.join([f'{player.name} will settle {GeneralUtils.get_ordinal(i)}' for i, player in enumerate(self.chaperone.players, 1)])
+        return f"""Hi {self.chaperone.player.name}, and welcome to Catan!
 
 A game of Catan begins with each player placing settlements on two nodes, with a single road leading away from each settlement.
 
