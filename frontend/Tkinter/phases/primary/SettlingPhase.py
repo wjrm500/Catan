@@ -20,26 +20,49 @@ class SettlingPhase(Phase):
     
     def setup_frames(self):
         standard_frame = partial(tkinter.Frame, background = self.BG_COLOR, highlightbackground = self.BG_COLOR)
+        place_frame = lambda what, where, anchor: what.place(in_ = where, anchor = anchor, relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
+
+        """
+        Level 1 frames
+        """
         self.inner_frame = standard_frame(self.root)
         self.inner_frame.pack(fill = 'both', expand = True, padx = 10, pady = 10)
+
+        """
+        Level 2 frames
+        """
+        # Top
         self.inner_frame_top = standard_frame(self.inner_frame, height = 50)
         self.inner_frame_top.pack(side = tkinter.TOP, fill = 'x')
-        self.inner_frame_top_left = standard_frame(self.inner_frame_top, height = 50)
-        self.inner_frame_top_right = standard_frame(self.inner_frame_top, height = 50)
-        self.inner_frame_top_left.place(in_ = self.inner_frame_top, anchor = 'e', relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
-        self.inner_frame_top_right.place(in_ = self.inner_frame_top, anchor = 'w', relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
+
+        # Middle
         self.inner_frame_middle = standard_frame(self.inner_frame)
         self.inner_frame_middle.pack(side = tkinter.TOP, fill = 'both', expand = True)
-        self.inner_frame_middle_left = standard_frame(self.inner_frame_middle)
-        self.inner_frame_middle_right = standard_frame(self.inner_frame_middle)
-        self.inner_frame_middle_left.place(in_ = self.inner_frame_middle, anchor = 'e', relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
-        self.inner_frame_middle_right.place(in_ = self.inner_frame_middle, anchor = 'w', relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
+
+        # Bottom
         self.inner_frame_bottom = standard_frame(self.inner_frame, height = 50)
         self.inner_frame_bottom.pack(side = tkinter.BOTTOM, fill = 'x')
+
+        """
+        Level 3 frames
+        """
+        # Top
+        self.inner_frame_top_left = standard_frame(self.inner_frame_top, height = 50)
+        place_frame(self.inner_frame_top_left, where = self.inner_frame_top, anchor = tkinter.E)
+        self.inner_frame_top_right = standard_frame(self.inner_frame_top, height = 50)
+        place_frame(self.inner_frame_top_right, where = self.inner_frame_top, anchor = tkinter.W)
+        
+        #  Middle
+        self.inner_frame_middle_left = standard_frame(self.inner_frame_middle)
+        place_frame(self.inner_frame_middle_left, where = self.inner_frame_middle, anchor = tkinter.E)
+        self.inner_frame_middle_right = standard_frame(self.inner_frame_middle)
+        place_frame(self.inner_frame_middle_right, where = self.inner_frame_middle, anchor = tkinter.W)
+        
+        # Bottom
         self.inner_frame_bottom_left = standard_frame(self.inner_frame_bottom, height = 50)
+        place_frame(self.inner_frame_bottom_left, where = self.inner_frame_bottom, anchor = tkinter.E)
         self.inner_frame_bottom_right = standard_frame(self.inner_frame_bottom, height = 50, padx = 10)
-        self.inner_frame_bottom_left.place(in_ = self.inner_frame_bottom, anchor = 'e', relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
-        self.inner_frame_bottom_right.place(in_ = self.inner_frame_bottom, anchor = 'w', relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
+        place_frame(self.inner_frame_bottom_right, where = self.inner_frame_bottom, anchor = tkinter.W)
     
     def setup_inner_frame_top_right(self):
         block_under_title = tkinter.Frame(self.inner_frame_top_right, background = 'black', height = 5, bd = 0, highlightthickness = 0)
