@@ -37,6 +37,8 @@ class LobbyPhase(SetupPhase):
         self.root.mainloop()
     
     def add_player(self, event):
+        if not isinstance(self.root.focus_get(), tkinter.Entry):
+            return
         name = self.new_player_input.get()
         errors = []
         players = self.chaperone.players
@@ -53,6 +55,7 @@ class LobbyPhase(SetupPhase):
             self.new_player_label_text.set('Name successfully submitted!')
             self.new_player_input.config(state = 'disabled')
             self.add_new_player_button.config(state = 'disabled')
+            self.root.focus_set() ### Remove focus from Entry widget by setting focus to any other widget
         else:
             self.error_text = self.render_error_text(self.inner_frame, '\n'.join(errors))
             self.error_text.pack(side = tkinter.TOP, pady = 10)

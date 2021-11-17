@@ -69,12 +69,12 @@ class SettlingPhase(Phase):
         self.root.mainloop()
     
     def get_introductory_text(self):
-        return textwrap.dedent("""
-            Welcome to Catan!
+        return textwrap.dedent(
+            """Welcome to Catan!
 
             A game of Catan begins with each player placing settlements on two nodes, with a single road leading away from each settlement.
 
             Players take it in turns to place settlements and roads, with turn-taking following the “snake draft” format, such that the player who settles first will be the player who settles last.
 
-            Players are ordered randomly for the first round of settling.
-        """)
+            Players are ordered randomly for the first round of settling."""
+        )
