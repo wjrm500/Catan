@@ -149,7 +149,27 @@ class HexagonRendering:
         
         self.draw_ports()
 
+
+
         ### Redraw affected settlements
+        ### Delete all settlements
+        self.delete_tag(self.CT_OBJ_SETTLEMENT)
+        ### Currently inefficient as redrawing rects that don't need to be redrawn
+        for node in self.distributor.nodes:
+            if node.settlement:
+                tags = [
+                    self.CT_OBJ_SETTLEMENT,
+                    # hexagon_rendering.ct_node_tag(node),
+                    self.CV_OBJ_RECT
+                ]
+                r = (self.scale * 3 / 4) / 5 ### Circle radius
+                fill = node.settlement.player.color
+                width = (self.scale * 3 / 4) / 10
+                x, y = node.real_x, node.real_y
+                self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
+
+
+
 
         ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
         node = draw_oval_args['node']
@@ -161,8 +181,8 @@ class HexagonRendering:
             self.ct_node_tag(node),
             self.CV_OBJ_RECT
         ]
-        x = self.real_x(node)
-        y = self.real_y(node)
+        x = node.real_x
+        y = node.real_y
         rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
         self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
         self.rectangle_node_dict[rectangle_id] = node
@@ -174,7 +194,7 @@ class HexagonRendering:
     def handle_click(self, event):
         rectangle_id = event.widget.find_withtag('current')[0]
         node = self.rectangle_node_dict[rectangle_id]
-        self.parent_phase.chaperone.build_settlement(node.id)
+        self.parent_phase.chaperone.build_settlement(node)
 
     def unfocus_focused_hexagons(self, event):
         for hexagon in self.focused_hexagons:
@@ -221,7 +241,7 @@ class HexagonRendering:
     def draw_ports(self):
         port_nodes = [node for node in self.distributor.nodes if node.port]
         for port_node in port_nodes:
-            if not hasattr(self, 'x_shift'): ### Could equally check for y_shift, x_centre_shift or y_centre_shift
+            if not hasattr(port_node, 'real_x'): ### Could equally check for real_y
                 continue
             port_type = port_node.port.type
             circle_color = '#87CEFA' if port_type == 'any_resource' else BACKGROUND_COLORS[port_node.port.type]
@@ -232,8 +252,8 @@ class HexagonRendering:
                 self.ct_node_tag(port_node),
                 self.CV_OBJ_OVAL
             ]
-            x = self.real_x(port_node)
-            y = self.real_y(port_node)
+            x = port_node.real_x
+            y = port_node.real_y
             self.create_oval(x - r, y - r, x + r, y + r, tags = tags, fill = circle_color, width = line_width)
     
     def real_x(self, node):

@@ -1,15 +1,9 @@
-import json
-import pickle
-from pympler.asizeof import asizeof
-import random
 import socket
 import threading
 
 from ClientServerInterface import ClientServerInterface
-from actions.Action import Action
 from actions.ActionFactory import ActionFactory
 from backend.mechanics.Player import Player
-from backend.objects.movable_pieces.Settlement import Settlement
 from config import config
 from backend.mechanics.Game import Game
 
@@ -51,10 +45,15 @@ class Server:
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
-                    node = game.distributor.get_object_by_id('node', input_data['node_id'])
                     player = game.get_player_from_client_address(client_address)
+
+                    ### UPDATE NODE
+                    node = input_data['node']
+                    game.distributor.nodes = [ex_node for ex_node in game.distributor.nodes if ex_node.id != node.id]
+                    game.distributor.nodes.append(input_data['node'])
                     node.add_settlement(player.settlements.pop())
-                    output_data = {'action': action, 'node': node, 'player_id': player.id} ### Removed 'distributor': game.distributor,
+
+                    output_data = {'action': action, 'distributor': game.distributor, 'node': node, 'player_id': player.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = input_data['num_hexagons']

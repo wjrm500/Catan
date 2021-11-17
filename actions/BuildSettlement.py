@@ -19,3 +19,7 @@ class BuildSettlement(Action):
         node = data['node']
         x, y = hexagon_rendering.real_x(node), hexagon_rendering.real_y(node)
         hexagon_rendering.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
+
+        ### Replace node in distributor
+        hexagon_rendering.distributor.nodes = [ex_node for ex_node in hexagon_rendering.distributor.nodes if ex_node.id != node.id]
+        hexagon_rendering.distributor.nodes.append(node)

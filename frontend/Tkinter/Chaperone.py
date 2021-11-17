@@ -90,11 +90,11 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
-    def build_settlement(self, node_id):
+    def build_settlement(self, node):
         data = {
             'action': ActionFactory.BUILD_SETTLEMENT,
             'game_code': self.game_code,
-            'node_id': node_id
+            'node': node
         }
         self.client.interface.send_data(self.client.socket, data)
     

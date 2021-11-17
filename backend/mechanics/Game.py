@@ -26,7 +26,7 @@ class Game:
         self.clients[client.getpeername()] = client
     
     def delete_client_and_corresponding_player_if_applicable(self, client_address):
-        player = self.get_player(client_address)
+        player = self.get_player_from_client_address(client_address)
         if player is not None:
             self.players.remove(player)
         del self.clients[client_address]
