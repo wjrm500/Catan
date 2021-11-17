@@ -9,6 +9,8 @@ class JoinExistingGame(Action):
         if 'error' in data:
             chaperone.display_error_text(data['error'])
             return
-        chaperone.game_code = data['game_code']
         chaperone.players = data['players']
-        chaperone.start_phase(LobbyPhase)
+        if chaperone.game_code == '': ### Only start lobby phase for new player
+            chaperone.game_code = data['game_code']
+            chaperone.root.after(100, chaperone.check_queue) ### Whenever starting new phase in callback, need to call this, otherwise queue no longer checked
+            chaperone.start_phase(LobbyPhase)

@@ -95,10 +95,11 @@ class GamePhase(Phase, abc.ABC):
     
     def run(self):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
-        self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
+        if self.chaperone.active():
+            self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.unfocus_focused_hexagons)
         self.root.mainloop()
     
     def update_gui(self):
-        instruction_text = "It's your turn!" if self.chaperone.player == self.chaperone.active_player else "Please wait for your turn!"
+        instruction_text = "It's your turn!" if self.chaperone.active() else "Please wait for your turn!"
         self.instruction_text.set(instruction_text)

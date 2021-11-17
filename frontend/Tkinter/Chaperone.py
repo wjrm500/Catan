@@ -18,9 +18,13 @@ class Chaperone:
         self.player = ''
         self.main = False ### User is main client i.e. created game
         self.active_player_index = 0
+        self.game_code = ''
     
     def get_active_player(self):
         return self.players[self.active_player_index]
+    
+    def active(self):
+        return self.player == self.get_active_player()
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
@@ -35,7 +39,8 @@ class Chaperone:
         self.root.after(100, self.check_queue)
     
     def update_gui(self):
-        self.current_phase.update_gui()
+        if hasattr(self.current_phase, 'update_gui') and callable(getattr(self.current_phase, 'update_gui')):
+            self.current_phase.update_gui()
     
     def display_error_text(self, error_text):
         self.current_phase.display_error_text(error_text)

@@ -21,7 +21,7 @@ class LobbyPhase(SetupPhase):
             'highlightthickness': 1
         }
         self.game_code_text = tkinter.StringVar()
-        self.game_code_text.set('Game code: ')
+        self.game_code_text.set(f'Game code: {self.chaperone.game_code}')
         self.game_code_label = self.render_label(where = self.inner_frame, text = self.game_code_text, config = {'background': '#eeeeee', 'font': ('Arial', '10', 'normal')})
         self.game_code_label.pack(side = tkinter.TOP, pady = 20)
         self.new_player_panel = self.render_new_player_panel(where = self.split_panel, config = player_panel_config)
