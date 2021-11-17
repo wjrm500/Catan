@@ -1,4 +1,6 @@
+from ClientServerInterface import ClientServerInterface
 from actions.Action import Action
+from backend.mechanics.Distributor import Distributor
 
 class BuildSettlement(Action):
     def __init__(self):
@@ -17,9 +19,11 @@ class BuildSettlement(Action):
         fill = player.color
         width = (hexagon_rendering.scale * 3 / 4) / 10
         node = data['node']
-        x, y = hexagon_rendering.real_x(node), hexagon_rendering.real_y(node)
-        hexagon_rendering.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
 
-        ### Replace node in distributor
-        hexagon_rendering.distributor.nodes = [ex_node for ex_node in hexagon_rendering.distributor.nodes if ex_node.id != node.id]
-        hexagon_rendering.distributor.nodes.append(node)
+        ### Replace node in client distributor with settled node from server distributor
+        ClientServerInterface.replace_object_in_distributor(hexagon_rendering.distributor, Distributor.OBJ_NODE, node)
+
+        ### Building settlement
+        x = node.real_x
+        y = node.real_y
+        hexagon_rendering.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)

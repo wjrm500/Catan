@@ -8,6 +8,10 @@ from backend.objects.cards.development.VictoryPoint import VictoryPoint
 from backend.objects.cards.development.YearOfPlenty import YearOfPlenty
 
 class Distributor:
+    OBJ_HEXAGON = 'hexagon'
+    OBJ_LINE = 'line'
+    OBJ_NODE = 'node'
+
     def __init__(self):
         self.hexagons = []
         self.lines = []
@@ -43,5 +47,9 @@ class Distributor:
         return type_class_mapping[type]()
     
     def get_object_by_id(self, obj, id):
-        if obj == 'node':
+        if obj == self.OBJ_HEXAGON:
+            return next(hexagon for hexagon in self.hexagon if hexagon.id == id)
+        elif obj == self.OBJ_LINE:
+             return next(line for line in self.line if line.id == id)
+        elif obj == self.OBJ_NODE:
             return next(node for node in self.nodes if node.id == id)

@@ -3,6 +3,7 @@ import threading
 
 from ClientServerInterface import ClientServerInterface
 from actions.ActionFactory import ActionFactory
+from backend.mechanics.Distributor import Distributor
 from backend.mechanics.Player import Player
 from config import config
 from backend.mechanics.Game import Game
@@ -47,13 +48,12 @@ class Server:
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
 
-                    ### UPDATE NODE
+                    ### Replace node in server distributor with node from client distributor (which might have properties such as real_x and real_y which we don't want to lose)
                     node = input_data['node']
-                    game.distributor.nodes = [ex_node for ex_node in game.distributor.nodes if ex_node.id != node.id]
-                    game.distributor.nodes.append(input_data['node'])
                     node.add_settlement(player.settlements.pop())
+                    ClientServerInterface.replace_object_in_distributor(game.distributor, Distributor.NODE, node)
 
-                    output_data = {'action': action, 'distributor': game.distributor, 'node': node, 'player_id': player.id}
+                    output_data = {'action': action, 'node': node, 'player_id': player.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = input_data['num_hexagons']
