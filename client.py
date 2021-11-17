@@ -1,3 +1,4 @@
+from actions.ActionFactory import ActionFactory
 from frontend.Tkinter.Chaperone import Chaperone
 import socket
 import threading
@@ -25,16 +26,19 @@ class Client:
     
     def receive(self):
         while True:
-            from_server = self.socket.recv(16)
-            bytes_to_receive = from_server.decode('utf-8')
-            if bytes_to_receive and bytes_to_receive.isnumeric():
-                data = self.socket.recv(int(bytes_to_receive))
-                try:
-                    data = data.decode('utf-8')
-                    data = json.loads(data)
-                except:
-                    data = pickle.loads(data)
-                self.queue.put(data)
+            try:
+                from_server = self.socket.recv(16)
+                bytes_to_receive = from_server.decode('utf-8')
+                if bytes_to_receive and bytes_to_receive.isnumeric():
+                    data = self.socket.recv(int(bytes_to_receive))
+                    try:
+                        data = data.decode('utf-8')
+                        data = json.loads(data)
+                    except:
+                        data = pickle.loads(data)
+                    self.queue.put(data)
+            except:
+                self.queue.put({'action': ActionFactory.END_GAME})
 
     def gui(self):
         self.chaperone = Chaperone(self.socket, self.queue)
