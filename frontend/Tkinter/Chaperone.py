@@ -18,6 +18,9 @@ class Chaperone:
         self.main = False ### User is main client i.e. created game
         self.active_player_index = 0
         self.game_code = ''
+    
+    def get_player_from_id(self, id):
+        return next(player for player in self.players if player.id == id)
 
     def update_players(self, players):
         self.players = players

@@ -5,7 +5,6 @@ class BuildSettlement(Action):
         pass
 
     def callback(self, chaperone, data):
-        # chaperone.distributor = data['distributor']
         hexagon_rendering = chaperone.current_phase.hexagon_rendering
         hexagon_rendering.delete_tag(hexagon_rendering.CT_OBJ_NODE)
         tags = [
@@ -14,7 +13,8 @@ class BuildSettlement(Action):
             hexagon_rendering.CV_OBJ_RECT
         ]
         r = (hexagon_rendering.scale * 3 / 4) / 5 ### Circle radius
-        fill = chaperone.player.color
+        player = chaperone.get_player_from_id(data['player_id'])
+        fill = player.color
         width = (hexagon_rendering.scale * 3 / 4) / 10
         node = data['node']
         x, y = hexagon_rendering.real_x(node), hexagon_rendering.real_y(node)

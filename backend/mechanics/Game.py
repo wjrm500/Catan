@@ -34,7 +34,7 @@ class Game:
     def add_player(self, player):
         self.players.append(player)
 
-    def get_player(self, client_address):
+    def get_player_from_client_address(self, client_address):
         return next((player for player in self.players if player.client_address == client_address), None)
     
     def setup_board(self):

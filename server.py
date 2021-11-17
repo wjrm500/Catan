@@ -52,9 +52,9 @@ class Server:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     node = game.distributor.get_object_by_id('node', input_data['node_id'])
-                    player = game.get_player(client_address)
+                    player = game.get_player_from_client_address(client_address)
                     node.add_settlement(player.settlements.pop())
-                    output_data = {'action': action, 'node': node} ### Removed 'distributor': game.distributor,
+                    output_data = {'action': action, 'node': node, 'player_id': player.id} ### Removed 'distributor': game.distributor,
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = input_data['num_hexagons']
@@ -97,7 +97,7 @@ class Server:
                 ### If game not yet started, simply remove client from game
                 for game_code, game in self.games.items():
                     if client_address in game.clients:
-                        player = game.get_player(client_address)
+                        player = game.get_player_from_client_address(client_address)
                         game.delete_client_and_corresponding_player_if_applicable(client_address)
                         if game.started:
                             self.broadcast_to_game(game.code, {'action': ActionFactory.END_GAME})
