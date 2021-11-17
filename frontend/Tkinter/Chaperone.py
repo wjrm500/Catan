@@ -1,13 +1,12 @@
+import os
 import tkinter
 from tkinter import messagebox
+
 from actions.ActionFactory import ActionFactory
-from frontend.Tkinter.phases.game.sub_phases.SettlingPhase import SettlingPhase
-import json
-import os
 
 class Chaperone:
-    def __init__(self, socket, queue):
-        self.socket = socket
+    def __init__(self, client, queue):
+        self.client = client
         self.queue = queue
         self.root = tkinter.Tk()
         self.root.after(100, self.check_queue)
@@ -31,7 +30,7 @@ class Chaperone:
         return self.players[self.active_player_index]
     
     def active(self):
-        return self.player is self.get_active_player()
+        return self.player.id == self.get_active_player().id
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
@@ -60,38 +59,41 @@ class Chaperone:
         self.current_phase.run()
     
     def add_player(self, name):
-        self.player = name
-        to_send = json.dumps({
+        data = {
             'action': ActionFactory.ADD_PLAYER,
             'game_code': self.game_code,
             'player': name
-        })
-        self.socket.send(to_send.encode('utf-8'))
+        }
+        self.client.interface.send_data(self.client.socket, data)
     
     def create_new_game(self, num_hexagons):
-        self.main = True
-        to_send = json.dumps({
+        data = {
             'action': ActionFactory.CREATE_NEW_GAME,
             'num_hexagons': num_hexagons
-        })
-        self.socket.send(to_send.encode('utf-8'))
-    
+        }
+        self.client.interface.send_data(self.client.socket, data)
+
     def join_existing_game(self, game_code):
-        to_send = json.dumps({
+        data = {
             'action': ActionFactory.JOIN_EXISTING_GAME,
             'game_code': game_code
-        })
-        self.socket.send(to_send.encode('utf-8'))
+        }
+        self.client.interface.send_data(self.client.socket, data)
     
     def start_game(self):
-        to_send = json.dumps({
+        data = {
             'action': ActionFactory.START_GAME,
             'game_code': self.game_code
-        })
-        self.socket.send(to_send.encode('utf-8'))
+        }
+        self.client.interface.send_data(self.client.socket, data)
     
-    def start_settle_phase(self):
-        self.settle_phase = SettlingPhase(self)
+    def build_settlement(self, node_id):
+        data = {
+            'action': ActionFactory.BUILD_SETTLEMENT,
+            'game_code': self.game_code,
+            'node_id': node_id
+        }
+        self.client.interface.send_data(self.client.socket, data)
     
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):

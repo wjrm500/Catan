@@ -1,11 +1,10 @@
-from actions.ActionFactory import ActionFactory
-from frontend.Tkinter.Chaperone import Chaperone
+import multiprocessing
 import socket
 import threading
-import multiprocessing
-import pickle
-import json
 
+from ClientServerInterface import ClientServerInterface
+from actions.ActionFactory import ActionFactory
+from frontend.Tkinter.Chaperone import Chaperone
 from frontend.Tkinter.phases.setup.sub_phases.HomePhase import HomePhase
 
 class Client:
@@ -13,6 +12,7 @@ class Client:
     LOCAL_PORT = 9090
 
     def __init__(self):
+        self.interface = ClientServerInterface()
         self.games = {}
         self.host = self.LOCAL_HOST
         self.port = self.LOCAL_PORT
@@ -27,21 +27,14 @@ class Client:
     def receive(self):
         while True:
             try:
-                from_server = self.socket.recv(16)
-                bytes_to_receive = from_server.decode('utf-8')
-                if bytes_to_receive and bytes_to_receive.isnumeric():
-                    data = self.socket.recv(int(bytes_to_receive))
-                    try:
-                        data = data.decode('utf-8')
-                        data = json.loads(data)
-                    except:
-                        data = pickle.loads(data)
+                data = self.interface.receive_data(self.socket)
+                if data:
                     self.queue.put(data)
             except:
                 self.queue.put({'action': ActionFactory.END_GAME})
 
     def gui(self):
-        self.chaperone = Chaperone(self.socket, self.queue)
+        self.chaperone = Chaperone(self, self.queue)
         self.chaperone.start_phase(HomePhase)
 
 client = Client()

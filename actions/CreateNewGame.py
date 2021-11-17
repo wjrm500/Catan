@@ -5,4 +5,5 @@ class CreateNewGame(Action):
         pass
 
     def callback(self, chaperone, data):
+        chaperone.main = True
         chaperone.game_code = data['game_code']

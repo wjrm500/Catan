@@ -35,7 +35,7 @@ class Game:
         self.players.append(player)
 
     def get_player(self, client_address):
-        return next((player for player in self.players if player.get_address() == client_address), None)
+        return next((player for player in self.players if player.client_address == client_address), None)
     
     def setup_board(self):
         HexagonDrawing.draw_hexagons(self)
@@ -68,7 +68,7 @@ class Game:
         for player in self.players:
             player.cities = [City() for _ in range(round(self.num_hexagons * 4 / 19))]
             player.roads = [Road() for _ in range(round(self.num_hexagons * 15 / 19))]
-            player.settlements = [Settlement() for _ in range(round(self.num_hexagons * 5 / 19))]
+            player.settlements = [Settlement(player) for _ in range(round(self.num_hexagons * 5 / 19))]
 
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])

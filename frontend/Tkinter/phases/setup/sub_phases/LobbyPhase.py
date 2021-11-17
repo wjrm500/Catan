@@ -52,6 +52,7 @@ class LobbyPhase(SetupPhase):
         if new_name in player_names:
             errors.append(f'The name {new_name} is taken')
         if len(errors) == 0:
+            self.chaperone.player = new_name ### Changing from None to str flags to callback that new Player object from server belongs to this client
             self.chaperone.add_player(new_name)
             ### Want the following code here and not in update_gui because we do not want to re-render left panel every time any other player enters name
             self.new_player_label_text.set('Name successfully submitted!')

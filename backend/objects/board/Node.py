@@ -9,6 +9,7 @@ class Node:
         self.lines = []
         self.on_coast = True
         self.port = None
+        self.settlement = None
     
     def __eq__(self, other):
         if not isinstance(other, Node):
@@ -23,3 +24,6 @@ class Node:
 
     def test(self, x, y):
         return round(self.x, 2) == round(x, 2) and round(self.y, 2) == round(y, 2)
+    
+    def add_settlement(self, settlement):
+        self.settlement = settlement

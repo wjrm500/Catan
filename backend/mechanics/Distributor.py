@@ -41,3 +41,7 @@ class Distributor:
             'year_of_plenty': YearOfPlenty
         }
         return type_class_mapping[type]()
+    
+    def get_object_by_id(self, obj, id):
+        if obj == 'node':
+            return next(node for node in self.nodes if node.id == id)
