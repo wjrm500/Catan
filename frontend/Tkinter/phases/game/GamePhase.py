@@ -81,10 +81,10 @@ class GamePhase(Phase, abc.ABC):
     def setup_inner_frame_middle_right(self): ### Specific to settling phase (the rest isn't)
         pass
     
-    def setup_inner_frame_bottom_left(self):
+    def setup_inner_frame_bottom_left(self, instruction_text, label_bg_color):
         self.instruction_text = tkinter.StringVar()
-        self.instruction_text.set('Awaiting instruction...')
-        self.instruction = tkinter.Label(self.inner_frame_bottom_left, textvariable = self.instruction_text)
+        self.instruction_text.set(instruction_text)
+        self.instruction = tkinter.Label(self.inner_frame_bottom_left, textvariable = self.instruction_text, background = label_bg_color, font = ('Arial, 12'), borderwidth = 1, relief = 'solid')
         self.instruction.place(anchor = tkinter.CENTER, relheight = 0.5, relwidth = 0.8, relx = 0.5, rely = 0.5)
 
     def setup_inner_frame_bottom_right(self):
@@ -98,3 +98,7 @@ class GamePhase(Phase, abc.ABC):
         self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.unfocus_focused_hexagons)
         self.root.mainloop()
+    
+    def update_gui(self):
+        instruction_text = "It's your turn!" if self.chaperone.player == self.chaperone.active_player else "Please wait for your turn!"
+        self.instruction_text.set(instruction_text)

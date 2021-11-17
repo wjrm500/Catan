@@ -7,4 +7,5 @@ class StartGame(Action):
 
     def callback(self, chaperone, data):
         chaperone.distributor = data['distributor']
+        chaperone.players = data['players']
         chaperone.start_phase(SettlingPhase)

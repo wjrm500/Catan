@@ -1,8 +1,9 @@
-import tkinter
-from GeneralUtils import GeneralUtils
-from frontend.Tkinter.phases.setup.SetupPhase import SetupPhase
-from frontend.ColorUtils import ColorUtils
 import re
+import tkinter
+
+from frontend.ColorUtils import ColorUtils
+from frontend.GeneralUtils import GeneralUtils
+from frontend.Tkinter.phases.setup.SetupPhase import SetupPhase
 
 ### Lobby game code needs to be visible
 ### LobbyPhase can be accessed by creator and joiners, should appear differently to both. For creator, option to proceed

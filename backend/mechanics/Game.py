@@ -1,10 +1,10 @@
-import string
-from backend.mechanics.Player import Player
-from .drawing.HexagonDrawing import HexagonDrawing
-import random
 import copy
-from ..objects.board.Port import Port
+import random
+import string
+
 from .Distributor import Distributor
+from .drawing.HexagonDrawing import HexagonDrawing
+from ..objects.board.Port import Port
 from ..objects.cards.ResourceCard import ResourceCard
 from ..objects.movable_pieces.City import City
 from ..objects.movable_pieces.Road import Road
@@ -119,3 +119,6 @@ class Game:
             )[0]
             if iterator >= len(coast_nodes) - 1:
                 break
+    
+    def randomise_player_order(self):
+        random.shuffle(self.players)

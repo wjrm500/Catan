@@ -1,12 +1,14 @@
+import json
+import pickle
+from pympler.asizeof import asizeof
+import random
+import socket
+import threading
+
 from actions.ActionFactory import ActionFactory
 from backend.mechanics.Player import Player
 from config import config
 from backend.mechanics.Game import Game
-import socket
-import threading
-import json
-from pympler.asizeof import asizeof
-import pickle
 
 class Server:
     LOCAL_HOST = '127.0.0.1'
@@ -67,8 +69,9 @@ class Server:
                     game.setup_board()
                     game.setup_cards()
                     game.setup_movable_pieces()
+                    game.randomise_player_order()
                     game.started = True
-                    self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor})
+                    self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor, 'players': [player.name for player in game.players]})
             except:                    
                 ### End any games for which the client was the main client
                 game_codes_to_delete = []
