@@ -37,6 +37,8 @@ class LobbyPhase(SetupPhase):
         self.root.mainloop()
     
     def add_player(self, event):
+        if hasattr(self, 'error_text'):
+            self.error_text.destroy()
         if not isinstance(self.root.focus_get(), tkinter.Entry):
             return
         new_name = self.new_player_input.get()
