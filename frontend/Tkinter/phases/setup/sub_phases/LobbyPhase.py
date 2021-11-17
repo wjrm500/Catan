@@ -1,7 +1,6 @@
 import tkinter
 from GeneralUtils import GeneralUtils
-from frontend.Tkinter.phases.primary.GamePhase import GamePhase
-from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
+from frontend.Tkinter.phases.setup.SetupPhase import SetupPhase
 from frontend.ColorUtils import ColorUtils
 import re
 

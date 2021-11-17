@@ -1,5 +1,5 @@
 from actions.Action import Action
-from frontend.Tkinter.phases.primary.setup.LobbyPhase import LobbyPhase
+from frontend.Tkinter.phases.setup.sub_phases.LobbyPhase import LobbyPhase
 
 class JoinExistingGame(Action):
     def __init__(self):

@@ -1,6 +1,6 @@
 import tkinter
-from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
-from frontend.Tkinter.phases.primary.setup.LobbyPhase import LobbyPhase
+from frontend.Tkinter.phases.setup.SetupPhase import SetupPhase
+from frontend.Tkinter.phases.setup.sub_phases.LobbyPhase import LobbyPhase
 
 class NewGamePhase(SetupPhase):
     MIN_HEXAGONS = 5

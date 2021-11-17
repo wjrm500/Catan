@@ -1,5 +1,5 @@
 import tkinter
-from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
+from frontend.Tkinter.phases.setup.SetupPhase import SetupPhase
 
 class ExistingGamePhase(SetupPhase):
     def __init__(self, chaperone):

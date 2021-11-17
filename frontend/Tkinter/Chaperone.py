@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import messagebox
 from actions.ActionFactory import ActionFactory
-from frontend.Tkinter.phases.primary.SettlingPhase import SettlingPhase
+from frontend.Tkinter.phases.game.sub_phases.SettlingPhase import SettlingPhase
 import json
 import os
 

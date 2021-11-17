@@ -1,5 +1,5 @@
 from actions.Action import Action
-from frontend.Tkinter.phases.primary.SettlingPhase import SettlingPhase
+from frontend.Tkinter.phases.game.sub_phases.SettlingPhase import SettlingPhase
 
 class StartGame(Action):
     def __init__(self):

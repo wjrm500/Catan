@@ -1,7 +1,7 @@
 import tkinter
-from frontend.Tkinter.phases.primary.SetupPhase import SetupPhase
-from frontend.Tkinter.phases.primary.setup.ExistingGamePhase import ExistingGamePhase
-from frontend.Tkinter.phases.primary.setup.NewGamePhase import NewGamePhase
+from frontend.Tkinter.phases.setup.SetupPhase import SetupPhase
+from frontend.Tkinter.phases.setup.sub_phases.ExistingGamePhase import ExistingGamePhase
+from frontend.Tkinter.phases.setup.sub_phases.NewGamePhase import NewGamePhase
 
 class HomePhase(SetupPhase):
     def __init__(self, chaperone):

@@ -1,8 +1,10 @@
-import tkinter
+import abc
 from PIL import Image, ImageTk
+import tkinter
+
 from frontend.ColorUtils import ColorUtils
 
-class Phase:
+class Phase(abc.ABC):
     BG_COLOR = '#ADD8E6'
     CATAN_LOGO_IMG_FILEPATH = './frontend/assets/images/catan_logo.png'
     CURSOR_HAND = 'hand2'

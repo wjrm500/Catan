@@ -5,7 +5,7 @@ import multiprocessing
 import pickle
 import json
 
-from frontend.Tkinter.phases.primary.setup.HomePhase import HomePhase
+from frontend.Tkinter.phases.setup.sub_phases.HomePhase import HomePhase
 
 class Client:
     LOCAL_HOST = '127.0.0.1'

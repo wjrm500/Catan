@@ -1,7 +1,9 @@
+import abc
 import tkinter
+
 from frontend.Tkinter.phases.Phase import Phase
 
-class SetupPhase(Phase):
+class SetupPhase(Phase, abc.ABC):
     SIDE_LENGTH = 500
 
     def __init__(self, chaperone):
