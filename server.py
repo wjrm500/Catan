@@ -43,7 +43,7 @@ class Server:
                     game = self.games[game_code]
                     player = Player(from_client['player'], client)
                     game.add_player(player)
-                    data = {'action': action, 'players': [player.name for player in game.players]}
+                    data = {'action': action, 'players': game.players} ### Should we just send one player back and append client-side?
                     self.broadcast_to_game(game.code, data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = from_client['num_hexagons']
@@ -58,7 +58,7 @@ class Server:
                     if game_code in self.games:
                         game = self.games[game_code]
                         game.add_client(client)
-                        data.update({'game_code': game.code, 'players': [player.name for player in game.players]})
+                        data.update({'game_code': game.code, 'players': game.players})
                         self.broadcast_to_game(game.code, data)
                     else:
                         data['error'] = f'"{game_code}" is not a valid game code'
@@ -69,9 +69,9 @@ class Server:
                     game.setup_board()
                     game.setup_cards()
                     game.setup_movable_pieces()
-                    game.randomise_player_order()
+                    game.randomise_player_order_and_assign_colors()
                     game.started = True
-                    self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor, 'players': [player.name for player in game.players]})
+                    self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor, 'players': game.players}) ### Do we need to send back players here?
             except:                    
                 ### End any games for which the client was the main client
                 game_codes_to_delete = []
@@ -91,7 +91,7 @@ class Server:
                             self.broadcast_to_game(game.code, {'action': ActionFactory.END_GAME})
                             game_codes_to_delete.append(game_code)
                         else:
-                            self.broadcast_to_game(game_code, {'action': ActionFactory.REMOVE_PLAYER, 'player': player.name})
+                            self.broadcast_to_game(game_code, {'action': ActionFactory.REMOVE_PLAYER, 'player': player})
 
                 for game_code in game_codes_to_delete:
                     del self.games[game_code]
@@ -104,7 +104,8 @@ class Server:
         try:
             encoded_message = json.dumps(message).encode('utf-8')
         except:
-            encoded_message = pickle.dumps(message)
+            serializable_message = self.get_serializable_message(message)
+            encoded_message = pickle.dumps(serializable_message)
         bytes_to_send = str(asizeof(encoded_message)).encode('utf-8')
         client.send(bytes_to_send) ### Header
         client.send(encoded_message)
@@ -114,7 +115,32 @@ class Server:
         for client in self.games[game_code].clients.values():
             self.broadcast_to_client(client, message)
     
-    ### Handle client disconnect
+    def get_serializable_message(self, message):
+        ### The first custom recursive function I've built that actually works!!!
+        ### Removes any unserializable properties from any objects in the message
+        if isinstance(message, dict):
+            to_return = {}
+            for key, value in message.items():
+                if not isinstance(value, list) and not isinstance(value, dict):
+                    if isinstance(value, object):
+                        if hasattr(value, 'get_serializable_copy') and callable(getattr(value, 'get_serializable_copy')):
+                            to_return[key] = value.get_serializable_copy()
+                        else:
+                            to_return[key] = value
+                else:
+                    to_return[key] = self.get_serializable_message(value)
+        elif isinstance(message, list):
+            to_return = []
+            for value in message:
+                if not isinstance(value, list) and not isinstance(value, dict):
+                    if isinstance(value, object):
+                        if hasattr(value, 'get_serializable_copy') and callable(getattr(value, 'get_serializable_copy')):
+                            to_return.append(value.get_serializable_copy())
+                        else:
+                            to_return.append(value)
+                else:
+                    to_return.append(self.get_serializable_message(value))
+        return to_return
 
 server = Server()
 server.serve()

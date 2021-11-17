@@ -120,5 +120,7 @@ class Game:
             if iterator >= len(coast_nodes) - 1:
                 break
     
-    def randomise_player_order(self):
+    def randomise_player_order_and_assign_colors(self):
         random.shuffle(self.players)
+        for player, color in zip(self.players, self.config['player_colors']):
+            player.set_color(color)

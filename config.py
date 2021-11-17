@@ -69,5 +69,6 @@ config = {
         'road_building': 2,
         'victory_point': 5,
         'year_of_plenty': 2
-    }
+    },
+    'player_colors': ['red', 'blue', 'lime', 'yellow']
 }

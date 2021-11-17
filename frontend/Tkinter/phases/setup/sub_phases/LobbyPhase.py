@@ -39,18 +39,18 @@ class LobbyPhase(SetupPhase):
     def add_player(self, event):
         if not isinstance(self.root.focus_get(), tkinter.Entry):
             return
-        name = self.new_player_input.get()
+        new_name = self.new_player_input.get()
         errors = []
-        players = self.chaperone.players
-        if not re.match('^[A-Za-z]{1,20}$', name):
+        player_names = [player.name for player in self.chaperone.players]
+        if not re.match('^[A-Za-z]{1,20}$', new_name):
             errors.append(f'Invalid name: use only alphabetic characters and limit to 20 characters')
-        if len(players) == self.MAX_PLAYER_COUNT:
+        if len(player_names) == self.MAX_PLAYER_COUNT:
             errors.append(f'Only {self.MAX_PLAYER_COUNT} players allowed')
-        name = name.title()
-        if name in players:
-            errors.append(f'The name {name} is taken')
+        new_name = new_name.title()
+        if new_name in player_names:
+            errors.append(f'The name {new_name} is taken')
         if len(errors) == 0:
-            self.chaperone.add_player(name)
+            self.chaperone.add_player(new_name)
             ### Want the following code here and not in update_gui because we do not want to re-render left panel every time any other player enters name
             self.new_player_label_text.set('Name successfully submitted!')
             self.new_player_input.config(state = 'disabled')
@@ -87,8 +87,8 @@ class LobbyPhase(SetupPhase):
             list_item = tkinter.Text(where, font = self.get_font(font_weight = 'normal'), foreground = 'black', background = self.BG_COLOR, width = 25, height = 1, bd = 0)
             list_item.config(config)
             list_item.tag_configure('tag-center', justify = 'center')
-            you_text = ' (you)' if player == self.chaperone.player else ''
-            list_item.insert(tkinter.END, f'{player}{you_text}', 'tag-center')
+            you_text = ' (you)' if player is self.chaperone.player else ''
+            list_item.insert(tkinter.END, f'{player.name}{you_text}', 'tag-center')
             existing_players_list.append(list_item)
         return existing_players_list
 

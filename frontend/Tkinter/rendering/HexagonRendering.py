@@ -1,4 +1,5 @@
 import math
+import random
 
 from config import config
 from frontend.ColorUtils import ColorUtils
@@ -17,6 +18,7 @@ class HexagonRendering:
     CT_OBJ_HEXAGON = 'ct_hexagon'
     CT_OBJ_LINE = 'ct_line'
     CT_OBJ_NODE = 'ct_node'
+    CT_OBJ_SETTLEMENT = 'ct_settlement'
 
     ### Canvas object constants
     CV_OBJ_LINE = 'cv_line'
@@ -39,6 +41,7 @@ class HexagonRendering:
         self.reset_canvas_objects()
         self.distributor = self.parent_phase.chaperone.distributor
         self.hexagon_renders = {hexagon.id: HexagonRender(self, hexagon) for hexagon in self.distributor.hexagons}
+        self.rectangle_node_dict = {}
     
     def reset_canvas_objects(self):
         self.canvas_objects = {
@@ -68,8 +71,9 @@ class HexagonRendering:
         self.update_canvas_object_count(self.CV_OBJ_OVAL, self.ACTION_CREATE)
     
     def create_rectangle(self, *args, **kwargs):
-        self.canvas.create_rectangle(*args, **kwargs)
+        rectangle_id = self.canvas.create_rectangle(*args, **kwargs)
         self.update_canvas_object_count(self.CV_OBJ_RECT, self.ACTION_CREATE)
+        return rectangle_id
     
     def create_text(self, *args, **kwargs):
         self.canvas.create_text(*args, **kwargs)
@@ -153,14 +157,31 @@ class HexagonRendering:
         tags = [
             self.CT_OBJ_NODE,
             self.ct_node_tag(node),
-            self.CV_OBJ_OVAL
+            self.CV_OBJ_RECT
         ]
-        self.create_rectangle(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)    
+        rectangle_id = self.create_rectangle(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)
+        self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
+        self.rectangle_node_dict[rectangle_id] = node
         
         ### Change cursor pointer to hand icon if cursor near node
         cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
         self.canvas.config(cursor = cursor)
     
+    def handle_click(self, event):
+        rectangle_id = event.widget.find_withtag('current')[0]
+        self.delete_tag(self.CT_OBJ_NODE)
+        tags = [
+            self.CT_OBJ_SETTLEMENT,
+            # self.ct_node_tag(node),
+            self.CV_OBJ_RECT
+        ]
+        node = self.rectangle_node_dict[rectangle_id]
+        circle_radius = (self.scale * 3 / 4) / 5
+        fill = 'black'
+        width = (self.scale * 3 / 4) / 10
+        rectangle_id = self.create_rectangle(node.real_x - circle_radius, node.real_y - circle_radius, node.real_x + circle_radius, node.real_y + circle_radius, tags = tags, fill = fill, width = width)
+        
+
     def unfocus_focused_hexagons(self, event):
         for hexagon in self.focused_hexagons:
             hexagon_render = self.hexagon_renders[hexagon.id]

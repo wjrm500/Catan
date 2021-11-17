@@ -86,6 +86,8 @@ class GamePhase(Phase, abc.ABC):
         self.instruction_text.set(instruction_text)
         self.instruction = tkinter.Label(self.inner_frame_bottom_left, textvariable = self.instruction_text, background = label_bg_color, font = ('Arial, 12'), borderwidth = 1, relief = 'solid')
         self.instruction.place(anchor = tkinter.CENTER, relheight = 0.5, relwidth = 0.8, relx = 0.5, rely = 0.5)
+        lab = tkinter.Label(self.inner_frame_bottom_left, text = 'COLOR', height = 10, width = 10, background = self.chaperone.player.color)
+        lab.pack(side = tkinter.TOP)
 
     def setup_inner_frame_bottom_right(self):
         self.button_text = tkinter.StringVar()
@@ -97,6 +99,7 @@ class GamePhase(Phase, abc.ABC):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
         if self.chaperone.active():
             self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
+            # self.canvas.bind('<Button-1>', lambda evt: self.hexagon_rendering.handle_click(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.unfocus_focused_hexagons)
         self.root.mainloop()
     
