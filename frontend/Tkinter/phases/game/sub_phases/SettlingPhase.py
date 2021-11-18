@@ -17,9 +17,8 @@ class SettlingPhase(GamePhase):
         self.text_area.yview('end')
         self.text_area.config(state = 'disabled')
     
-    def setup_inner_frame_bottom_left(self):
-        active = self.chaperone.active()
-        instruction_text = "It's your turn!" if active else 'Please wait for your turn'
+    def setup_inner_frame_bottom_left(self, active):
+        instruction_text = "Build a settlement!" if active else 'Please wait for your turn'
         label_bg_color = '#90EE90' if active else '#F08080' ### LightGreen or LightCoral
         return super().setup_inner_frame_bottom_left(instruction_text, label_bg_color)
     

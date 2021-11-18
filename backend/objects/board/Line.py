@@ -13,6 +13,7 @@ class Line(Incrementable):
         for node in self.nodes:
             node.lines.append(self)
         self.hexagons = []
+        self.road = None
     
     def angle(self):
         y_change = self.end_node.y - self.start_node.y

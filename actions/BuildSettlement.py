@@ -17,3 +17,6 @@ class BuildSettlement(Action):
 
         hexagon_rendering.draw_ports()
         hexagon_rendering.draw_settlements()
+        hexagon_rendering.unfocus_focused_hexagons(None)
+        hexagon_rendering.canvas_mode = hexagon_rendering.CANVAS_MODE_BUILD_ROAD
+        hexagon_rendering.canvas.config(cursor = '')

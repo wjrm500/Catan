@@ -13,11 +13,12 @@ class GamePhase(Phase, abc.ABC):
         self.root.geometry('1000x500')
         self.frames = {}
         self.place_widget = lambda what, where, anchor: what.place(in_ = where, anchor = anchor, relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
+        active = self.chaperone.active()
         self.setup_frames()
         self.setup_inner_frame_top_right()
-        self.setup_inner_frame_middle_left()
+        self.setup_inner_frame_middle_left(active)
         self.setup_inner_frame_middle_right()
-        self.setup_inner_frame_bottom_left()
+        self.setup_inner_frame_bottom_left(active)
         self.setup_inner_frame_bottom_right()
     
     def setup_frames(self):
@@ -73,10 +74,11 @@ class GamePhase(Phase, abc.ABC):
         label = tkinter.Label(self.inner_frame_top_right, text = 'SETTLING PHASE', font = ('Arial', 12), padx = 5, pady = 5, background = self.BG_COLOR)
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
         
-    def setup_inner_frame_middle_left(self):
+    def setup_inner_frame_middle_left(self, active):
         self.canvas = tkinter.Canvas(self.inner_frame_middle_left, background = 'lightblue', bd = 0, highlightthickness = 0)
         self.canvas.pack(expand = True)
         self.hexagon_rendering = HexagonRendering(self)
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT if active else HexagonRendering.CANVAS_MODE_DISABLED
     
     @abc.abstractmethod
     def setup_inner_frame_middle_right(self): ### Specific to settling phase (the rest isn't)
@@ -109,11 +111,10 @@ class GamePhase(Phase, abc.ABC):
     
     def run(self):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
-        if self.chaperone.active():
-            self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
+        self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.unfocus_focused_hexagons)
         self.root.mainloop()
     
     def update_gui(self):
-        instruction_text = "It's your turn!" if self.chaperone.active() else "Please wait for your turn!"
+        instruction_text = "It's your turn!" if self.chaperone.active() else "Please wait for your turn!" ### TODO: Active text will depend on whether building settlement or road
         self.instruction_text.set(instruction_text)

@@ -1,4 +1,6 @@
 import math
+import numpy as np
+from numpy.linalg import norm
 import random
 
 from config import config
@@ -19,6 +21,7 @@ class HexagonRendering:
     CT_OBJ_LINE = 'ct_line'
     CT_OBJ_NODE = 'ct_node'
     CT_OBJ_PORT = 'ct_port'
+    CT_OBJ_ROAD = 'ct_road'
     CT_OBJ_SETTLEMENT = 'ct_settlement'
 
     ### Canvas object constants
@@ -32,11 +35,19 @@ class HexagonRendering:
     ACTION_CREATE = 'create'
     ACTION_DELETE = 'delete'
 
+    ### Canvas modes
+    CANVAS_MODE_BUILD_ROAD = 'build_road'
+    CANVAS_MODE_BUILD_SETTLEMENT = 'build_settlement'
+    CANVAS_MODE_CITY_UPGRADE = 'city_upgrade'
+    CANVAS_MODE_DEFAULT = 'default'
+    CANVAS_MODE_DISABLED = 'disabled'
+    
     IN_DEVELOPMENT = False
 
     def __init__(self, parent_phase):
         self.parent_phase = parent_phase
         self.canvas = self.parent_phase.canvas
+        self.canvas_mode = self.CANVAS_MODE_DEFAULT
         self.scale = 1
         self.focused_hexagons = []
         self.reset_canvas_objects()
@@ -119,11 +130,76 @@ class HexagonRendering:
         self.draw_settlements()
     
     def handle_motion(self, event):
+        event_x, event_y = event.x, event.y
+        if self.canvas_mode == self.CANVAS_MODE_BUILD_ROAD:
+            self.build_road(event_x, event_y)
+        elif self.canvas_mode == self.CANVAS_MODE_BUILD_SETTLEMENT:
+            self.build_settlement(event_x, event_y)
+        elif self.canvas_mode == self.CANVAS_MODE_DISABLED:
+            pass
+        
+    def build_road(self, event_x, event_y):
+        self.delete_tag(self.CT_OBJ_ROAD)
+
+        ### Find closest line to cursor
+        def get_dist_to_line(event_x, event_y, line): ### https://www.geeksforgeeks.org/minimum-distance-from-a-point-to-the-line-segment-using-vectors/
+            E = event_x, event_y
+            A = self.real_x(line.start_node), self.real_y(line.start_node)
+            B = self.real_x(line.end_node), self.real_y(line.end_node)
+            AB = [B[0] - A[0], B[1] - A[1]]
+            BE = [E[0] - B[0], E[1] - B[1]] 
+            AE = [E[0] - A[0], E[1] - A[1]]
+            AB_BE = AB[0] * BE[0] + AB[1] * BE[1]
+            AB_AE = AB[0] * AE[0] + AB[1] * AE[1]
+            if (AB_BE > 0):
+                x, y = E[0] - B[0], E[1] - B[1]
+                reqAns = np.sqrt(x * x + y * y)
+            elif (AB_AE < 0):
+                x, y = E[0] - A[0], E[1] - A[1]
+                reqAns = np.sqrt(x * x + y * y)
+            else:
+                x1, y1, x2, y2 = AB[0], AB[1], AE[0], AE[1]
+                mod = np.sqrt(x1 * x1 + y1 * y1)
+                reqAns = abs(x1 * y2 - y1 * x2) / mod
+            return reqAns
+        
+        line_dists = [(line, get_dist_to_line(event_x, event_y, line)) for line in self.distributor.lines]
+        min_line_dist = min(map(lambda x: x[1], line_dists))
+        for line, dist in line_dists:
+            closest_to_cursor = dist == min_line_dist
+            if closest_to_cursor:
+                reversed_dist = max(self.scale - dist, 0)
+                fill_color = self.parent_phase.chaperone.player.color if min_line_dist / self.scale < 0.2 else 'white'
+                line_width = min(self.scale * 3 / 4, reversed_dist) / 10
+                draw_road_args = {'fill': fill_color, 'line': line, 'width': line_width}
+                break
+        
+        line = draw_road_args['line']
+        if not line.road:
+            # r = draw_node_args['circle_radius']
+            # fill = draw_node_args['fill']
+            # width = draw_node_args['width']
+            tags = [
+                self.CT_OBJ_ROAD,
+                # self.ct_node_tag(node),
+                # self.CV_OBJ_RECT
+            ]
+            x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
+            x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
+            line_id = self.create_line(x1, y1, x2, y2, tags = tags, width = 10)# fill: fill,
+            # self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
+            # self.rectangle_node_dict[rectangle_id] = node
+        
+            # ### Change cursor pointer to hand icon if cursor near node
+            # cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
+            # self.canvas.config(cursor = cursor)
+
+    def build_settlement(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
 
         ### Find closest node to cursor and collect arguments for rendering
-        x1, y1 = event.x, event.y
-        node_dists = [(node, math.sqrt(pow(self.real_x(node) - x1, 2) + pow(self.real_y(node) - y1, 2))) for node in self.distributor.nodes]
+        get_dist_to_node = lambda node: math.sqrt(pow(self.real_x(node) - event_x, 2) + pow(self.real_y(node) - event_y, 2))
+        node_dists = [(node, get_dist_to_node(node)) for node in self.distributor.nodes]
         min_node_dist = min(map(lambda x: x[1], node_dists))
         for node, dist in node_dists:
             closest_to_cursor = dist == min_node_dist
@@ -133,7 +209,7 @@ class HexagonRendering:
                 circle_radius = min(self.scale * 3 / 4, reversed_dist) / 5
                 fill_color = self.parent_phase.chaperone.player.color if min_node_dist / self.scale < 0.2 else 'white'
                 line_width = min(self.scale * 3 / 4, reversed_dist) / 10
-                draw_rect_args = {'node': node, 'circle_radius': circle_radius, 'fill': fill_color, 'width': line_width}
+                draw_node_args = {'node': node, 'circle_radius': circle_radius, 'fill': fill_color, 'width': line_width}
                 break
         
         ### Focus / unfocus hexagons
@@ -149,15 +225,15 @@ class HexagonRendering:
                 self.focused_hexagons.append(hexagon)
         
         ### TODO: Run the following methods more efficiently - ONLY REDRAW PORTS AND SETTLEMENTS AFFECTED BY HEXAGON FOCUSING
-        self.draw_ports(node, draw_rect_args)
+        self.draw_ports(node, draw_node_args)
         self.draw_settlements()
 
-        node = draw_rect_args['node']
+        node = draw_node_args['node']
         if not node.settlement and not node.adjacent_to_settled_node():
             ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
-            r = draw_rect_args['circle_radius']
-            fill = draw_rect_args['fill']
-            width = draw_rect_args['width']
+            r = draw_node_args['circle_radius']
+            fill = draw_node_args['fill']
+            width = draw_node_args['width']
             tags = [
                 self.CT_OBJ_NODE,
                 self.ct_node_tag(node),
@@ -221,7 +297,7 @@ class HexagonRendering:
     def ct_settlement_tag(self, settlement):
         return '{}.{}'.format(self.CT_OBJ_SETTLEMENT, settlement.id)
 
-    def draw_ports(self, hovered_node = None, draw_rect_args = None):
+    def draw_ports(self, hovered_node = None, draw_node_args = None):
         self.delete_tag(self.CT_OBJ_PORT)
         port_nodes = [node for node in self.distributor.nodes if node.port]
         for port_node in port_nodes:
@@ -233,7 +309,7 @@ class HexagonRendering:
 
             r = line_width * 2 ### Circle radius
             if hovered_node is not None and port_node is hovered_node:
-                r = max(r, draw_rect_args['circle_radius'] * 2.1)
+                r = max(r, draw_node_args['circle_radius'] * 2)
             if port_node.settlement:
                 r = line_width * 5
             tags = [ ### TODO: Change these - do we need a new port tag?
