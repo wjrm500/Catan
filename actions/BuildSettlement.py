@@ -18,5 +18,4 @@ class BuildSettlement(Action):
         hexagon_rendering.draw_ports()
         hexagon_rendering.draw_settlements()
         hexagon_rendering.unfocus_focused_hexagons(None)
-        hexagon_rendering.canvas_mode = hexagon_rendering.CANVAS_MODE_BUILD_ROAD ### THIS WILL DEPEND ON CLIENT - ONE CLIENT WILL STILL BE DISABLED
         hexagon_rendering.canvas.config(cursor = '')

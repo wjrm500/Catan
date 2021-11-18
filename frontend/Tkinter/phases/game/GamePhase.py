@@ -2,7 +2,6 @@ import abc
 from functools import partial
 import tkinter
 import tkinter.scrolledtext
-from frontend.ColorUtils import ColorUtils
 
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
@@ -116,5 +115,14 @@ class GamePhase(Phase, abc.ABC):
         self.root.mainloop()
     
     def update_gui(self):
-        instruction_text = "It's your turn!" if self.chaperone.active() else "Please wait for your turn!" ### TODO: Active text will depend on whether building settlement or road
+        if self.chaperone.active():
+            if self.hexagon_rendering.canvas_mode == HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT:
+                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
+                instruction_text = 'Build a road!'
+            else:
+                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
+                instruction_text = 'Build a settlement!'
+        else:
+            self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+            instruction_text = 'Please wait for your turn'
         self.instruction_text.set(instruction_text)
