@@ -256,7 +256,11 @@ class HexagonRendering:
                 self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
     
     def real_x(self, node):
-        return (node.x + self.x_shift) * self.scale + self.x_centre_shift
+        scale_factor = 0.95
+        # return (node.x + self.x_shift) * self.scale + self.x_centre_shift
+        return (node.x + (self.x_shift * 1 / scale_factor)) * (self.scale * scale_factor) + (self.x_centre_shift * 1 / scale_factor)
     
     def real_y(self, node):
-        return (node.y + self.y_shift) * self.scale + self.y_centre_shift
+        scale_factor = 0.95
+        # return (node.y + self.y_shift) * self.scale + self.y_centre_shift
+        return (node.y + (self.y_shift * 1 / scale_factor)) * (self.scale * scale_factor) + (self.y_centre_shift * 1 / scale_factor)
