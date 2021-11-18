@@ -149,7 +149,7 @@ class HexagonRendering:
                 self.focused_hexagons.append(hexagon)
         
         ### TODO: Run the following methods more efficiently - ONLY REDRAW PORTS AND SETTLEMENTS AFFECTED BY HEXAGON FOCUSING
-        self.draw_ports()
+        self.draw_ports(node, draw_rect_args)
         self.draw_settlements()
 
         node = draw_rect_args['node']
@@ -221,7 +221,7 @@ class HexagonRendering:
     def ct_settlement_tag(self, settlement):
         return '{}.{}'.format(self.CT_OBJ_SETTLEMENT, settlement.id)
 
-    def draw_ports(self):
+    def draw_ports(self, hovered_node = None, draw_rect_args = None):
         self.delete_tag(self.CT_OBJ_PORT)
         port_nodes = [node for node in self.distributor.nodes if node.port]
         for port_node in port_nodes:
@@ -230,8 +230,12 @@ class HexagonRendering:
             port_type = port_node.port.type
             circle_color = '#87CEFA' if port_type == 'any_resource' else BACKGROUND_COLORS[port_node.port.type]
             line_width = round(self.scale / 15)
-            radius_multiplier = 5 if port_node.settlement else 2
-            r = line_width * radius_multiplier ### Circle radius
+
+            r = line_width * 2 ### Circle radius
+            if hovered_node is not None and port_node is hovered_node:
+                r = max(r, draw_rect_args['circle_radius'] * 2.1)
+            if port_node.settlement:
+                r = line_width * 5
             tags = [ ### TODO: Change these - do we need a new port tag?
                 self.CT_OBJ_PORT,
                 self.ct_port_tag(port_node),
