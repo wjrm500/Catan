@@ -19,9 +19,12 @@ class BuildSettlement(Action):
         fill = player.color
         width = (hexagon_rendering.scale * 3 / 4) / 10
         node = data['node']
+        settlement = data['settlement']
 
-        ### Replace node in client distributor with settled node from server distributor
-        ClientServerInterface.replace_object_in_distributor(hexagon_rendering.distributor, Distributor.OBJ_NODE, node)
+        ### Following two lines necessary to work with client-side versions of objects
+        node = hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, node.id)
+        settlement = hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, settlement.id)
+        node.add_settlement(settlement)
 
         ### Building settlement
         x = hexagon_rendering.real_x(node)

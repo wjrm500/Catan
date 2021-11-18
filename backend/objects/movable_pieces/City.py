@@ -1,3 +1,3 @@
 class City:
-    def __init__(self):
-        pass
+    def __init__(self, player):
+        self.player = player

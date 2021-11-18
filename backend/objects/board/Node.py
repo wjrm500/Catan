@@ -29,3 +29,10 @@ class Node(Incrementable):
     
     def add_settlement(self, settlement):
         self.settlement = settlement
+    
+    def adjacent_to_settled_node(self):
+        for line in self.lines:
+            other_node = next(node for node in line.nodes if node is not self)
+            if other_node.settlement:
+                return True
+        return False

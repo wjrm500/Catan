@@ -133,7 +133,7 @@ class HexagonRendering:
                 circle_radius = min(self.scale * 3 / 4, reversed_dist) / 5
                 fill_color = self.parent_phase.chaperone.player.color if min_node_dist / self.scale < 0.2 else 'white'
                 line_width = min(self.scale * 3 / 4, reversed_dist) / 10
-                draw_oval_args = {'node': node, 'circle_radius': circle_radius, 'fill': fill_color, 'width': line_width}
+                draw_rect_args = {'node': node, 'circle_radius': circle_radius, 'fill': fill_color, 'width': line_width}
                 break
         
         ### Focus / unfocus hexagons
@@ -148,28 +148,29 @@ class HexagonRendering:
                 hexagon_render.focus()
                 self.focused_hexagons.append(hexagon)
         
-        ### DO THIS MORE EFFICIENTLY - ONLY DRAW PORTS YOU HVAE TO DRAW
+        ### TODO: Run the following methods more efficiently - ONLY REDRAW PORTS AND SETTLEMENTS AFFECTED BY HEXAGON FOCUSING
         self.draw_ports()
         self.draw_settlements()
 
-        ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
-        node = draw_oval_args['node']
-        r = draw_oval_args['circle_radius']
-        fill = draw_oval_args['fill']
-        width = draw_oval_args['width']
-        tags = [
-            self.CT_OBJ_NODE,
-            self.ct_node_tag(node),
-            self.CV_OBJ_RECT
-        ]
-        x, y = self.real_x(node), self.real_y(node)
-        rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
-        self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
-        self.rectangle_node_dict[rectangle_id] = node
+        node = draw_rect_args['node']
+        if not node.settlement and not node.adjacent_to_settled_node():
+            ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
+            r = draw_rect_args['circle_radius']
+            fill = draw_rect_args['fill']
+            width = draw_rect_args['width']
+            tags = [
+                self.CT_OBJ_NODE,
+                self.ct_node_tag(node),
+                self.CV_OBJ_RECT
+            ]
+            x, y = self.real_x(node), self.real_y(node)
+            rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
+            self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
+            self.rectangle_node_dict[rectangle_id] = node
         
-        ### Change cursor pointer to hand icon if cursor near node
-        cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
-        self.canvas.config(cursor = cursor)
+            ### Change cursor pointer to hand icon if cursor near node
+            cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
+            self.canvas.config(cursor = cursor)
     
     def handle_click(self, event):
         rectangle_id = event.widget.find_withtag('current')[0]

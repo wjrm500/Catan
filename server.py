@@ -47,13 +47,10 @@ class Server:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
-
-                    ### Replace node in server distributor with node from client distributor (which might have properties such as real_x and real_y which we don't want to lose)
-                    node = input_data['node']
-                    node.add_settlement(player.settlements.pop())
-                    ClientServerInterface.replace_object_in_distributor(game.distributor, Distributor.OBJ_NODE, node)
-
-                    output_data = {'action': action, 'node': node, 'player_id': player.id}
+                    node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
+                    settlement = player.settlements.pop()
+                    node.add_settlement(settlement)
+                    output_data = {'action': action, 'node': node, 'player_id': player.id, 'settlement': settlement}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = input_data['num_hexagons']

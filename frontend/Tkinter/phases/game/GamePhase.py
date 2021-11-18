@@ -2,7 +2,6 @@ import abc
 from functools import partial
 import tkinter
 import tkinter.scrolledtext
-from frontend.ColorUtils import ColorUtils
 
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering

@@ -58,15 +58,3 @@ class ClientServerInterface:
                 else:
                     to_return.append(self.get_serializable_message(value))
         return to_return
-    
-    @staticmethod
-    def replace_object_in_distributor(distributor, object_type, new_object):
-        if object_type == Distributor.OBJ_HEXAGON:
-            distributor.hexagons = [existing_hexagon for existing_hexagon in distributor.hexagons if existing_hexagon.id != new_object.id]
-            distributor.hexagons.append(new_object)
-        elif object_type == Distributor.OBJ_LINE:
-            distributor.lines = [existing_line for existing_line in distributor.lines if existing_line.id != new_object.id]
-            distributor.lines.append(new_object)
-        elif object_type == Distributor.OBJ_NODE:
-            distributor.nodes = [existing_node for existing_node in distributor.nodes if existing_node.id != new_object.id]
-            distributor.nodes.append(new_object)

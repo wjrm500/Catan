@@ -66,9 +66,9 @@ class Game:
     
     def setup_movable_pieces(self):
         for player in self.players:
-            player.cities = [City() for _ in range(round(self.num_hexagons * 4 / 19))]
-            player.roads = [Road() for _ in range(round(self.num_hexagons * 15 / 19))]
-            player.settlements = [Settlement(player) for _ in range(round(self.num_hexagons * 5 / 19))]
+            player.cities = [self.distributor.get_city(player) for _ in range(round(self.num_hexagons * 4 / 19))]
+            player.roads = [self.distributor.get_road(player) for _ in range(round(self.num_hexagons * 15 / 19))]
+            player.settlements = [self.distributor.get_settlement(player) for _ in range(round(self.num_hexagons * 5 / 19))]
 
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])

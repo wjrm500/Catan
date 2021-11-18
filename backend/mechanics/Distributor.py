@@ -1,3 +1,7 @@
+from backend.objects.board.Port import Port
+from backend.objects.movable_pieces.City import City
+from backend.objects.movable_pieces.Road import Road
+from backend.objects.movable_pieces.Settlement import Settlement
 from ..objects.board.Hexagon import Hexagon
 from ..objects.board.Line import Line
 from ..objects.board.Node import Node
@@ -8,14 +12,32 @@ from backend.objects.cards.development.VictoryPoint import VictoryPoint
 from backend.objects.cards.development.YearOfPlenty import YearOfPlenty
 
 class Distributor:
+    OBJ_CITY = 'city'
     OBJ_HEXAGON = 'hexagon'
     OBJ_LINE = 'line'
     OBJ_NODE = 'node'
+    OBJ_PORT = 'port'
+    OBJ_ROAD = 'road'
+    OBJ_SETTLEMENT = 'settlement'
 
     def __init__(self):
+        self.cities = []
         self.hexagons = []
         self.lines = []
         self.nodes = []
+        self.ports = []
+        self.roads = []
+        self.settlements = []
+    
+    def get_city(self, player):
+        city = City(player)
+        self.cities.append(city)
+        return city
+    
+    def get_hexagon(self, nodes, lines):
+        hexagon = Hexagon(nodes, lines)
+        self.hexagons.append(hexagon) ### TODO: Fix related issue (try commenting out this line)
+        return hexagon
     
     def get_line(self, start_node, end_node):
         for line in self.lines:
@@ -33,8 +55,20 @@ class Distributor:
         self.nodes.append(node)
         return node
     
-    def get_hexagon(self, nodes, lines):
-        return Hexagon(nodes, lines)
+    def get_port(self):
+        port = Port()
+        self.ports.append(port)
+        return port
+    
+    def get_road(self, player):
+        road = Road(player)
+        self.roads.append(road)
+        return road
+    
+    def get_settlement(self, player):
+        settlement = Settlement(player)
+        self.settlements.append(settlement)
+        return settlement
     
     def get_development_card(self, type):
         type_class_mapping = {
@@ -47,9 +81,17 @@ class Distributor:
         return type_class_mapping[type]()
     
     def get_object_by_id(self, obj, id):
-        if obj == self.OBJ_HEXAGON:
-            return next(hexagon for hexagon in self.hexagon if hexagon.id == id)
+        if obj == self.OBJ_CITY:
+            return next(city for city in self.cities if city.id == id)
+        elif obj == self.OBJ_HEXAGON:
+            return next(hexagon for hexagon in self.hexagons if hexagon.id == id)
         elif obj == self.OBJ_LINE:
-             return next(line for line in self.line if line.id == id)
+             return next(line for line in self.lines if line.id == id)
         elif obj == self.OBJ_NODE:
             return next(node for node in self.nodes if node.id == id)
+        elif obj == self.OBJ_PORT:
+            return next(port for port in self.ports if port.id == id)
+        elif obj == self.OBJ_ROAD:
+            return next(road for road in self.roads if road.id == id)
+        elif obj == self.OBJ_SETTLEMENT:
+            return next(settlement for settlement in self.settlements if settlement.id == id)

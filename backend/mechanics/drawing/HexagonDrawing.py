@@ -5,12 +5,10 @@ class HexagonDrawing:
     def draw_hexagons(cls, game):
         start_node = game.distributor.get_node(0, 0)
         hexagon = cls.draw_hexagon(game.distributor, start_node, 0)
-        game.distributor.hexagons.append(hexagon)
         while len(game.distributor.hexagons) < game.num_hexagons:
             start_node = hexagon.last_free_node() if len(game.distributor.hexagons) > 1 else hexagon.nodes[2]
             start_angle = start_node.start_angle()
             hexagon = cls.draw_hexagon(game.distributor, start_node, start_angle)
-            game.distributor.hexagons.append(hexagon)
 
     @staticmethod
     def draw_hexagon(distributor, node, angle):
