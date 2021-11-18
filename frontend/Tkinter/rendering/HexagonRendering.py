@@ -185,13 +185,24 @@ class HexagonRendering:
             ]
             x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
             x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
-            line_id = self.create_line(x1, y1, x2, y2, tags = tags, fill = fill, width = width)
+            self.create_line(x1, y1, x2, y2, tags = tags, fill = 'black', width = width)
+            if min_line_dist / self.scale < 0.05:
+                x_shorten = (x2 - x1) / 25
+                y_shorten = (y2 - y1) / 25
+                new_x1 = x1 + x_shorten
+                new_x2 = x2 - x_shorten
+                new_y1 = y1 + y_shorten
+                new_y2 = y2 - y_shorten
+                self.create_line(new_x1, new_y1, new_x2, new_y2, tags = tags, fill = fill, width = width * 0.6)
             # self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
             # self.rectangle_node_dict[rectangle_id] = node
         
             ### Change cursor pointer to hand icon if cursor near node
             cursor = self.parent_phase.CURSOR_HAND if min_line_dist / self.scale < 0.05 else ''
             self.canvas.config(cursor = cursor)
+        
+            self.draw_ports()
+            self.draw_settlements()
 
     def build_settlement(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
