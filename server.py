@@ -51,7 +51,7 @@ class Server:
                     ### Replace node in server distributor with node from client distributor (which might have properties such as real_x and real_y which we don't want to lose)
                     node = input_data['node']
                     node.add_settlement(player.settlements.pop())
-                    ClientServerInterface.replace_object_in_distributor(game.distributor, Distributor.NODE, node)
+                    ClientServerInterface.replace_object_in_distributor(game.distributor, Distributor.OBJ_NODE, node)
 
                     output_data = {'action': action, 'node': node, 'player_id': player.id}
                     self.broadcast_to_game(game.code, output_data)

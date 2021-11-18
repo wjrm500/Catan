@@ -1,9 +1,12 @@
+from collections import namedtuple
 import math
 import numpy as np
 
-class Line:
-    def __init__(self, line_id, start_node, end_node):
-        self.id = line_id
+from backend.Incrementable import Incrementable
+
+class Line(Incrementable):
+    def __init__(self, start_node, end_node):
+        super().__init__()
         self.start_node = start_node
         self.end_node = end_node
         self.nodes = [self.start_node, self.end_node]
@@ -27,7 +30,8 @@ class Line:
         # return self.start_node.test(start_node.x, start_node.y) and self.end_node.test(end_node.x, end_node.y)
         return (self.start_node is start_node and self.end_node is end_node) or (self.start_node is end_node and self.end_node is start_node)
     
-    def centre_point(self, real = False):
-        centre_point_x = np.mean((self.start_node.real_x, self.end_node.real_x) if real else (self.start_node.x, self.end_node.x))
-        centre_point_y = np.mean((self.start_node.real_y, self.end_node.real_y) if real else (self.start_node.y, self.end_node.y))
-        return (centre_point_x, centre_point_y)
+    def centre_point(self):
+        centre_point_x = np.mean(self.start_node.x, self.end_node.x)
+        centre_point_y = np.mean(self.start_node.y, self.end_node.y)
+        CentrePoint = namedtuple('CentrePoint', ['x', 'y'])
+        return CentrePoint(x = centre_point_x, y = centre_point_y)

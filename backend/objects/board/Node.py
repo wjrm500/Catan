@@ -1,8 +1,10 @@
 import math
 
-class Node:
-    def __init__(self, node_id, x, y):
-        self.id = node_id
+from backend.Incrementable import Incrementable
+
+class Node(Incrementable):
+    def __init__(self, x, y):
+        super().__init__()
         self.x = x
         self.y = y
         self.hexagons = []

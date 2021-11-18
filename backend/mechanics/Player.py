@@ -1,10 +1,8 @@
-import itertools
+from backend.Incrementable import Incrementable
 
-class Player:
-    new_id = itertools.count()
-
+class Player(Incrementable):
     def __init__(self, name, client_address):
-        self.id = next(Player.new_id)
+        super().__init__()
         self.name = name
         self.client_address = client_address
         self.longest_road = False

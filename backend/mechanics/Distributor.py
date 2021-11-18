@@ -21,7 +21,7 @@ class Distributor:
         for line in self.lines:
             if line.test(start_node, end_node):
                 return line
-        line = Line(len(self.lines) + 1, start_node, end_node)
+        line = Line(start_node, end_node)
         self.lines.append(line)
         return line
     
@@ -29,12 +29,12 @@ class Distributor:
         for node in self.nodes:
             if node.test(x, y):
                 return node
-        node = Node(len(self.nodes) + 1, x, y)
+        node = Node(x, y)
         self.nodes.append(node)
         return node
     
     def get_hexagon(self, nodes, lines):
-        return Hexagon(len(self.hexagons) + 1, nodes, lines)
+        return Hexagon(nodes, lines)
     
     def get_development_card(self, type):
         type_class_mapping = {

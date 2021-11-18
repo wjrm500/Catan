@@ -18,11 +18,12 @@ class HexagonBodyRender:
         self.render = render
 
     def render_polygon(self, focused):
-        points = [[node.real_x, node.real_y] for node in self.render.hexagon.nodes]
+        rendering = self.render.rendering
+        points = [[rendering.real_x(node), rendering.real_y(node)] for node in self.render.hexagon.nodes]
         points = [item for sublist in points for item in sublist]
         if focused == self.render.FOCUSED:
             fill = FOCUSED_BACKGROUND_COLORS[self.render.hexagon.resource_type]
-        else:
+        else:                                                                   
             fill = BACKGROUND_COLORS[self.render.hexagon.resource_type]
         tags = [
             self.render.rendering.CT_OBJ_HEXAGON,
@@ -39,7 +40,9 @@ class HexagonBodyRender:
             '{}.{}'.format(self.render.hexagon_tag, focused),
             self.render.rendering.CV_OBJ_TEXT
         ]
-        x, y = self.render.hexagon.centre_point(True)
+        rendering = self.render.rendering
+        centre_point = self.render.hexagon.centre_point()
+        x, y = (rendering.real_x(centre_point), rendering.real_y(centre_point))
         text_fill = FOCUSED_TEXT_COLORS[self.render.hexagon.resource_type] if focused else TEXT_COLORS[self.render.hexagon.resource_type]
         show_resource_type = self.render.rendering.scale > 50
         roll_num_offset = -(self.render.rendering.scale / 4) if show_resource_type else 0

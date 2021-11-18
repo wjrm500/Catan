@@ -1,8 +1,11 @@
+from collections import namedtuple
 import numpy as np
 
-class Hexagon:
-    def __init__(self, hexagon_id, lines, nodes):
-        self.id = hexagon_id
+from backend.Incrementable import Incrementable
+
+class Hexagon(Incrementable):
+    def __init__(self, lines, nodes):
+        super().__init__()
         self.lines = lines
         self.nodes = nodes
         self.resource_type = None
@@ -30,7 +33,8 @@ class Hexagon:
             if len(node.lines) < 3:
                 return node
     
-    def centre_point(self, real = False):
-        centre_point_x = np.mean([node.real_x if real else node.x for node in self.nodes])
-        centre_point_y = np.mean([node.real_y if real else node.y for node in self.nodes])
-        return (centre_point_x, centre_point_y)
+    def centre_point(self):
+        centre_point_x = np.mean([node.x for node in self.nodes])
+        centre_point_y = np.mean([node.y for node in self.nodes])
+        CentrePoint = namedtuple('CentrePoint', ['x', 'y'])
+        return CentrePoint(x = centre_point_x, y = centre_point_y)

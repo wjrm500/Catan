@@ -24,6 +24,6 @@ class BuildSettlement(Action):
         ClientServerInterface.replace_object_in_distributor(hexagon_rendering.distributor, Distributor.OBJ_NODE, node)
 
         ### Building settlement
-        x = node.real_x
-        y = node.real_y
+        x = hexagon_rendering.real_x(node)
+        y = hexagon_rendering.real_y(node)
         hexagon_rendering.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)

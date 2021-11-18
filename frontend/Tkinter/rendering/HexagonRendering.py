@@ -18,6 +18,7 @@ class HexagonRendering:
     CT_OBJ_HEXAGON = 'ct_hexagon'
     CT_OBJ_LINE = 'ct_line'
     CT_OBJ_NODE = 'ct_node'
+    CT_OBJ_PORT = 'ct_port'
     CT_OBJ_SETTLEMENT = 'ct_settlement'
 
     ### Canvas object constants
@@ -120,9 +121,8 @@ class HexagonRendering:
         self.delete_tag(self.CT_OBJ_NODE)
 
         ### Find closest node to cursor and collect arguments for rendering
-        x1 = event.x
-        y1 = event.y
-        node_dists = [(node, math.sqrt(pow(node.real_x - x1, 2) + pow(node.real_y - y1, 2))) for node in self.distributor.nodes]
+        x1, y1 = event.x, event.y
+        node_dists = [(node, math.sqrt(pow(self.real_x(node) - x1, 2) + pow(self.real_y(node) - y1, 2))) for node in self.distributor.nodes]
         min_node_dist = min(map(lambda x: x[1], node_dists))
         for node, dist in node_dists:
             closest_to_cursor = dist == min_node_dist
@@ -147,29 +147,9 @@ class HexagonRendering:
                 hexagon_render.focus()
                 self.focused_hexagons.append(hexagon)
         
+        ### DO THIS MORE EFFICIENTLY - ONLY DRAW PORTS YOU HVAE TO DRAW
         self.draw_ports()
-
-
-
-        ### Redraw affected settlements
-        ### Delete all settlements
-        self.delete_tag(self.CT_OBJ_SETTLEMENT)
-        ### Currently inefficient as redrawing rects that don't need to be redrawn
-        for node in self.distributor.nodes:
-            if node.settlement:
-                tags = [
-                    self.CT_OBJ_SETTLEMENT,
-                    # hexagon_rendering.ct_node_tag(node),
-                    self.CV_OBJ_RECT
-                ]
-                r = (self.scale * 3 / 4) / 5 ### Circle radius
-                fill = node.settlement.player.color
-                width = (self.scale * 3 / 4) / 10
-                x, y = node.real_x, node.real_y
-                self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
-
-
-
+        self.draw_settlements()
 
         ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
         node = draw_oval_args['node']
@@ -181,8 +161,7 @@ class HexagonRendering:
             self.ct_node_tag(node),
             self.CV_OBJ_RECT
         ]
-        x = node.real_x
-        y = node.real_y
+        x, y = self.real_x(node), self.real_y(node)
         rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
         self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
         self.rectangle_node_dict[rectangle_id] = node
@@ -221,11 +200,6 @@ class HexagonRendering:
             self.x_centre_shift = (self.canvas_width - x_max * self.scale) / 2
             self.y_centre_shift = (self.canvas_height - y_max * self.scale) / 2
             self.centre_points = []
-
-            for node in self.distributor.nodes:
-                node.real_x = self.real_x(node)
-                node.real_y = self.real_y(node)
-
             for hexagon in self.distributor.hexagons:
                 self.init_render(hexagon)
     
@@ -237,24 +211,45 @@ class HexagonRendering:
 
     def ct_node_tag(self, node):
         return '{}.{}'.format(self.CT_OBJ_NODE, node.id)
+    
+    def ct_port_tag(self, port):
+        return '{}.{}'.format(self.CT_OBJ_PORT, port.id)
+    
+    def ct_settlement_tag(self, settlement):
+        return '{}.{}'.format(self.CT_OBJ_SETTLEMENT, settlement.id)
 
     def draw_ports(self):
+        self.delete_tag(self.CT_OBJ_PORT)
         port_nodes = [node for node in self.distributor.nodes if node.port]
         for port_node in port_nodes:
-            if not hasattr(port_node, 'real_x'): ### Could equally check for real_y
+            if not hasattr(self, 'scale'):
                 continue
             port_type = port_node.port.type
             circle_color = '#87CEFA' if port_type == 'any_resource' else BACKGROUND_COLORS[port_node.port.type]
             line_width = round(self.scale / 15)
             r = line_width * 2 ### Circle radius
             tags = [ ### TODO: Change these - do we need a new port tag?
-                self.CT_OBJ_NODE,
-                self.ct_node_tag(port_node),
+                self.CT_OBJ_PORT,
+                self.ct_port_tag(port_node),
                 self.CV_OBJ_OVAL
             ]
-            x = port_node.real_x
-            y = port_node.real_y
-            self.create_oval(x - r, y - r, x + r, y + r, tags = tags, fill = circle_color, width = line_width)
+            x, y = self.real_x(port_node), self.real_y(port_node)
+            self.create_oval(x - r, y - r, x + r, y + r, tags = tags, fill = circle_color, outline = ColorUtils.darken_hex(circle_color, 0.5), width = line_width)
+    
+    def draw_settlements(self):
+        self.delete_tag(self.CT_OBJ_SETTLEMENT)
+        for node in self.distributor.nodes:
+            if node.settlement:
+                tags = [
+                    self.CT_OBJ_SETTLEMENT,
+                    self.ct_settlement_tag(node.settlement),
+                    self.CV_OBJ_RECT
+                ]
+                r = (self.scale * 3 / 4) / 5 ### Circle radius
+                fill = node.settlement.player.color
+                width = (self.scale * 3 / 4) / 10
+                x, y = self.real_x(node), self.real_y(node)
+                self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
     
     def real_x(self, node):
         return (node.x + self.x_shift) * self.scale + self.x_centre_shift
