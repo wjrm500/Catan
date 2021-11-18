@@ -116,6 +116,7 @@ class HexagonRendering:
         self.focused_hexagons = []
         self.draw_board()
         self.draw_ports()
+        self.draw_settlements()
     
     def handle_motion(self, event):
         self.delete_tag(self.CT_OBJ_NODE)
