@@ -169,16 +169,15 @@ class HexagonRendering:
             closest_to_cursor = dist == min_line_dist
             if closest_to_cursor:
                 reversed_dist = max(self.scale - dist, 0)
-                fill_color = self.parent_phase.chaperone.player.color if min_line_dist / self.scale < 0.2 else 'white'
-                line_width = min(self.scale * 3 / 4, reversed_dist) / 10
+                fill_color = self.parent_phase.chaperone.player.color if min_line_dist / self.scale < 0.05 else 'black'
+                line_width = min(self.scale * 3 / 4, reversed_dist) / 5
                 draw_road_args = {'fill': fill_color, 'line': line, 'width': line_width}
                 break
         
         line = draw_road_args['line']
         if not line.road:
-            # r = draw_node_args['circle_radius']
-            # fill = draw_node_args['fill']
-            # width = draw_node_args['width']
+            fill = draw_road_args['fill']
+            width = draw_road_args['width']
             tags = [
                 self.CT_OBJ_ROAD,
                 # self.ct_node_tag(node),
@@ -186,13 +185,13 @@ class HexagonRendering:
             ]
             x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
             x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
-            line_id = self.create_line(x1, y1, x2, y2, tags = tags, width = 10)# fill: fill,
+            line_id = self.create_line(x1, y1, x2, y2, tags = tags, fill = fill, width = width)
             # self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
             # self.rectangle_node_dict[rectangle_id] = node
         
-            # ### Change cursor pointer to hand icon if cursor near node
-            # cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
-            # self.canvas.config(cursor = cursor)
+            ### Change cursor pointer to hand icon if cursor near node
+            cursor = self.parent_phase.CURSOR_HAND if min_line_dist / self.scale < 0.05 else ''
+            self.canvas.config(cursor = cursor)
 
     def build_settlement(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
