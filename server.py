@@ -43,6 +43,15 @@ class Server:
                     game.add_player(player)
                     output_data = {'action': action, 'player': player}
                     self.broadcast_to_game(game.code, output_data)
+                elif action == ActionFactory.BUILD_ROAD:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line'].id)
+                    road = player.roads.pop()
+                    line.add_road(road)
+                    output_data = {'action': action, 'line': line, 'player_id': player.id, 'road': road} ### TODO: Should send back player as player has spent a road - same for build settlement
+                    self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
                     game = self.games[game_code]

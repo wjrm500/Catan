@@ -27,12 +27,13 @@ class Node(Incrementable):
     def test(self, x, y):
         return round(self.x, 2) == round(x, 2) and round(self.y, 2) == round(y, 2)
     
-    def add_settlement(self, settlement):
-        self.settlement = settlement
-    
     def adjacent_to_settled_node(self):
         for line in self.lines:
             other_node = next(node for node in line.nodes if node is not self)
             if other_node.settlement:
                 return True
         return False
+    
+    def add_settlement(self, settlement):
+        self.settlement = settlement
+        settlement.node = self

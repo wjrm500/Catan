@@ -53,7 +53,9 @@ class HexagonRendering:
         self.reset_canvas_objects()
         self.distributor = self.parent_phase.chaperone.distributor
         self.hexagon_renders = {hexagon.id: HexagonRender(self, hexagon) for hexagon in self.distributor.hexagons}
+        ### Below dicts are for keeping track of canvas objects when they are clicked
         self.rectangle_node_dict = {}
+        self.line_dict = {}
     
     def reset_canvas_objects(self):
         self.canvas_objects = {
@@ -71,8 +73,9 @@ class HexagonRendering:
             print(self.canvas_objects)
     
     def create_line(self, *args, **kwargs):
-        self.canvas.create_line(*args, **kwargs)
+        line_id = self.canvas.create_line(*args, **kwargs)
         self.update_canvas_object_count(self.CV_OBJ_LINE, self.ACTION_CREATE)
+        return line_id
     
     def create_polygon(self, *args, **kwargs):
         self.canvas.create_polygon(*args, **kwargs)
@@ -132,14 +135,15 @@ class HexagonRendering:
     def handle_motion(self, event):
         event_x, event_y = event.x, event.y
         if self.canvas_mode == self.CANVAS_MODE_BUILD_ROAD:
-            self.build_road(event_x, event_y)
+            self.handle_build_road_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_BUILD_SETTLEMENT:
-            self.build_settlement(event_x, event_y)
+            self.handle_build_settlement_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_DISABLED:
             pass
         
-    def build_road(self, event_x, event_y):
-        self.delete_tag(self.CT_OBJ_ROAD)
+    def handle_build_road_motion(self, event_x, event_y):
+        self.canvas.config(cursor = '')
+        self.delete_tag(self.CT_OBJ_LINE)
 
         ### Find closest line to cursor
         def get_dist_to_line(event_x, event_y, line): ### https://www.geeksforgeeks.org/minimum-distance-from-a-point-to-the-line-segment-using-vectors/
@@ -175,36 +179,53 @@ class HexagonRendering:
                 break
         
         line = draw_road_args['line']
+        for node in line.nodes:
+            if node.settlement and node.settlement.player is self.parent_phase.chaperone.get_active_player():
+                roadworthy = True
+                break
+        else:
+            roadworthy = False
         if not line.road:
             fill = draw_road_args['fill']
             width = draw_road_args['width']
-            tags = [
-                self.CT_OBJ_ROAD,
-                # self.ct_node_tag(node),
-                # self.CV_OBJ_RECT
+            tags = [ ### TODO: CHANGE!
+                self.CT_OBJ_LINE,
+                self.ct_line_tag(line),
+                self.CV_OBJ_LINE
             ]
             x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
             x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
-            self.create_line(x1, y1, x2, y2, tags = tags, fill = 'black', width = width)
-            if min_line_dist / self.scale < 0.05:
+            outer_line_id = self.create_line(x1, y1, x2, y2, tags = tags, fill = 'black' if roadworthy else 'gray', width = width)
+            if min_line_dist / self.scale < 0.05 and roadworthy:
+                ### Draw coloured line to sit inside outer line so outer line appears to be a border
                 x_shorten = (x2 - x1) / 25
                 y_shorten = (y2 - y1) / 25
                 new_x1 = x1 + x_shorten
                 new_x2 = x2 - x_shorten
                 new_y1 = y1 + y_shorten
                 new_y2 = y2 - y_shorten
-                self.create_line(new_x1, new_y1, new_x2, new_y2, tags = tags, fill = fill, width = width * 0.6)
-            # self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
-            # self.rectangle_node_dict[rectangle_id] = node
-        
-            ### Change cursor pointer to hand icon if cursor near node
-            cursor = self.parent_phase.CURSOR_HAND if min_line_dist / self.scale < 0.05 else ''
-            self.canvas.config(cursor = cursor)
-        
+                inner_line_id = self.create_line(new_x1, new_y1, new_x2, new_y2, tags = tags, fill = fill, width = width * 0.6)
+
+                ### Show hand cursor to indicate clickability
+                cursor = self.parent_phase.CURSOR_HAND
+                self.canvas.config(cursor = cursor)
+
+                ### Make clickable
+                self.canvas.tag_bind(outer_line_id, '<Button-1>', self.handle_build_road_click)
+                self.canvas.tag_bind(inner_line_id, '<Button-1>', self.handle_build_road_click)
+                self.line_dict[outer_line_id] = line
+                self.line_dict[inner_line_id] = line
+
+            self.draw_roads()
             self.draw_ports()
             self.draw_settlements()
+    
+    def handle_build_road_click(self, event):
+        line_id = event.widget.find_withtag('current')[0]
+        line = self.line_dict[line_id]
+        self.parent_phase.chaperone.build_road(line)
 
-    def build_settlement(self, event_x, event_y):
+    def handle_build_settlement_motion(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
 
         ### Find closest node to cursor and collect arguments for rendering
@@ -235,6 +256,7 @@ class HexagonRendering:
                 self.focused_hexagons.append(hexagon)
         
         ### TODO: Run the following methods more efficiently - ONLY REDRAW PORTS AND SETTLEMENTS AFFECTED BY HEXAGON FOCUSING
+        self.draw_roads()
         self.draw_ports(node, draw_node_args)
         self.draw_settlements()
 
@@ -251,14 +273,14 @@ class HexagonRendering:
             ]
             x, y = self.real_x(node), self.real_y(node)
             rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
-            self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_click)
+            self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_build_settlement_click)
             self.rectangle_node_dict[rectangle_id] = node
         
             ### Change cursor pointer to hand icon if cursor near node
             cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
             self.canvas.config(cursor = cursor)
     
-    def handle_click(self, event):
+    def handle_build_settlement_click(self, event):
         rectangle_id = event.widget.find_withtag('current')[0]
         node = self.rectangle_node_dict[rectangle_id]
         self.parent_phase.chaperone.build_settlement(node)
@@ -268,6 +290,7 @@ class HexagonRendering:
             hexagon_render = self.hexagon_renders[hexagon.id]
             hexagon_render.unfocus()
         self.focused_hexagons = []
+        self.draw_roads()
         self.draw_ports()
         self.draw_settlements()
     
@@ -292,6 +315,7 @@ class HexagonRendering:
             for hexagon in self.distributor.hexagons:
                 self.init_render(hexagon)
     
+    ### TODO: Below methods crying out for merge
     def ct_line_tag(self, line):
         return '{}.{}'.format(self.CT_OBJ_LINE, line.id)
     
@@ -304,8 +328,84 @@ class HexagonRendering:
     def ct_port_tag(self, port):
         return '{}.{}'.format(self.CT_OBJ_PORT, port.id)
     
+    def ct_road_tag(self, road):
+        return '{}.{}'.format(self.CT_OBJ_ROAD, road.id)
+
     def ct_settlement_tag(self, settlement):
         return '{}.{}'.format(self.CT_OBJ_SETTLEMENT, settlement.id)
+    
+    def draw_roads(self):
+        self.delete_tag(self.CT_OBJ_ROAD)
+        for line in self.distributor.lines:
+            if line.road:
+                outer_line_tags = [
+                    self.CT_OBJ_LINE,
+                    self.ct_line_tag(line),
+                    self.CV_OBJ_LINE
+                ]
+                inner_line_tags = [
+                    self.CT_OBJ_ROAD,
+                    self.ct_road_tag(line.road),
+                    self.CV_OBJ_LINE
+                ]
+
+                x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
+                x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
+                width = (self.scale * 3 / 4) / 5
+                self.create_line(x1, y1, x2, y2, tags = outer_line_tags, fill = 'black', width = width)
+                fill = line.road.player.color
+                x_shorten = (x2 - x1) / 25
+                y_shorten = (y2 - y1) / 25
+                new_x1 = x1 + x_shorten
+                new_x2 = x2 - x_shorten
+                new_y1 = y1 + y_shorten
+                new_y2 = y2 - y_shorten
+                self.create_line(new_x1, new_y1, new_x2, new_y2, tags = inner_line_tags, fill = fill, width = width * 0.6)
+
+                # tags = [
+                #     self.CT_OBJ_SETTLEMENT,
+                #     self.ct_settlement_tag(node.settlement),
+                #     self.CV_OBJ_RECT
+                # ]
+                # r = (self.scale * 3 / 4) / 5 ### Circle radius
+                # fill = node.settlement.player.color
+                # width = (self.scale * 3 / 4) / 10
+                # x, y = self.real_x(node), self.real_y(node)
+                # self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
+
+        # reversed_dist = max(self.scale - dist, 0)
+        # fill_color = self.parent_phase.chaperone.player.color if min_line_dist / self.scale < 0.05 else 'black'
+        # line_width = min(self.scale * 3 / 4, reversed_dist) / 5
+        # draw_road_args = {'fill': fill_color, 'line': line, 'width': line_width}
+        # fill = draw_road_args['fill']
+        # width = draw_road_args['width']
+        # tags = [ ### TODO: CHANGE!
+        #     self.CT_OBJ_LINE,
+        #     self.ct_line_tag(line),
+        #     self.CV_OBJ_LINE
+        # ]
+        # x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
+        # x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
+        # outer_line_id = self.create_line(x1, y1, x2, y2, tags = tags, fill = 'black' if roadworthy else 'gray', width = width)
+        # if min_line_dist / self.scale < 0.05 and roadworthy:
+        #     ### Draw coloured line to sit inside outer line so outer line appears to be a border
+        #     x_shorten = (x2 - x1) / 25
+        #     y_shorten = (y2 - y1) / 25
+        #     new_x1 = x1 + x_shorten
+        #     new_x2 = x2 - x_shorten
+        #     new_y1 = y1 + y_shorten
+        #     new_y2 = y2 - y_shorten
+        #     inner_line_id = self.create_line(new_x1, new_y1, new_x2, new_y2, tags = tags, fill = fill, width = width * 0.6)
+
+        #     ### Show hand cursor to indicate clickability
+        #     cursor = self.parent_phase.CURSOR_HAND
+        #     self.canvas.config(cursor = cursor)
+
+        #     ### Make clickable
+        #     self.canvas.tag_bind(outer_line_id, '<Button-1>', self.handle_build_road_click)
+        #     self.canvas.tag_bind(inner_line_id, '<Button-1>', self.handle_build_road_click)
+        #     self.line_dict[outer_line_id] = line
+        #     self.line_dict[inner_line_id] = line
 
     def draw_ports(self, hovered_node = None, draw_node_args = None):
         self.delete_tag(self.CT_OBJ_PORT)

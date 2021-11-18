@@ -36,3 +36,7 @@ class Line(Incrementable):
         centre_point_y = np.mean(self.start_node.y, self.end_node.y)
         CentrePoint = namedtuple('CentrePoint', ['x', 'y'])
         return CentrePoint(x = centre_point_x, y = centre_point_y)
+    
+    def add_road(self, road):
+        self.road = road
+        road.line = self

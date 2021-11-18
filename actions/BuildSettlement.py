@@ -1,4 +1,3 @@
-from ClientServerInterface import ClientServerInterface
 from actions.Action import Action
 from backend.mechanics.Distributor import Distributor
 
@@ -15,8 +14,9 @@ class BuildSettlement(Action):
         settlement = hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement'].id)
         node.add_settlement(settlement)
 
+        hexagon_rendering.draw_roads()
         hexagon_rendering.draw_ports()
         hexagon_rendering.draw_settlements()
         hexagon_rendering.unfocus_focused_hexagons(None)
-        hexagon_rendering.canvas_mode = hexagon_rendering.CANVAS_MODE_BUILD_ROAD
+        hexagon_rendering.canvas_mode = hexagon_rendering.CANVAS_MODE_BUILD_ROAD ### THIS WILL DEPEND ON CLIENT - ONE CLIENT WILL STILL BE DISABLED
         hexagon_rendering.canvas.config(cursor = '')

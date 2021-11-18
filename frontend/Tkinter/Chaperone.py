@@ -67,7 +67,7 @@ class Chaperone:
             'game_code': self.game_code,
             'player': name
         }
-        self.client.interface.send_data(self.client.socket, data)
+        self.client.interface.send_data(self.client.socket, data) ### Tried using a decorator for this (as appears in other methods but couldn't get it to work)
     
     def create_new_game(self, num_hexagons):
         data = {
@@ -95,6 +95,14 @@ class Chaperone:
             'action': ActionFactory.BUILD_SETTLEMENT,
             'game_code': self.game_code,
             'node': node
+        }
+        self.client.interface.send_data(self.client.socket, data)
+
+    def build_road(self, line):
+        data = {
+            'action': ActionFactory.BUILD_ROAD,
+            'game_code': self.game_code,
+            'line': line
         }
         self.client.interface.send_data(self.client.socket, data)
     
