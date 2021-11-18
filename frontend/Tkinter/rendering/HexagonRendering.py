@@ -183,6 +183,7 @@ class HexagonRendering:
             hexagon_render.unfocus()
         self.focused_hexagons = []
         self.draw_ports()
+        self.draw_settlements()
     
     def draw_board(self):
         self.canvas_width = self.canvas.winfo_width()
@@ -229,7 +230,8 @@ class HexagonRendering:
             port_type = port_node.port.type
             circle_color = '#87CEFA' if port_type == 'any_resource' else BACKGROUND_COLORS[port_node.port.type]
             line_width = round(self.scale / 15)
-            r = line_width * 2 ### Circle radius
+            radius_multiplier = 5 if port_node.settlement else 2
+            r = line_width * radius_multiplier ### Circle radius
             tags = [ ### TODO: Change these - do we need a new port tag?
                 self.CT_OBJ_PORT,
                 self.ct_port_tag(port_node),
