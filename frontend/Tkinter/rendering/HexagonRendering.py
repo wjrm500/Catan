@@ -182,11 +182,11 @@ class HexagonRendering:
         for node in line.nodes:
             current_phase = self.parent_phase.chaperone.current_phase
             node_settled = node.settlement and self.parent_phase.client_active()
+            node_on_road = [line for line in node.lines if line.road and line.road.player is self.parent_phase.active_player()]
             if GeneralUtils.safe_isinstance(current_phase, 'SettlingPhase'):
-                if node_settled:
+                if node_settled and not node_on_road:
                     roadworthy = True; break
             elif GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase'):
-                node_on_road = [line for line in node.lines if line.road and line.road.player is self.parent_phase.active_player()]
                 if node_settled or node_on_road:
                     roadworthy = True; break
         else:
@@ -222,9 +222,9 @@ class HexagonRendering:
                 cursor = self.parent_phase.CURSOR_HAND
                 self.canvas.config(cursor = cursor)
 
-            self.draw_roads()
-            self.draw_ports()
-            self.draw_settlements()
+        self.draw_roads()
+        self.draw_ports()
+        self.draw_settlements()
     
     def handle_build_road_click(self, event):
         line_id = event.widget.find_withtag('current')[0]
@@ -381,7 +381,7 @@ class HexagonRendering:
             line_width = round(self.scale / 15)
 
             r = line_width * 2 ### Circle radius
-            if hovered_node is not None and port_node is hovered_node:
+            if hovered_node is not None and port_node is hovered_node and not port_node.adjacent_to_settled_node():
                 r = max(r, draw_node_args['circle_radius'] * 2)
             if port_node.settlement:
                 r = line_width * 5
