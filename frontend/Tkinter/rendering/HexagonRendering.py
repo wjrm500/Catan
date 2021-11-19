@@ -1,7 +1,5 @@
 import math
 import numpy as np
-from numpy.linalg import norm
-import random
 
 from config import config
 from frontend.ColorUtils import ColorUtils
@@ -129,6 +127,7 @@ class HexagonRendering:
             hexagon_render.unfocus()
         self.focused_hexagons = []
         self.draw_board()
+        self.draw_roads()
         self.draw_ports()
         self.draw_settlements()
     
@@ -157,15 +156,15 @@ class HexagonRendering:
             AB_AE = AB[0] * AE[0] + AB[1] * AE[1]
             if (AB_BE > 0):
                 x, y = E[0] - B[0], E[1] - B[1]
-                reqAns = np.sqrt(x * x + y * y)
+                res = np.sqrt(x * x + y * y)
             elif (AB_AE < 0):
                 x, y = E[0] - A[0], E[1] - A[1]
-                reqAns = np.sqrt(x * x + y * y)
+                res = np.sqrt(x * x + y * y)
             else:
                 x1, y1, x2, y2 = AB[0], AB[1], AE[0], AE[1]
                 mod = np.sqrt(x1 * x1 + y1 * y1)
-                reqAns = abs(x1 * y2 - y1 * x2) / mod
-            return reqAns
+                res = abs(x1 * y2 - y1 * x2) / mod
+            return res
         
         line_dists = [(line, get_dist_to_line(event_x, event_y, line)) for line in self.distributor.lines]
         min_line_dist = min(map(lambda x: x[1], line_dists))
@@ -180,15 +179,22 @@ class HexagonRendering:
         
         line = draw_road_args['line']
         for node in line.nodes:
-            if node.settlement and node.settlement.player is self.parent_phase.chaperone.get_active_player():
-                roadworthy = True
-                break
+            active_player = self.parent_phase.chaperone.get_active_player()
+            phase_name = self.parent_phase.chaperone.current_phase.__class__.__name__ ### Had to use this instead of isinstance to avoid circular dependencies :/
+            if phase_name == 'SettlingPhase': ### TODO: Swap back with SettlingPhase - swapped for testing!
+                if node.settlement and node.settlement.player is active_player:
+                    roadworthy = True; break
+            elif phase_name == 'MainGamePhase':
+                node_settled = node.settlement and node.settlement.player is active_player
+                node_on_road = [line for line in node.lines if line.road and line.road.player is active_player]
+                if node_settled or node_on_road:
+                    roadworthy = True; break
         else:
             roadworthy = False
         if not line.road:
             fill = draw_road_args['fill']
             width = draw_road_args['width']
-            tags = [ ### TODO: CHANGE!
+            tags = [
                 self.CT_OBJ_LINE,
                 self.ct_line_tag(line),
                 self.CV_OBJ_LINE
@@ -206,15 +212,15 @@ class HexagonRendering:
                 new_y2 = y2 - y_shorten
                 inner_line_id = self.create_line(new_x1, new_y1, new_x2, new_y2, tags = tags, fill = fill, width = width * 0.6)
 
-                ### Show hand cursor to indicate clickability
-                cursor = self.parent_phase.CURSOR_HAND
-                self.canvas.config(cursor = cursor)
-
                 ### Make clickable
                 self.canvas.tag_bind(outer_line_id, '<Button-1>', self.handle_build_road_click)
                 self.canvas.tag_bind(inner_line_id, '<Button-1>', self.handle_build_road_click)
                 self.line_dict[outer_line_id] = line
                 self.line_dict[inner_line_id] = line
+
+                ### Show hand cursor to indicate clickability
+                cursor = self.parent_phase.CURSOR_HAND
+                self.canvas.config(cursor = cursor)
 
             self.draw_roads()
             self.draw_ports()
@@ -362,51 +368,6 @@ class HexagonRendering:
                 new_y2 = y2 - y_shorten
                 self.create_line(new_x1, new_y1, new_x2, new_y2, tags = inner_line_tags, fill = fill, width = width * 0.6)
 
-                # tags = [
-                #     self.CT_OBJ_SETTLEMENT,
-                #     self.ct_settlement_tag(node.settlement),
-                #     self.CV_OBJ_RECT
-                # ]
-                # r = (self.scale * 3 / 4) / 5 ### Circle radius
-                # fill = node.settlement.player.color
-                # width = (self.scale * 3 / 4) / 10
-                # x, y = self.real_x(node), self.real_y(node)
-                # self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
-
-        # reversed_dist = max(self.scale - dist, 0)
-        # fill_color = self.parent_phase.chaperone.player.color if min_line_dist / self.scale < 0.05 else 'black'
-        # line_width = min(self.scale * 3 / 4, reversed_dist) / 5
-        # draw_road_args = {'fill': fill_color, 'line': line, 'width': line_width}
-        # fill = draw_road_args['fill']
-        # width = draw_road_args['width']
-        # tags = [ ### TODO: CHANGE!
-        #     self.CT_OBJ_LINE,
-        #     self.ct_line_tag(line),
-        #     self.CV_OBJ_LINE
-        # ]
-        # x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
-        # x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
-        # outer_line_id = self.create_line(x1, y1, x2, y2, tags = tags, fill = 'black' if roadworthy else 'gray', width = width)
-        # if min_line_dist / self.scale < 0.05 and roadworthy:
-        #     ### Draw coloured line to sit inside outer line so outer line appears to be a border
-        #     x_shorten = (x2 - x1) / 25
-        #     y_shorten = (y2 - y1) / 25
-        #     new_x1 = x1 + x_shorten
-        #     new_x2 = x2 - x_shorten
-        #     new_y1 = y1 + y_shorten
-        #     new_y2 = y2 - y_shorten
-        #     inner_line_id = self.create_line(new_x1, new_y1, new_x2, new_y2, tags = tags, fill = fill, width = width * 0.6)
-
-        #     ### Show hand cursor to indicate clickability
-        #     cursor = self.parent_phase.CURSOR_HAND
-        #     self.canvas.config(cursor = cursor)
-
-        #     ### Make clickable
-        #     self.canvas.tag_bind(outer_line_id, '<Button-1>', self.handle_build_road_click)
-        #     self.canvas.tag_bind(inner_line_id, '<Button-1>', self.handle_build_road_click)
-        #     self.line_dict[outer_line_id] = line
-        #     self.line_dict[inner_line_id] = line
-
     def draw_ports(self, hovered_node = None, draw_node_args = None):
         self.delete_tag(self.CT_OBJ_PORT)
         port_nodes = [node for node in self.distributor.nodes if node.port]
@@ -422,7 +383,7 @@ class HexagonRendering:
                 r = max(r, draw_node_args['circle_radius'] * 2)
             if port_node.settlement:
                 r = line_width * 5
-            tags = [ ### TODO: Change these - do we need a new port tag?
+            tags = [
                 self.CT_OBJ_PORT,
                 self.ct_port_tag(port_node),
                 self.CV_OBJ_OVAL
@@ -446,11 +407,9 @@ class HexagonRendering:
                 self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
     
     def real_x(self, node):
-        scale_factor = 0.95
-        # return (node.x + self.x_shift) * self.scale + self.x_centre_shift
-        return (node.x + (self.x_shift * 1 / scale_factor)) * (self.scale * scale_factor) + (self.x_centre_shift * 1 / scale_factor)
+        pct_canvas_used = 0.95
+        return (node.x + (self.x_shift * 1 / pct_canvas_used)) * (self.scale * pct_canvas_used) + (self.x_centre_shift * 1 / pct_canvas_used)
     
     def real_y(self, node):
-        scale_factor = 0.95
-        # return (node.y + self.y_shift) * self.scale + self.y_centre_shift
-        return (node.y + (self.y_shift * 1 / scale_factor)) * (self.scale * scale_factor) + (self.y_centre_shift * 1 / scale_factor)
+        pct_canvas_used = 0.95
+        return (node.y + (self.y_shift * 1 / pct_canvas_used)) * (self.scale * pct_canvas_used) + (self.y_centre_shift * 1 / pct_canvas_used)

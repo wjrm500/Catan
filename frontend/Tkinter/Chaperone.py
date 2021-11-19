@@ -22,7 +22,7 @@ class Chaperone:
     def update_active_player_index(self):
         self.active_player_index += 1
         if self.active_player_index > len(self.players) - 1:
-            self.active_player_index = 1
+            self.active_player_index = 0
     
     def get_player_from_id(self, id):
         return next(player for player in self.players if player.id == id)
