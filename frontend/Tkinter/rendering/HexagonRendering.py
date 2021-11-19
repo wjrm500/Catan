@@ -181,7 +181,7 @@ class HexagonRendering:
         for node in line.nodes:
             active_player = self.parent_phase.chaperone.get_active_player()
             phase_name = self.parent_phase.chaperone.current_phase.__class__.__name__ ### Had to use this instead of isinstance to avoid circular dependencies :/
-            if phase_name == 'SettlingPhase': ### TODO: Swap back with SettlingPhase - swapped for testing!
+            if phase_name == 'SettlingPhase':
                 if node.settlement and node.settlement.player is active_player:
                     roadworthy = True; break
             elif phase_name == 'MainGamePhase':
@@ -230,6 +230,7 @@ class HexagonRendering:
         line_id = event.widget.find_withtag('current')[0]
         line = self.line_dict[line_id]
         self.parent_phase.chaperone.build_road(line)
+        self.delete_tag(self.CT_OBJ_LINE)
 
     def handle_build_settlement_motion(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
@@ -290,6 +291,7 @@ class HexagonRendering:
         rectangle_id = event.widget.find_withtag('current')[0]
         node = self.rectangle_node_dict[rectangle_id]
         self.parent_phase.chaperone.build_settlement(node)
+        self.delete_tag(self.CT_OBJ_NODE)
 
     def unfocus_focused_hexagons(self, event):
         for hexagon in self.focused_hexagons:

@@ -8,7 +8,6 @@ class BuildRoad(Action):
 
     def callback(self, chaperone, data):
         hexagon_rendering = chaperone.current_phase.hexagon_rendering
-        hexagon_rendering.delete_tag(hexagon_rendering.CT_OBJ_LINE)
 
         ### Following two lines necessary to work with client-side versions of objects
         line = hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_LINE, data['line'].id)
