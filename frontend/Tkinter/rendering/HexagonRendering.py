@@ -127,13 +127,16 @@ class HexagonRendering:
         self.draw_settlements()
     
     def handle_resize(self, event):
-        self.canvas.pack(fill = "both", expand = True)
-        for hexagon in self.focused_hexagons:
-            hexagon_render = self.hexagon_renders[hexagon.id]
-            hexagon_render.unfocus()
-        self.focused_hexagons = []
-        self.draw_board()
-        self.draw_board_items()
+        try:
+            self.canvas.pack(fill = 'both', expand = True)
+            for hexagon in self.focused_hexagons:
+                hexagon_render = self.hexagon_renders[hexagon.id]
+                hexagon_render.unfocus()
+            self.focused_hexagons = []
+            self.draw_board()
+            self.draw_board_items()
+        except:
+            pass
     
     def handle_motion(self, event):
         event_x, event_y = event.x, event.y

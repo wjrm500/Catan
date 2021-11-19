@@ -4,6 +4,7 @@ import tkinter.scrolledtext
 from frontend.ColorUtils import ColorUtils
 from frontend.GeneralUtils import GeneralUtils
 from frontend.Tkinter.phases.game.GamePhase import GamePhase
+from frontend.Tkinter.phases.game.sub_phases.MainGamePhase import MainGamePhase
 
 class SettlingPhase(GamePhase):
     def __init__(self, chaperone):
@@ -21,6 +22,14 @@ class SettlingPhase(GamePhase):
             self.active_player_index_incrementing = True
         if at_end:
             self.active_player_index_incrementing = False
+
+        ### Move to main game phase if all players have settled twice
+        move_on = sum([bool(settlement.node) for player in self.chaperone.players for settlement in player.settlements]) == len(self.chaperone.players) * 2
+        if move_on:
+            self.chaperone.start_phase(MainGamePhase)
+        
+    def setup_inner_frame_top_right(self):
+        super().setup_inner_frame_top_right('SETTLING PHASE')
     
     def setup_inner_frame_middle_right(self): ### Specific to settling phase (the rest isn't)
         self.text_area = tkinter.scrolledtext.ScrolledText(self.inner_frame_middle_right, font = ('Arial', 12), padx = 10, pady = 10, wrap = 'word', background = ColorUtils.lighten_hex(self.BG_COLOR, 0.2))
@@ -32,7 +41,7 @@ class SettlingPhase(GamePhase):
     
     def setup_inner_frame_bottom_left(self):
         client_active = self.client_active()
-        instruction_text = "Build a settlement!" if client_active else 'Please wait for your turn'
+        instruction_text = 'Build a settlement!' if client_active else 'Please wait for your turn'
         label_bg_color = '#90EE90' if client_active else '#F08080' ### LightGreen or LightCoral
         return super().setup_inner_frame_bottom_left(instruction_text, label_bg_color)
     

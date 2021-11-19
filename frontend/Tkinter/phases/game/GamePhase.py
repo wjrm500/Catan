@@ -36,7 +36,9 @@ class GamePhase(Phase, abc.ABC):
         """
         Level 1 frames
         """
-        self.inner_frame = frame_partial(self.root)
+        self.outer_frame = tkinter.Frame(self.root)
+        self.outer_frame.pack(fill = 'both', expand = True)
+        self.inner_frame = frame_partial(self.outer_frame)
         self.inner_frame.pack(fill = 'both', expand = True, padx = 10, pady = 10)
 
         """
@@ -75,12 +77,12 @@ class GamePhase(Phase, abc.ABC):
         self.inner_frame_bottom_right = frame_partial(self.inner_frame_bottom, height = 50, padx = 10, pady = 5)
         self.place_widget(self.inner_frame_bottom_right, where = self.inner_frame_bottom, anchor = tkinter.W)
     
-    def setup_inner_frame_top_right(self):
+    def setup_inner_frame_top_right(self, phase_name):
         block_under_title = tkinter.Frame(self.inner_frame_top_right, background = 'black', height = 5, bd = 0, highlightthickness = 0)
         block_under_title.pack(side = tkinter.BOTTOM, fill = 'x')
-        label = tkinter.Label(self.inner_frame_top_right, text = 'CATAN', font = ('Arial', 20, 'bold'), background = self.BG_COLOR)
+        label = tkinter.Label(self.inner_frame_top_right, text = 'CATAN', font = ('Arial', 20, 'bold'), background = self.BG_COLOR, foreground = 'goldenrod')
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
-        label = tkinter.Label(self.inner_frame_top_right, text = 'SETTLING PHASE', font = ('Arial', 12), padx = 5, pady = 5, background = self.BG_COLOR)
+        label = tkinter.Label(self.inner_frame_top_right, text = phase_name, font = ('Arial', 12), padx = 5, pady = 5, background = self.BG_COLOR)
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
         
     def setup_inner_frame_middle_left(self):
@@ -122,4 +124,4 @@ class GamePhase(Phase, abc.ABC):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
         self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.handle_leave)
-        self.root.mainloop()        
+        self.root.mainloop()

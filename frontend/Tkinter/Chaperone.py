@@ -42,9 +42,9 @@ class Chaperone:
     def display_error_text(self, error_text):
         self.current_phase.display_error_text(error_text)
     
-    def start_phase(self, phase, destroy_root = False):
+    def start_phase(self, phase, to_destroy = None):
         if self.current_phase is not None:
-            to_destroy = self.current_phase.root if destroy_root else self.current_phase.outer_frame
+            to_destroy = to_destroy or self.current_phase.outer_frame
             to_destroy.destroy()
         self.current_phase = phase(self)
         self.current_phase.run()
