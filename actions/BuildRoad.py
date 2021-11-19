@@ -39,3 +39,9 @@ class BuildRoad(Action):
                 self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
                 self.game_phase.instruction_text.set('Please wait for your turn')
                 self.game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral
+        text_area = self.game_phase.text_area
+        text_area.config(state = 'normal')
+        text_to_insert = f'{self.data["player"].name} built a road.'
+        text_area.insert('end', f'\n\n{text_to_insert}')
+        text_area.yview('end')
+        text_area.config(state = 'disabled')

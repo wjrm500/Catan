@@ -37,3 +37,6 @@ class Node(Incrementable):
     def add_settlement(self, settlement):
         self.settlement = settlement
         settlement.node = self
+    
+    def nominal_value(self):
+        return sum(hexagon.num_pips for hexagon in self.hexagons)
