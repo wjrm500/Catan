@@ -12,13 +12,23 @@ class GamePhase(Phase, abc.ABC):
         self.root.geometry('1000x500')
         self.frames = {}
         self.place_widget = lambda what, where, anchor: what.place(in_ = where, anchor = anchor, relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
-        active = self.chaperone.active()
+        self.active_player_index = 0
         self.setup_frames()
         self.setup_inner_frame_top_right()
-        self.setup_inner_frame_middle_left(active)
+        self.setup_inner_frame_middle_left()
         self.setup_inner_frame_middle_right()
-        self.setup_inner_frame_bottom_left(active)
+        self.setup_inner_frame_bottom_left()
         self.setup_inner_frame_bottom_right()
+    
+    @abc.abstractmethod
+    def update_active_player_index(self):
+        pass
+
+    def active_player(self):
+        return self.chaperone.players[self.active_player_index]
+    
+    def client_active(self):
+        return self.chaperone.player.id == self.active_player().id
     
     def setup_frames(self):
         frame_partial = partial(tkinter.Frame, background = self.BG_COLOR)#, highlightbackground = ColorUtils.darken_hex(self.BG_COLOR, 0.5), highlightthickness = 1)
@@ -73,11 +83,11 @@ class GamePhase(Phase, abc.ABC):
         label = tkinter.Label(self.inner_frame_top_right, text = 'SETTLING PHASE', font = ('Arial', 12), padx = 5, pady = 5, background = self.BG_COLOR)
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
         
-    def setup_inner_frame_middle_left(self, active):
+    def setup_inner_frame_middle_left(self):
         self.canvas = tkinter.Canvas(self.inner_frame_middle_left, background = 'lightblue', bd = 0, highlightthickness = 0)
         self.canvas.pack(expand = True)
         self.hexagon_rendering = HexagonRendering(self)
-        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT if active else HexagonRendering.CANVAS_MODE_DISABLED
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT if self.client_active() else HexagonRendering.CANVAS_MODE_DISABLED
     
     @abc.abstractmethod
     def setup_inner_frame_middle_right(self): ### Specific to settling phase (the rest isn't)
@@ -121,7 +131,8 @@ class GamePhase(Phase, abc.ABC):
         self.hexagon_rendering.unfocus_focused_hexagons(None)
         self.hexagon_rendering.canvas.config(cursor = '')
         canvas_mode = self.hexagon_rendering.canvas_mode
-        if self.chaperone.active():
+        client_active = self.client_active()
+        if client_active:
             if canvas_mode == HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT:
                 self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
                 instruction_text = 'Build a road!'
@@ -132,5 +143,5 @@ class GamePhase(Phase, abc.ABC):
             self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
             instruction_text = 'Please wait for your turn'
         self.instruction_text.set(instruction_text)
-        label_bg_color = '#90EE90' if self.chaperone.active() else '#F08080' ### LightGreen or LightCoral
+        label_bg_color = '#90EE90' if client_active else '#F08080' ### LightGreen or LightCoral
         self.instruction.configure({'background': label_bg_color})

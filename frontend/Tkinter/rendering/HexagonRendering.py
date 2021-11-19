@@ -3,6 +3,7 @@ import numpy as np
 
 from config import config
 from frontend.ColorUtils import ColorUtils
+from frontend.GeneralUtils import GeneralUtils
 from frontend.Tkinter.rendering.HexagonRender import HexagonRender
 
 def set_colors(darken): ### TODO: Factor out - duplicate on HexagonBodyRender
@@ -179,14 +180,13 @@ class HexagonRendering:
         
         line = draw_road_args['line']
         for node in line.nodes:
-            active_player = self.parent_phase.chaperone.get_active_player()
-            phase_name = self.parent_phase.chaperone.current_phase.__class__.__name__ ### Had to use this instead of isinstance to avoid circular dependencies :/
-            if phase_name == 'SettlingPhase':
-                if node.settlement and node.settlement.player is active_player:
+            current_phase = self.parent_phase.chaperone.current_phase
+            node_settled = node.settlement and self.parent_phase.client_active()
+            if GeneralUtils.safe_isinstance(current_phase, 'SettlingPhase'):
+                if node_settled:
                     roadworthy = True; break
-            elif phase_name == 'MainGamePhase':
-                node_settled = node.settlement and node.settlement.player is active_player
-                node_on_road = [line for line in node.lines if line.road and line.road.player is active_player]
+            elif GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase'):
+                node_on_road = [line for line in node.lines if line.road and line.road.player is self.parent_phase.active_player()]
                 if node_settled or node_on_road:
                     roadworthy = True; break
         else:

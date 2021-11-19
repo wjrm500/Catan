@@ -1,5 +1,6 @@
 from actions.Action import Action
 from backend.mechanics.Distributor import Distributor
+from frontend.GeneralUtils import GeneralUtils
 from frontend.Tkinter.phases.game.sub_phases.SettlingPhase import SettlingPhase
 
 class BuildRoad(Action):
@@ -14,5 +15,5 @@ class BuildRoad(Action):
         road = hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_ROAD, data['road'].id)
         line.add_road(road)
 
-        if isinstance(chaperone.current_phase, SettlingPhase):
-            chaperone.update_active_player_index()
+        if GeneralUtils.safe_isinstance(chaperone.current_phase, 'SettlingPhase'):
+            chaperone.current_phase.update_active_player_index()

@@ -16,13 +16,7 @@ class Chaperone:
         self.players = []
         self.player = None
         self.main = False ### User is main client i.e. created game
-        self.active_player_index = 0
         self.game_code = ''
-    
-    def update_active_player_index(self):
-        self.active_player_index += 1
-        if self.active_player_index > len(self.players) - 1:
-            self.active_player_index = 0
     
     def get_player_from_id(self, id):
         return next(player for player in self.players if player.id == id)
@@ -33,12 +27,6 @@ class Chaperone:
             for player in self.players:
                 if player.id == self.player.id:
                     self.player = player
-    
-    def get_active_player(self):
-        return self.players[self.active_player_index]
-    
-    def active(self):
-        return self.player.id == self.get_active_player().id
     
     def get_font(self):
         return (self.FONT_NAME, self.FONT_SIZE, self.FONT_WEIGHT)
