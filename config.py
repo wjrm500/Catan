@@ -26,13 +26,13 @@ config = {
         }
     },
     'port_types': {
-        'any_resource': {
-            'cost': 3,
-            'count': 4
-        },
         'brick': {
             'cost': 2,
             'count': 1
+        },
+        'general': {
+            'cost': 3,
+            'count': 4
         },
         'grain': {
             'cost': 2,

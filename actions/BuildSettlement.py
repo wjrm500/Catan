@@ -33,9 +33,13 @@ class BuildSettlement(Action):
         text_area = self.game_phase.text_area
         text_area.config(state = 'normal')
         node = self.data['settlement'].node
+        port_text = ''
+        if (port := node.port):
+            a_an = 'an' if port.type.startswith(tuple('aeiou')) else 'a'
+            port_text = f' on {a_an} {port.type} port'
         nominal_value = node.nominal_value()
         nominal_values = ' + '.join([f'{hexagon.num_pips} {hexagon.resource_type}' for hexagon in node.hexagons])
-        text_to_insert = f'{self.data["player"].name} built a settlement! This settlement has a nominal value of {nominal_value} ({nominal_values}).'
+        text_to_insert = f'{self.data["player"].name} built a settlement{port_text}! This settlement has a nominal value of {nominal_value} ({nominal_values}).'
         text_area.insert('end', f'\n\n{text_to_insert}')
         text_area.yview('end')
         text_area.config(state = 'disabled')

@@ -14,7 +14,7 @@ class Matplotlib():
             port_nodes = [node for node in nodes if node.port]
             for port_node in port_nodes:
                 port_type = port_node.port.type
-                circle_color = 'blue' if port_type == 'any_resource' else game.config['resource_types'][port_node.port.type]['color']
+                circle_color = 'blue' if port_type == 'general' else game.config['resource_types'][port_node.port.type]['color']
                 circle = plt.Circle(
                     [port_node.x * scale + x_shift, port_node.y * scale + y_shift],
                     0.2,

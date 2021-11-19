@@ -22,11 +22,6 @@ class SettlingPhase(GamePhase):
             self.active_player_index_incrementing = True
         if at_end:
             self.active_player_index_incrementing = False
-
-        ### Move to main game phase if all players have settled twice
-        move_on = sum([bool(settlement.node) for player in self.chaperone.players for settlement in player.settlements]) == len(self.chaperone.players) * 2
-        if move_on:
-            self.chaperone.start_phase(MainGamePhase)
         
     def setup_inner_frame_top_right(self):
         super().setup_inner_frame_top_right('SETTLING PHASE')
@@ -55,4 +50,8 @@ Players take it in turns to place settlements and roads, with turn-taking follow
 
 Players are ordered randomly for the first round of settling.
 
-{settling_order_text}"""
+{settling_order_text}
+
+Round 1 commencing...
+
+It is {self.active_player().name}'s turn to settle..."""
