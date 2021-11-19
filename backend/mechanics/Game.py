@@ -68,7 +68,8 @@ class Game:
         for player in self.players:
             player.cities = [self.distributor.get_city(player) for _ in range(round(self.num_hexagons * 4 / 19))]
             player.roads = [self.distributor.get_road(player) for _ in range(round(self.num_hexagons * 15 / 19))]
-            player.settlements = [self.distributor.get_settlement(player) for _ in range(round(self.num_hexagons * 5 / 19))]
+            # player.settlements = [self.distributor.get_settlement(player) for _ in range(round(self.num_hexagons * 5 / 19))]
+            player.settlements = [self.distributor.get_settlement(player) for _ in range(round(self.num_hexagons * 50 / 19))] ### TODO: Revert to line above - this one for testing
 
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])

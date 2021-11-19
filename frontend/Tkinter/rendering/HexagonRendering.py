@@ -140,6 +140,15 @@ class HexagonRendering:
             self.handle_build_settlement_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_DISABLED:
             pass
+    
+    def handle_leave(self, event):
+        self.delete_tag(self.CT_OBJ_LINE)
+        self.delete_tag(self.CT_OBJ_NODE)
+        self.unfocus_focused_hexagons()
+        self.draw_roads()
+        self.draw_ports()
+        self.draw_settlements()
+        self.canvas.config(cursor = '')
         
     def handle_build_road_motion(self, event_x, event_y):
         self.canvas.config(cursor = '')
@@ -230,7 +239,6 @@ class HexagonRendering:
         line_id = event.widget.find_withtag('current')[0]
         line = self.line_dict[line_id]
         self.parent_phase.chaperone.build_road(line)
-        self.delete_tag(self.CT_OBJ_LINE)
 
     def handle_build_settlement_motion(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
@@ -291,16 +299,12 @@ class HexagonRendering:
         rectangle_id = event.widget.find_withtag('current')[0]
         node = self.rectangle_node_dict[rectangle_id]
         self.parent_phase.chaperone.build_settlement(node)
-        self.delete_tag(self.CT_OBJ_NODE)
 
-    def unfocus_focused_hexagons(self, event):
+    def unfocus_focused_hexagons(self):
         for hexagon in self.focused_hexagons:
             hexagon_render = self.hexagon_renders[hexagon.id]
             hexagon_render.unfocus()
         self.focused_hexagons = []
-        self.draw_roads()
-        self.draw_ports()
-        self.draw_settlements()
     
     def draw_board(self):
         self.canvas_width = self.canvas.winfo_width()
@@ -346,21 +350,15 @@ class HexagonRendering:
         self.delete_tag(self.CT_OBJ_ROAD)
         for line in self.distributor.lines:
             if line.road:
-                outer_line_tags = [
-                    self.CT_OBJ_LINE,
+                tags = [
+                    self.CT_OBJ_ROAD,
                     self.ct_line_tag(line),
                     self.CV_OBJ_LINE
                 ]
-                inner_line_tags = [
-                    self.CT_OBJ_ROAD,
-                    self.ct_road_tag(line.road),
-                    self.CV_OBJ_LINE
-                ]
-
                 x1, y1 = self.real_x(line.start_node), self.real_y(line.start_node)
                 x2, y2 = self.real_x(line.end_node), self.real_y(line.end_node)
                 width = (self.scale * 3 / 4) / 5
-                self.create_line(x1, y1, x2, y2, tags = outer_line_tags, fill = 'black', width = width)
+                self.create_line(x1, y1, x2, y2, tags = tags, fill = 'black', width = width)
                 fill = line.road.player.color
                 x_shorten = (x2 - x1) / 25
                 y_shorten = (y2 - y1) / 25
@@ -368,7 +366,7 @@ class HexagonRendering:
                 new_x2 = x2 - x_shorten
                 new_y1 = y1 + y_shorten
                 new_y2 = y2 - y_shorten
-                self.create_line(new_x1, new_y1, new_x2, new_y2, tags = inner_line_tags, fill = fill, width = width * 0.6)
+                self.create_line(new_x1, new_y1, new_x2, new_y2, tags = tags, fill = fill, width = width * 0.6)
 
     def draw_ports(self, hovered_node = None, draw_node_args = None):
         self.delete_tag(self.CT_OBJ_PORT)

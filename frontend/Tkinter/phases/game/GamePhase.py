@@ -121,18 +121,14 @@ class GamePhase(Phase, abc.ABC):
     def run(self):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
         self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
-        self.canvas.bind('<Leave>', self.hexagon_rendering.unfocus_focused_hexagons)
+        self.canvas.bind('<Leave>', self.hexagon_rendering.handle_leave)
         self.root.mainloop()
     
     def update_gui(self):
-        self.hexagon_rendering.draw_roads()
-        self.hexagon_rendering.draw_ports()
-        self.hexagon_rendering.draw_settlements()
-        self.hexagon_rendering.unfocus_focused_hexagons(None)
-        self.hexagon_rendering.canvas.config(cursor = '')
         canvas_mode = self.hexagon_rendering.canvas_mode
         client_active = self.client_active()
         if client_active:
+            self.hexagon_rendering.handle_leave(event = None)
             if canvas_mode == HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT:
                 self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
                 instruction_text = 'Build a road!'
