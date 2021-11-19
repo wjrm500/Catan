@@ -50,7 +50,7 @@ class Server:
                     line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line'].id)
                     road = player.roads.pop()
                     line.add_road(road)
-                    output_data = {'action': action, 'line': line, 'player_id': player.id, 'road': road} ### TODO: Should send back player as player has spent a road - same for build settlement
+                    output_data = {'action': action, 'line': line, 'player': player, 'road': road} ### TODO: Player has spent a road
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
@@ -59,7 +59,7 @@ class Server:
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
                     settlement = player.settlements.pop()
                     node.add_settlement(settlement)
-                    output_data = {'action': action, 'node': node, 'player_id': player.id, 'settlement': settlement}
+                    output_data = {'action': action, 'node': node, 'player': player, 'settlement': settlement} ### TODO: Player has spent a settlement
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = input_data['num_hexagons']

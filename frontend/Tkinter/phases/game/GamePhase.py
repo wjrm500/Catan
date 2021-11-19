@@ -122,22 +122,4 @@ class GamePhase(Phase, abc.ABC):
         self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
         self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.handle_leave)
-        self.root.mainloop()
-    
-    def update_gui(self):
-        canvas_mode = self.hexagon_rendering.canvas_mode
-        client_active = self.client_active()
-        if client_active:
-            self.hexagon_rendering.handle_leave(event = None)
-            if canvas_mode == HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT:
-                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
-                instruction_text = 'Build a road!'
-            elif canvas_mode == HexagonRendering.CANVAS_MODE_DISABLED or canvas_mode == HexagonRendering.CANVAS_MODE_BUILD_ROAD:
-                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
-                instruction_text = 'Build a settlement!'
-        else:
-            self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
-            instruction_text = 'Please wait for your turn'
-        self.instruction_text.set(instruction_text)
-        label_bg_color = '#90EE90' if client_active else '#F08080' ### LightGreen or LightCoral
-        self.instruction.configure({'background': label_bg_color})
+        self.root.mainloop()        

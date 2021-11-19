@@ -37,12 +37,7 @@ class Chaperone:
             data = self.queue.get(timeout = 0.1)
             action = ActionFactory.get_action(data['action'])
             action.callback(self, data)
-            self.update_gui()
         self.root.after(100, self.check_queue)
-    
-    def update_gui(self):
-        if hasattr(self.current_phase, 'update_gui') and callable(getattr(self.current_phase, 'update_gui')):
-            self.current_phase.update_gui()
     
     def display_error_text(self, error_text):
         self.current_phase.display_error_text(error_text)

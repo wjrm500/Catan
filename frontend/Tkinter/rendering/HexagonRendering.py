@@ -121,6 +121,11 @@ class HexagonRendering:
         hexagon_render = self.hexagon_renders[hexagon.id]
         hexagon_render.unfocus(hexagons_to_focus)
     
+    def draw_board_items(self):
+        self.draw_roads()
+        self.draw_ports()
+        self.draw_settlements()
+    
     def handle_resize(self, event):
         self.canvas.pack(fill = "both", expand = True)
         for hexagon in self.focused_hexagons:
@@ -128,9 +133,7 @@ class HexagonRendering:
             hexagon_render.unfocus()
         self.focused_hexagons = []
         self.draw_board()
-        self.draw_roads()
-        self.draw_ports()
-        self.draw_settlements()
+        self.draw_board_items()
     
     def handle_motion(self, event):
         event_x, event_y = event.x, event.y
@@ -145,9 +148,7 @@ class HexagonRendering:
         self.delete_tag(self.CT_OBJ_LINE)
         self.delete_tag(self.CT_OBJ_NODE)
         self.unfocus_focused_hexagons()
-        self.draw_roads()
-        self.draw_ports()
-        self.draw_settlements()
+        self.draw_board_items()
         self.canvas.config(cursor = '')
         
     def handle_build_road_motion(self, event_x, event_y):
@@ -231,9 +232,7 @@ class HexagonRendering:
                 cursor = self.parent_phase.CURSOR_HAND
                 self.canvas.config(cursor = cursor)
 
-        self.draw_roads()
-        self.draw_ports()
-        self.draw_settlements()
+        self.draw_board_items()
     
     def handle_build_road_click(self, event):
         line_id = event.widget.find_withtag('current')[0]

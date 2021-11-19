@@ -54,7 +54,7 @@ class LobbyPhase(SetupPhase):
         if len(errors) == 0:
             self.chaperone.player = new_name ### Changing from None to str flags to callback that new Player object from server belongs to this client
             self.chaperone.add_player(new_name)
-            ### Want the following code here and not in update_gui because we do not want to re-render left panel every time any other player enters name
+            ### Want the following code here and not in callback because we do not want to re-render left panel every time any other player enters name
             self.new_player_label_text.set('Name successfully submitted!')
             self.new_player_input.config(state = 'disabled')
             self.add_new_player_button.config(state = 'disabled')
@@ -95,21 +95,5 @@ class LobbyPhase(SetupPhase):
             existing_players_list.append(list_item)
         return existing_players_list
 
-    def go_to_main_loop(self, event):
+    def start_game(self, event):
         self.chaperone.start_game()
-    
-    def update_gui(self):
-        self.game_code_text.set('Game code: {}'.format(self.chaperone.game_code))
-        if hasattr(self, 'existing_players_list'):
-            for list_item in self.existing_players_list:
-                list_item.destroy()
-        self.existing_players_list = self.render_existing_players_list(where = self.existing_players_panel, config = {'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1)})
-        for i, list_item in enumerate(self.existing_players_list):
-            list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))
-        if hasattr(self, 'proceed_button'):
-            self.proceed_button.destroy()
-        # if self.chaperone.main and len(self.chaperone.players) > 1:
-        if self.chaperone.main and len(self.chaperone.players) > 0: ### TODO: Replace with commented line above - temporary change for testing
-            self.proceed_button = self.render_button(where = self.inner_frame, text = 'Start game')
-            self.proceed_button.pack(side = tkinter.TOP, pady = 10)
-            self.proceed_button.bind('<Button-1>', self.go_to_main_loop)
