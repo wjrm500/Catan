@@ -40,3 +40,6 @@ class Line(Incrementable):
     def add_road(self, road):
         self.road = road
         road.line = self
+    
+    def on_coast(self):
+        return sum(len(node.lines) for node in self.nodes) < 6

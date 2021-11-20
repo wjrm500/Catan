@@ -70,5 +70,5 @@ config = {
         'victory_point': 5,
         'year_of_plenty': 2
     },
-    'player_colors': {'red': '#FF0000', 'blue': '#0000FF', 'lime': '#00FF00', 'yellow': '#FFFF00'}
+    'player_colors': {'red': '#FF0000', 'aqua': '#00FFFF', 'lime': '#00FF00', 'yellow': '#FFFF00'}
 }

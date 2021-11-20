@@ -377,7 +377,7 @@ class HexagonRendering:
             if not hasattr(self, 'scale'):
                 continue
             port_type = port_node.port.type
-            circle_color = '#87CEFA' if port_type == 'general' else BACKGROUND_COLORS[port_node.port.type]
+            circle_color = '#0000FF' if port_type == 'general' else BACKGROUND_COLORS[port_node.port.type]
             line_width = round(self.scale / 15)
 
             r = line_width * 2 ### Circle radius

@@ -20,16 +20,17 @@ class HexagonRender:
         ### Initial render
         self.body_render.render_polygon(self.UNFOCUSED)
         self.body_render.render_text_elements(self.UNFOCUSED)
+        self.border_render.thicken_coastlines()
     
     def focus(self):
         ### Overlay darker hexagon and thick border when cursor gets near
         self.set_focused(True)
         self.body_render.render_polygon(self.FOCUSED)
         self.body_render.render_text_elements(self.FOCUSED)
-        self.border_render.add_hexagon_border()
+        self.border_render.add_focused_hexagon_border()
     
     def unfocus(self, hexagons_to_focus = []):
         ### Remove darker hexagon overlay and thick border when cursor moves away
         self.set_focused(False)
         self.rendering.delete_tag('{}.{}'.format(self.hexagon_tag, self.FOCUSED))
-        self.border_render.remove_hexagon_border(hexagons_to_focus)
+        self.border_render.remove_focused_hexagon_border(hexagons_to_focus)
