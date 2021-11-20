@@ -49,7 +49,7 @@ class BuildRoad(Action):
 
         if move_on_to_next_phase:
             ### Move to main game phase prompt
-            text_to_insert = f'All done! The game creator should now click the "Proceed" button in the bottom right corner of their screen to advance all players to the main game.'
+            text_to_insert = f'The settling phase is now complete! The game creator should now click the "Proceed" button in the bottom right corner of their screen to advance all players to the main game.'
             text_area.insert('end', f'\n\n{text_to_insert}')
         else:
             ### Round X commencing...
