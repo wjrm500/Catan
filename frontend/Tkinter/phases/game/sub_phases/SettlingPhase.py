@@ -55,3 +55,12 @@ Players are ordered randomly for the first round of settling.
 Round 1 commencing...
 
 It is {self.active_player().name}'s turn to settle..."""
+
+    def activate_button(self):
+        self.button_text.set('Proceed')
+        self.button['state'] = 'normal'
+        self.button.configure({'background': '#90EE90'}) ### LightGreen
+        self.button.bind('<Button-1>', self.start_game_proper)
+    
+    def start_game_proper(self, event):
+        self.chaperone.start_game_proper()

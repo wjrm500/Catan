@@ -6,6 +6,7 @@ from actions.EndGame import EndGame
 from actions.JoinExistingGame import JoinExistingGame
 from actions.RemovePlayer import RemovePlayer
 from actions.StartGame import StartGame
+from actions.StartGameProper import StartGameProper
 
 class ActionFactory:
     ADD_PLAYER = 'ADD_PLAYER'
@@ -16,6 +17,7 @@ class ActionFactory:
     JOIN_EXISTING_GAME = 'JOIN_EXISTING_GAME'
     REMOVE_PLAYER = 'REMOVE_PLAYER'
     START_GAME = 'START_GAME'
+    START_GAME_PROPER = 'START_GAME_PROPER'
 
     @classmethod
     def get_action(cls, action):
@@ -35,3 +37,5 @@ class ActionFactory:
             return RemovePlayer()
         elif action == cls.START_GAME:
             return StartGame()
+        elif action == cls.START_GAME_PROPER:
+            return StartGameProper()

@@ -88,6 +88,8 @@ class Server:
                     game.randomise_player_order_and_assign_colors()
                     game.started = True
                     self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor, 'players': game.players})
+                elif action == ActionFactory.START_GAME_PROPER:
+                    self.broadcast_to_game(input_data['game_code'], {'action': action})
             except Exception as e:
                 print(str(e))
                 ### End any games for which the client was the main client
