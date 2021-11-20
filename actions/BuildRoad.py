@@ -51,6 +51,7 @@ class BuildRoad(Action):
             ### Move to main game phase prompt
             text_to_insert = f'The settling phase is now complete! The game creator should now click the "Proceed" button in the bottom right corner of their screen to advance all players to the main game.'
             text_area.insert('end', f'\n\n{text_to_insert}')
+            self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
             if self.chaperone.main:
                 self.game_phase.activate_button()
         else:
