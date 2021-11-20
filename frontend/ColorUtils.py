@@ -1,3 +1,4 @@
+from collections import namedtuple
 from colorsys import rgb_to_hls, hls_to_rgb
 from PIL import ImageColor
 
@@ -37,3 +38,14 @@ class ColorUtils:
     @classmethod
     def darken_color(cls, rgb, factor = 0.1):
         return cls.adjust_color_lightness(rgb, 1 - factor)
+        
+    @classmethod
+    def get_luminance(cls, hex):
+        rgb = cls.hex_to_rgb(hex)
+        rgb = namedtuple('RGB', ['r', 'g', 'b'])(*rgb)
+        return 0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b
+    
+    @classmethod
+    def get_fg_from_bg(cls, hex):
+        luminance = cls.get_luminance(hex)
+        return '#000000' if luminance > (255 / 2) else '#FFFFFF'

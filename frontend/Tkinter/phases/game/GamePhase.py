@@ -1,7 +1,9 @@
 import abc
+from config import config
 from functools import partial
 import tkinter
 import tkinter.scrolledtext
+from frontend.ColorUtils import ColorUtils
 
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
@@ -110,8 +112,10 @@ class GamePhase(Phase, abc.ABC):
         self.instruction = label_partial(textvariable = self.instruction_text, background = label_bg_color, width = round(frame_width / 3))
         self.instruction.grid(row = 0, column = 0, padx = 10)
 
-        player_data_text = f'Your color is {self.chaperone.player.color.upper()}'
-        player_data = label_partial(text = player_data_text, background = self.chaperone.player.color, width = round(frame_width / 3))
+        player_color = self.chaperone.player.color
+        player_color_hex = config['player_colors'][self.chaperone.player.color]
+        player_data_text = f'Your color is {player_color.upper()}'
+        player_data = label_partial(text = player_data_text, bg = player_color_hex, fg = ColorUtils.get_fg_from_bg(player_color_hex), width = round(frame_width / 3))
         player_data.grid(row = 0, column = 1, padx = 10)
 
     def setup_inner_frame_bottom_right(self):
