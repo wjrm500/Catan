@@ -51,18 +51,18 @@ class Game:
             if resource_type != 'desert'
         }
         self.development_cards = []
-        development_card_type_counts = copy.deepcopy(self.config['development_card_type_counts'])
+        development_card_types = copy.deepcopy(self.config['development_card_types'])
         for _ in range(round(self.num_hexagons * 25 / 19)):
             development_card_type = random.choices(
-                population = [development_card_type for development_card_type in development_card_type_counts.keys()],
-                weights = [count for count in development_card_type_counts.values()],
+                population = [development_card_type for development_card_type in development_card_types.keys()],
+                weights = [data['count'] for data in development_card_types.values()],
                 k = 1
             )[0]
             development_card = self.distributor.get_development_card(development_card_type)
             self.development_cards.append(development_card)
-            development_card_type_counts[development_card_type] -= 1
+            development_card_types[development_card_type]['count'] -= 1
             if sum(development_card_type_counts.values()) == 0:
-                development_card_type_counts = copy.deepcopy(self.config['development_card_type_counts']) 
+                development_card_types = copy.deepcopy(self.config['development_card_types']) 
     
     def setup_movable_pieces(self):
         for player in self.players:

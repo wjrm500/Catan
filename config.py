@@ -63,12 +63,27 @@ config = {
         11: 2,
         12: 1
     },
-    'development_card_type_counts': {
-        'knight': 14,
-        'monopoly': 2,
-        'road_building': 2,
-        'victory_point': 5,
-        'year_of_plenty': 2
+    'development_card_types': {
+        'knight': {
+            'color': '#9400D3',
+            'count': '14'
+        },
+        'monopoly': {
+            'color': '#6B8E23',
+            'count': '2'
+        },
+        'road_building': {
+            'color': '#6B8E23',
+            'count': '2'
+        },
+        'victory_point': {
+            'color': '#FF8C00',
+            'count': '5'
+        },
+        'year_of_plenty': {
+            'color': '#6B8E23',
+            'count': '2'
+        }
     },
     'player_colors': {'red': '#FF0000', 'aqua': '#00FFFF', 'lime': '#00FF00', 'yellow': '#FFFF00'}
 }

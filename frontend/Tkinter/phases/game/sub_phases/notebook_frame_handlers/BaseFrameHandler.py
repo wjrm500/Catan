@@ -1,8 +1,9 @@
 import abc
 import tkinter
 
-class BaseFrame:
-    def __init__(self, notebook) -> None:
+class BaseFrameHandler:
+    def __init__(self, root, notebook) -> None:
+        self.root = root
         self.frame = tkinter.Frame(notebook)
 
     def get(self):

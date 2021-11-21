@@ -126,7 +126,7 @@ class GamePhase(Phase, abc.ABC):
         self.button['state'] = 'disable'
     
     def run(self):
-        self.root.bind('<Configure>', self.hexagon_rendering.handle_resize)
+        self.root.bind('<Configure>', self.hexagon_rendering.handle_resize, '+')
         self.canvas.bind('<Motion>', lambda evt: self.hexagon_rendering.handle_motion(evt))
         self.canvas.bind('<Leave>', self.hexagon_rendering.handle_leave)
         self.root.mainloop()
