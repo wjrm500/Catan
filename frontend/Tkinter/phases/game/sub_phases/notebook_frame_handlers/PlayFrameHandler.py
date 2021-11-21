@@ -14,10 +14,11 @@ class PlayFrameHandler(BaseFrameHandler):
         resource_card_frame.pack(side = tkinter.TOP)
         development_card_frame = self.development_card_frame(self.frame)
         development_card_frame.pack(side = tkinter.TOP)
-    
+        movable_piece_frame = self.movable_piece_frame(self.frame)
+        movable_piece_frame.pack(side = tkinter.TOP, fill = 'x')
+
     def card_frame(self, where, title, iterable):
         self.root.update_idletasks()
-        frame_height = where.master.master.winfo_height() ### Get height of inner frame middle right
         frame_width = where.master.master.winfo_width() ### Get width of inner frame middle right
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
@@ -55,3 +56,17 @@ class PlayFrameHandler(BaseFrameHandler):
             for k, v in config['development_card_types'].items()
         ]
         return self.card_frame(where, 'Development cards', iterable)
+    
+    def movable_piece_frame(self, where):
+        outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
+        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
+        inner_frame = tkinter.Frame(outer_frame, background = darker_blue)
+        inner_frame.pack(fill = 'x', side = tkinter.TOP)
+        for i, movable_pieces in enumerate(['roads', 'settlements', 'cities', 'tokens']): ### Only add tokens if two players
+            piece_label = tkinter.Label(inner_frame, text = f'{movable_pieces.title()}:', background = darker_blue)
+            piece_label.grid(row = 0, column = i * 2)
+            num_label_text = tkinter.StringVar() ### Needs to be accessible later
+            num_label_text.set('0')
+            num_label = tkinter.Label(inner_frame, textvariable = num_label_text, background = darker_blue)
+            num_label.grid(row = 0, column = i * 2 + 1)
+        return outer_frame
