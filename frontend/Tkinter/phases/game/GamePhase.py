@@ -114,7 +114,8 @@ class GamePhase(Phase, abc.ABC):
 
         player_color = self.chaperone.player.color
         player_data_text = f'Your color is {player_color.upper()}'
-        player_data = label_partial(text = player_data_text, bg = player_color, fg = ColorUtils.get_fg_from_bg(player_color), width = round(frame_width / 3))
+        player_color_hex = config['player_colors'][player_color]
+        player_data = label_partial(text = player_data_text, bg = player_color_hex, fg = ColorUtils.get_fg_from_bg(player_color_hex), width = round(frame_width / 3))
         player_data.grid(row = 0, column = 1, padx = 10)
 
     def setup_inner_frame_bottom_right(self):

@@ -74,10 +74,10 @@ class MainGamePhase(GamePhase):
         return super().setup_inner_frame_bottom_left(instruction_text, label_bg_color)
     
     def run(self):
-        self.root.bind('<Configure>', self.resize_, '+')
+        self.root.bind('<Configure>', self.resize_card_labels, '+')
         super().run()
     
-    def resize_(self, event):
+    def resize_card_labels(self, event):
         play_frame = self.notebook_frame_handlers['play']
         frame_width = play_frame.get().winfo_width()
         for label in play_frame.labels:

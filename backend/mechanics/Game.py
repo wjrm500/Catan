@@ -123,5 +123,5 @@ class Game:
     
     def randomise_player_order_and_assign_colors(self):
         random.shuffle(self.players)
-        for player, color in zip(self.players, self.config['player_colors'].values()):
+        for player, color in zip(self.players, self.config['player_colors'].keys()):
             player.set_color(color)
