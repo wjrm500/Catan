@@ -1,3 +1,5 @@
+import functools
+
 from actions.Action import Action
 from backend.mechanics.Distributor import Distributor
 from frontend.GeneralUtils import GeneralUtils
@@ -38,7 +40,9 @@ class BuildSettlement(Action):
             a_an = 'an' if port.type.startswith(tuple('aeiou')) else 'a'
             port_text = f' on {a_an} {port.type} port'
         nominal_value = node.nominal_value()
-        nominal_values = ' + '.join([f'{hexagon.num_pips} {hexagon.resource_type}' for hexagon in node.hexagons if hexagon.resource_type != 'desert'])
+        def fun(d, x): d[x[0]] = d.get(x[0], 0) + x[1]; return d
+        d = functools.reduce(fun, [(hexagon.resource_type, hexagon.num_pips) for hexagon in node.hexagons], {})
+        nominal_values = ' + '.join(f'{v} {k}' for k, v in d.items() if k != 'desert')
         text_to_insert = f'{self.data["player"].name} built a settlement{port_text}! This settlement has a nominal value of {nominal_value} ({nominal_values}).'
         text_area.insert('end', f'\n\n{text_to_insert}')
         text_area.yview('end')

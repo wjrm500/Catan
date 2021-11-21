@@ -3,8 +3,6 @@ import pickle
 
 from pympler.asizeof import asizeof
 
-from backend.mechanics.Distributor import Distributor
-
 class ClientServerInterface:
     def send_data(self, recipient, message):
         try:
