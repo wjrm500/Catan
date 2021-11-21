@@ -44,12 +44,14 @@ class HexagonBorderRender:
     def remove_focused_hexagon_border(self, hexagons_to_focus = []):
         rendering = self.render.rendering
         focus_retaining_lines = [line for hexagon in hexagons_to_focus for line in hexagon.lines]
-        line_width = round(rendering.scale / 10)
+        focus_retaining_nodes = [node for hexagon in hexagons_to_focus for node in hexagon.nodes]
         for line in self.render.hexagon.lines:
+            if line in focus_retaining_lines:
+                continue
             line_tag = rendering.ct_line_tag(line)
             rendering.delete_tag(line_tag)
             for node in line.nodes:
+                if node in focus_retaining_nodes:
+                    continue
                 node_tag = rendering.ct_node_tag(node)
                 rendering.delete_tag(node_tag)
-            if line in focus_retaining_lines:
-                self.draw_focused_line(line, line_tag, line_width)
