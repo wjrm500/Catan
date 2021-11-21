@@ -61,7 +61,7 @@ class Game:
             development_card = self.distributor.get_development_card(development_card_type)
             self.development_cards.append(development_card)
             development_card_types[development_card_type]['count'] -= 1
-            if sum(development_card_type_counts.values()) == 0:
+            if sum(x['count'] for x in development_card_types.values()) == 0:
                 development_card_types = copy.deepcopy(self.config['development_card_types']) 
     
     def setup_movable_pieces(self):
