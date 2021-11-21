@@ -1,3 +1,4 @@
+### TODO: Do we even need all this stuff? Is line width not a create_polygon param? Only thing to keep is drawing outline of whole board?
 class HexagonBorderRender:
     def __init__(self, render):
         self.render = render
