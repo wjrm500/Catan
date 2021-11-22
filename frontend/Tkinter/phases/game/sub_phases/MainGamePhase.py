@@ -78,7 +78,7 @@ class MainGamePhase(GamePhase):
         super().run()
     
     def resize_card_labels(self, event):
-        play_frame = self.notebook_frame_handlers['play']
-        frame_width = play_frame.get().winfo_width()
-        for label in play_frame.labels:
+        play_frame_handler = self.notebook_frame_handlers['play']
+        frame_width = play_frame_handler.get().winfo_width()
+        for label in play_frame_handler.labels:
             label.configure({'width': round(frame_width / 50), 'wraplength': round(frame_width / 8)})
