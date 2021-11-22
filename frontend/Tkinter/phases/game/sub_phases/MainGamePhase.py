@@ -1,6 +1,6 @@
 import tkinter
 from tkinter import ttk
-from frontend.ColorUtils import ColorUtils
+
 from frontend.Tkinter.phases.game.GamePhase import GamePhase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.ChatFrameHandler import ChatFrameHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.HistoryFrameHandler import HistoryFrameHandler
@@ -17,52 +17,6 @@ class MainGamePhase(GamePhase):
         super().setup_inner_frame_top_right('MAIN GAME PHASE')
     
     def setup_inner_frame_middle_right(self):
-        style = ttk.Style()
-        darker_blue = ColorUtils.darken_hex(self.BG_COLOR, 0.2)
-        style.theme_create('catan', parent = 'classic', settings = {
-            'TNotebook': {
-                'configure': {'background': self.BG_COLOR, 'tabmargins': [0, 0]}
-            },
-            'TNotebook.Tab': {
-                'configure': {'background': self.BG_COLOR, 'padding': [5, 5]},
-                'map': {'background': [('selected', darker_blue)]}
-            },
-            'Treeview': {
-                'configure': {'background': self.BG_COLOR, 'fieldbackground': self.BG_COLOR}
-            },
-            'Treeview.Heading': {
-                'configure': {'background': self.BG_COLOR, 'font': ('Arial', 10, 'bold')}
-            }
-        })
-        style.theme_use('catan')
-
-        ### Style scrollbar
-        style.element_create('My.Vertical.TScrollbar.trough', 'from', 'clam')
-        style.element_create('My.Vertical.TScrollbar.thumb', 'from', 'clam')
-        style.element_create('My.Vertical.TScrollbar.grip', 'from', 'clam')
-        style.layout(
-            'My.Vertical.TScrollbar',
-            [
-                (
-                    'My.Vertical.TScrollbar.trough',
-                    {
-                        'children': [
-                            (
-                                'My.Vertical.TScrollbar.thumb',
-                                {
-                                    'unit': '1',
-                                    'children': [('My.Vertical.TScrollbar.grip', {'sticky': ''})],
-                                    'sticky': 'nswe'
-                                }
-                            )
-                        ],
-                        'sticky': 'ns'
-                    }
-                )
-            ]
-        )
-
-
         self.notebook = ttk.Notebook(self.inner_frame_middle_right)
         self.notebook_frame_handlers = {}
         for frame_name in ['play', 'status', 'history', 'chat']:

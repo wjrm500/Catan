@@ -85,5 +85,55 @@ config = {
             'count': 2
         }
     },
-    'player_colors': {'red': '#FF0000', 'aqua': '#00FFFF', 'lime': '#00FF00', 'yellow': '#FFFF00'}
+    'player_colors': {'red': '#FF0000', 'aqua': '#00FFFF', 'lime': '#00FF00', 'yellow': '#FFFF00'},
+    'actions': [
+            {
+                'name': 'Build road',
+                'cost': {
+                    'resource_cards': {
+                        'brick': 1,
+                        'lumber': 1
+                    },
+                    'other_items': {
+                        'game_token': 1
+                    }
+                }
+            },
+            {
+                'name': 'Build settlement',
+                'cost': {
+                    'resource_cards': {
+                        'brick': 1,
+                        'grain': 1,
+                        'lumber': 1,
+                        'wool': 1
+                    },
+                    'other_items': {
+                        'available_node': 1,
+                        'settlement_token': 1
+                    }
+                }
+            },
+            {
+                'name': 'Upgrade settlement to city',
+                'cost': {
+                    'resource_cards': {
+                        'grain': 2,
+                        'ore': 3
+                    },
+                    'other_items': {
+                        'available_settlement': 1,
+                        'city_token': 1
+                    }
+                }
+            }
+    ]
+    # 'Build road',
+    # 'Build settlement',
+    # 'Upgrade settlement to city',
+    # 'Buy a development card',
+    # 'Use a development card',
+    # 'Trade with the bank',
+    # 'Swap two cards with opponent',
+    # 'Move robber to desert hex'
 }

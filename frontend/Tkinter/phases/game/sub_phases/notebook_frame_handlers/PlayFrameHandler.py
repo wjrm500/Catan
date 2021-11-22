@@ -82,69 +82,17 @@ class PlayFrameHandler(BaseFrameHandler):
         inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
         inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
         columns = ['action', 'cost']
-        tree = ttk.Treeview(inner_frame, columns = columns, show = 'headings')
-        tree.tag_configure('odd', background = Phase.BG_COLOR)
-        tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
-        tree.column('#0', width = 200)
-        tree.heading('action', text = 'Action', anchor = tkinter.W)
-        tree.heading('cost', text = 'Cost', anchor = tkinter.W)
-        actions = [
-            {
-                'name': 'Build road',
-                'cost': {
-                    'resource_cards': {
-                        'brick': 1,
-                        'lumber': 1
-                    },
-                    'other_items': {
-                        'game_token': 1
-                    }
-                }
-            },
-            {
-                'name': 'Build settlement',
-                'cost': {
-                    'resource_cards': {
-                        'brick': 1,
-                        'grain': 1,
-                        'lumber': 1,
-                        'wool': 1
-                    },
-                    'other_items': {
-                        'available_node': 1,
-                        'settlement_token': 1
-                    }
-                }
-            },
-            {
-                'name': 'Upgrade settlement to city',
-                'cost': {
-                    'resource_cards': {
-                        'grain': 2,
-                        'ore': 3
-                    },
-                    'other_items': {
-                        'available_settlement': 1,
-                        'city_token': 1
-                    }
-                }
-            }
-        ]
-        # 'Build road',
-        # 'Build settlement',
-        # 'Upgrade settlement to city',
-        # 'Buy a development card',
-        # 'Use a development card',
-        # 'Trade with the bank',
-        # 'Swap two cards with opponent',
-        # 'Move robber to desert hex'
-        for i, action in enumerate(actions):
+        self.action_tree = ttk.Treeview(inner_frame, columns = columns, show = 'headings')
+        self.action_tree.tag_configure('odd', background = Phase.BG_COLOR)
+        self.action_tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
+        self.action_tree.column('#0', width = 200)
+        self.action_tree.heading('action', text = 'Action', anchor = tkinter.W)
+        self.action_tree.heading('cost', text = 'Cost', anchor = tkinter.W)
+        for i, action in enumerate(config['actions']):
             cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action['cost'].values() for k, v in v.items()])
-            tree.insert('', tkinter.END, values = (action['name'], cost_text), tags = ('even' if i % 2 == 0 else 'odd',))
-        tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
-        scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = tree.yview, style = 'My.Vertical.TScrollbar')
-        tree.configure(yscrollcommand = scrollbar.set)
+            self.action_tree.insert('', tkinter.END, values = (action['name'], cost_text), tags = ('even' if i % 2 == 0 else 'odd',))
+        self.action_tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
+        scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = self.action_tree.yview, style = 'My.Vertical.TScrollbar')
+        self.action_tree.configure(yscrollcommand = scrollbar.set)
         scrollbar.pack(fill = 'y', side = tkinter.LEFT)
         return outer_frame
-
-        ### Might have to ditch treeview as cannot embed widgets so no text variables, multicoloured text or links
