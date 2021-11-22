@@ -20,6 +20,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.action_frame = self.create_action_frame(self.frame)
         self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
+        self.frame.grid_rowconfigure(3, weight = 1)
 
     def create_card_frame(self, where, title, iterable):
         self.root.update_idletasks()
@@ -81,32 +82,69 @@ class PlayFrameHandler(BaseFrameHandler):
         inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
         inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
         columns = ['action', 'cost']
-        tree = ttk.Treeview(inner_frame, columns = columns, show = 'headings', height = 4)
-        tree.heading('action', text = 'Action')
-        tree.heading('cost', text = 'Cost')
-        actions = ['Build road', 'Build settlement', 'Upgrade settlement to city', 'Buy a development card', 'Use a development card', 'Trade with the bank', 'Swap two cards with opponent', 'Move robber to desert hex']
-        for action in actions:
-            tree.insert('', tkinter.END, values = (action, 'Cost'))
+        tree = ttk.Treeview(inner_frame, columns = columns, show = 'headings')
+        tree.tag_configure('odd', background = Phase.BG_COLOR)
+        tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
+        tree.column('#0', width = 200)
+        tree.heading('action', text = 'Action', anchor = tkinter.W)
+        tree.heading('cost', text = 'Cost', anchor = tkinter.W)
+        actions = [
+            {
+                'name': 'Build road',
+                'cost': {
+                    'resource_cards': {
+                        'brick': 1,
+                        'lumber': 1
+                    },
+                    'other_items': {
+                        'game_token': 1
+                    }
+                }
+            },
+            {
+                'name': 'Build settlement',
+                'cost': {
+                    'resource_cards': {
+                        'brick': 1,
+                        'grain': 1,
+                        'lumber': 1,
+                        'wool': 1
+                    },
+                    'other_items': {
+                        'available_node': 1,
+                        'settlement_token': 1
+                    }
+                }
+            },
+            {
+                'name': 'Upgrade settlement to city',
+                'cost': {
+                    'resource_cards': {
+                        'grain': 2,
+                        'ore': 3
+                    },
+                    'other_items': {
+                        'available_settlement': 1,
+                        'city_token': 1
+                    }
+                }
+            }
+        ]
+        # 'Build road',
+        # 'Build settlement',
+        # 'Upgrade settlement to city',
+        # 'Buy a development card',
+        # 'Use a development card',
+        # 'Trade with the bank',
+        # 'Swap two cards with opponent',
+        # 'Move robber to desert hex'
+        for i, action in enumerate(actions):
+            cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action['cost'].values() for k, v in v.items()])
+            tree.insert('', tkinter.END, values = (action['name'], cost_text), tags = ('even' if i % 2 == 0 else 'odd',))
         tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
-        scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = tree.yview)
+        scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = tree.yview, style = 'My.Vertical.TScrollbar')
         tree.configure(yscrollcommand = scrollbar.set)
         scrollbar.pack(fill = 'y', side = tkinter.LEFT)
         return outer_frame
 
-
-        # frame_width = where.master.master.winfo_width() ### Get width of inner frame middle right
-        # outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        # darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        # # inner_frame = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
-        # inner_frame = ScrolledWindow(outer_frame)
-        # inner_frame.pack(fill = 'x', side = tkinter.TOP)
-        # actions = ['Build road', 'Build settlement', 'Upgrade settlement to city', 'Buy a development card', 'Use a development card', 'Trade with the bank', 'Swap two cards with opponent', 'Move robber to desert hex']
-        # inner_frame.grid_columnconfigure(0, weight = 1)
-        # inner_frame.grid_columnconfigure(1, weight = 1)
-        # for i, action in enumerate(actions):
-        #     # inner_frame.grid_rowconfigure(i, weight = 1)
-        #     action_button = tkinter.Button(inner_frame, text = action, justify = tkinter.LEFT)
-        #     action_button.grid(row = i, column = 0)
-        #     cost_label = tkinter.Label(inner_frame, text = 'Cost')
-        #     cost_label.grid(row = i, column = 1)
-        # return outer_frame
+        ### Might have to ditch treeview as cannot embed widgets so no text variables, multicoloured text or links

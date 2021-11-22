@@ -26,9 +26,43 @@ class MainGamePhase(GamePhase):
             'TNotebook.Tab': {
                 'configure': {'background': self.BG_COLOR, 'padding': [5, 5]},
                 'map': {'background': [('selected', darker_blue)]}
+            },
+            'Treeview': {
+                'configure': {'background': self.BG_COLOR, 'fieldbackground': self.BG_COLOR}
+            },
+            'Treeview.Heading': {
+                'configure': {'background': self.BG_COLOR, 'font': ('Arial', 10, 'bold')}
             }
         })
         style.theme_use('catan')
+
+        ### Style scrollbar
+        style.element_create('My.Vertical.TScrollbar.trough', 'from', 'clam')
+        style.element_create('My.Vertical.TScrollbar.thumb', 'from', 'clam')
+        style.element_create('My.Vertical.TScrollbar.grip', 'from', 'clam')
+        style.layout(
+            'My.Vertical.TScrollbar',
+            [
+                (
+                    'My.Vertical.TScrollbar.trough',
+                    {
+                        'children': [
+                            (
+                                'My.Vertical.TScrollbar.thumb',
+                                {
+                                    'unit': '1',
+                                    'children': [('My.Vertical.TScrollbar.grip', {'sticky': ''})],
+                                    'sticky': 'nswe'
+                                }
+                            )
+                        ],
+                        'sticky': 'ns'
+                    }
+                )
+            ]
+        )
+
+
         self.notebook = ttk.Notebook(self.inner_frame_middle_right)
         self.notebook_frame_handlers = {}
         for frame_name in ['play', 'status', 'history', 'chat']:
@@ -82,3 +116,4 @@ class MainGamePhase(GamePhase):
         frame_width = play_frame_handler.get().winfo_width()
         for label in play_frame_handler.labels:
             label.configure({'width': round(frame_width / 50), 'wraplength': round(frame_width / 8)})
+        # play_frame_handler.action_canvas.configure(scrollregion = play_frame_handler.action_canvas.bbox("all"))
