@@ -30,13 +30,13 @@ class MainGamePhase(GamePhase):
     
     def frame_handler_by_name(self, notebook, frame_name):
         if frame_name == 'play':
-            frame_handler = PlayFrameHandler(self.root, notebook)
+            frame_handler = PlayFrameHandler(self, notebook)
         elif frame_name == 'status':
-            frame_handler = StatusFrameHandler(self.root, notebook)
+            frame_handler = StatusFrameHandler(self, notebook)
         elif frame_name == 'history':
-            frame_handler = HistoryFrameHandler(self.root, notebook)
+            frame_handler = HistoryFrameHandler(self, notebook)
         elif frame_name == 'chat':
-            frame_handler = ChatFrameHandler(self.root, notebook)
+            frame_handler = ChatFrameHandler(self, notebook)
         return frame_handler
 
     def play_frame(self):

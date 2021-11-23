@@ -7,6 +7,12 @@ from actions.JoinExistingGame import JoinExistingGame
 from actions.RemovePlayer import RemovePlayer
 from actions.StartGame import StartGame
 from actions.StartGameProper import StartGameProper
+from actions.main_game.BuyDevelopmentCard import BuyDevelopmentCard
+from actions.main_game.MoveRobberToDesert import MoveRobberToDesert
+from actions.main_game.SwapCards import SwapCards
+from actions.main_game.TradeWithBank import TradeWithBank
+from actions.main_game.UpgradeSettlement import UpgradeSettlement
+from actions.main_game.UseDevelopmentCard import UseDevelopmentCard
 
 class ActionFactory:
     ADD_PLAYER = 'ADD_PLAYER'
@@ -18,6 +24,14 @@ class ActionFactory:
     REMOVE_PLAYER = 'REMOVE_PLAYER'
     START_GAME = 'START_GAME'
     START_GAME_PROPER = 'START_GAME_PROPER'
+
+    ### Main game-specific actions
+    UPGRADE_SETTLEMENT = 'UPGRADE_SETTLEMENT'
+    BUY_DEVELOPMENT_CARD = 'BUY_DEVELOPMENT_CARD'
+    USE_DEVELOPMENT_CARD = 'USE_DEVELOPMENT_CARD'
+    TRADE_WITH_BANK = 'TRADE_WITH_BANK'
+    SWAP_CARDS = 'SWAP_CARDS'
+    MOVE_ROBBER_TO_DESERT = 'MOVE_ROBBER_TO_DESERT'
 
     @classmethod
     def get_action(cls, action):
@@ -39,3 +53,15 @@ class ActionFactory:
             return StartGame()
         elif action == cls.START_GAME_PROPER:
             return StartGameProper()
+        elif action == cls.UPGRADE_SETTLEMENT:
+            return UpgradeSettlement()
+        elif action == cls.BUY_DEVELOPMENT_CARD:
+            return BuyDevelopmentCard()
+        elif action == cls.USE_DEVELOPMENT_CARD:
+            return UseDevelopmentCard()
+        elif action == cls.TRADE_WITH_BANK:
+            return TradeWithBank()
+        elif action == cls.SWAP_CARDS:
+            return SwapCards()
+        elif action == cls.MOVE_ROBBER_TO_DESERT:
+            return MoveRobberToDesert()

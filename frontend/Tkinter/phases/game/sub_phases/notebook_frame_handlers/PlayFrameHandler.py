@@ -12,6 +12,7 @@ class PlayFrameHandler(BaseFrameHandler):
     def setup(self):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
+        self.card_num_label_texts = {}
         self.resource_card_frame = self.create_resource_card_frame(self.frame)
         self.resource_card_frame.grid(row = 0, column = 0, sticky = 'ew')
         self.development_card_frame = self.create_development_card_frame(self.frame)
@@ -32,14 +33,16 @@ class PlayFrameHandler(BaseFrameHandler):
         outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
         outer_frame_bottom.pack(side = tkinter.TOP)
         outer_frame.grid_rowconfigure(0, weight = 1)
+        self.card_num_label_texts[title] = {}
         for i, tup in enumerate(iterable):
             outer_frame_bottom.grid_columnconfigure(i, weight = 1, uniform = 'catan')
             inner_frame = tkinter.Frame(outer_frame_bottom, background = tup.color, highlightbackground = 'black', highlightthickness = 3)
             type_label_text = tup.name.title().replace('_', ' ')
             label_partial = partial(tkinter.Label, inner_frame, background = tup.color, foreground = ColorUtils.get_fg_from_bg(tup.color), width = round(frame_width / 50), wraplength = round(frame_width / 8))
             type_label = label_partial(height = 1, text = type_label_text)
-            num_label_text = tkinter.StringVar() ### Needs to be accessible later
+            num_label_text = tkinter.StringVar()
             num_label_text.set('0')
+            self.card_num_label_texts[title][tup.name] = num_label_text
             num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, textvariable = num_label_text)
             type_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
             num_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
@@ -71,7 +74,7 @@ class PlayFrameHandler(BaseFrameHandler):
             piece_label = tkinter.Label(inner_frame, text = f'{movable_pieces.title()}:', background = darker_blue)
             piece_label.grid(row = 0, column = i * 2)
             num_label_text = tkinter.StringVar() ### Needs to be accessible later
-            num_label_text.set('0')
+            num_label_text.set(str(len(getattr(self.player, movable_pieces, []))))
             num_label = tkinter.Label(inner_frame, textvariable = num_label_text, background = darker_blue)
             num_label.grid(row = 0, column = i * 2 + 1)
         return outer_frame
@@ -90,14 +93,20 @@ class PlayFrameHandler(BaseFrameHandler):
         self.action_tree.column('#1', width = 180, stretch = False)
         self.action_tree.heading('action', text = 'Action', anchor = tkinter.W)
         self.action_tree.heading('cost', text = 'Cost', anchor = tkinter.W)
-        for i, action in enumerate(config['actions']):
-            cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action['cost'].values() for k, v in v.items()])
-            self.action_tree.insert('', tkinter.END, iid = action['const'], text = action['const'], values = (action['name'], cost_text), tags = ('even' if i % 2 == 0 else 'odd', 'disabled' if i > 0 else 'enabled'))
+        self.fill_action_tree()
         self.action_tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
         scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = self.action_tree.yview, style = 'My.Vertical.TScrollbar')
         self.action_tree.configure(yscrollcommand = scrollbar.set)
         scrollbar.pack(fill = 'y', side = tkinter.LEFT)
         return outer_frame
+    
+    def fill_action_tree(self):
+        self.action_tree.delete(*self.action_tree.get_children())
+        for i, (action_const, action_data) in enumerate(config['actions'].items()):
+            cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action_data['cost'].values() for k, v in v.items()])
+            even_tag = 'even' if i % 2 == 0 else 'odd'
+            enabled_tag = 'enabled' if self.player.can_afford(action_const) else 'disabled'
+            self.action_tree.insert('', tkinter.END, iid = action_const, text = action_const, values = (action_data['name'], cost_text), tags = (even_tag, enabled_tag))
     
     def motion_handler(self, event):
         item = self.action_tree.identify('item', event.x, event.y)

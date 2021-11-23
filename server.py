@@ -39,7 +39,7 @@ class Server:
                 if action == ActionFactory.ADD_PLAYER:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
-                    player = Player(input_data['player'], client_address)
+                    player = Player(game, input_data['player'], client_address)
                     game.add_player(player)
                     output_data = {'action': action, 'player': player}
                     self.broadcast_to_game(game.code, output_data)

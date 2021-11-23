@@ -86,101 +86,93 @@ config = {
         }
     },
     'player_colors': {'red': '#FF0000', 'aqua': '#00FFFF', 'lime': '#00FF00', 'yellow': '#FFFF00'},
-    'actions': [
-            {
-                'name': 'Build road',
-                'const': 'BUILD_ROAD',
-                'cost': {
-                    'resource_cards': {
-                        'brick': 1,
-                        'lumber': 1
-                    },
-                    'other_items': {
-                        'game_token': 1
-                    }
-                }
-            },
-            {
-                'name': 'Build settlement',
-                'const': 'BUILD_SETTLEMENT',
-                'cost': {
-                    'resource_cards': {
-                        'brick': 1,
-                        'grain': 1,
-                        'lumber': 1,
-                        'wool': 1
-                    },
-                    'other_items': {
-                        'available_node': 1,
-                        'settlement_token': 1
-                    }
-                }
-            },
-            {
-                'name': 'Upgrade settlement to city',
-                'const': 'UPGRADE_SETTLEMENT',
-                'cost': {
-                    'resource_cards': {
-                        'grain': 2,
-                        'ore': 3
-                    },
-                    'other_items': {
-                        'available_settlement': 1,
-                        'city_token': 1
-                    }
-                }
-            },
-            {
-                'name': 'Buy a development card',
-                'const': 'BUY_DEVELOPMENT_CARD',
-                'cost': {
-                    'resource_cards': {
-                        'grain': 1,
-                        'ore': 1,
-                        'wool': 1
-                    },
-                    'other_items': {
-                        'development_card_in_deck': 1 ### Maybe just have unlimited
-                    }
-                }
-            },
-            {
-                'name': 'Use a development card',
-                'const': 'USE_DEVELOPMENT_CARD',
-                'cost': {
-                    'other_items': {
-                        'development_card_in_hand': 1
-                    }
-                }
-            },
-            {
-                'name': 'Trade with the bank',
-                'const': 'BANK_TRADE',
-                'cost': {
-                    'other_items': {
-                        'resource_card_in_hand': 'variable'
-                    }
-                }
-            },
-            {
-                'name': 'Swap two cards with opponent',
-                'const': 'SWAP_CARDS',
-                'cost': {
-                    'other_items': {
-                        'game_token': 'variable', ### 2 if winning else 1
-                        'resource_card_in_hand': 2,
-                        'resource_card_in_opponent_hand': 2
-                    }
-                }
-            },
-            {
-                'name': 'Move robber to desert hex',
-                'const': 'MOVE_ROBBER_TO_DESERT',
-                'cost': {
-                    'other_items': {
-                        'game_token': 'variable' ### 2 if winning else 1
-                    }
+    'actions': {
+        'BUILD_ROAD': {
+            'name': 'Build road',
+            'cost': {
+                'resource_cards': {
+                    'brick': 1,
+                    'lumber': 1
+                },
+                'other_items': {
+                    'game_token': 1
                 }
             }
-    ]
+        },
+        'BUILD_SETTLEMENT': {
+            'name': 'Build settlement',
+            'cost': {
+                'resource_cards': {
+                    'brick': 1,
+                    'grain': 1,
+                    'lumber': 1,
+                    'wool': 1
+                },
+                'other_items': {
+                    'available_node': 1,
+                    'settlement_token': 1
+                }
+            }
+        },
+        'UPGRADE_SETTLEMENT': {
+            'name': 'Upgrade settlement to city',
+            'cost': {
+                'resource_cards': {
+                    'grain': 2,
+                    'ore': 3
+                },
+                'other_items': {
+                    'available_settlement': 1,
+                    'city_token': 1
+                }
+            }
+        },
+        'BUY_DEVELOPMENT_CARD': {
+            'name': 'Buy a development card',
+            'cost': {
+                'resource_cards': {
+                    'grain': 1,
+                    'ore': 1,
+                    'wool': 1
+                },
+                'other_items': {
+                    'development_card_in_deck': 1 ### Maybe just have unlimited
+                }
+            }
+        },
+        'USE_DEVELOPMENT_CARD': {
+            'name': 'Use a development card',
+            'cost': {
+                'other_items': {
+                    'development_card_in_hand': 1
+                }
+            }
+        },
+        'TRADE_WITH_BANK': {
+            'name': 'Trade with the bank',
+            'cost': {
+                'other_items': {
+                    'resource_card_in_hand': 'variable'
+                }
+            }
+        },
+        'SWAP_CARDS': {
+            'name': 'Swap two cards with opponent',
+            'cost': {
+                'other_items': {
+                    'game_token': 'variable', ### 2 if winning else 1
+                    'resource_card_in_hand': 2,
+                    'resource_card_in_opponent_hand': 2
+                }
+            }
+        },
+        'MOVE_ROBBER_TO_DESERT': {
+            'name': 'Move robber to desert hex',
+            'cost': {
+                'other_items': {
+                    'game_token': 'variable' ### 2 if winning else 1
+                }
+            }
+        }
+    }
 }
