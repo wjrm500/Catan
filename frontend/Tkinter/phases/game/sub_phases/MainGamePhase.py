@@ -63,6 +63,9 @@ class MainGamePhase(GamePhase):
     
     def run(self):
         self.root.bind('<Configure>', self.resize_card_labels, '+')
+        play_frame_handler = self.notebook_frame_handlers['play']
+        play_frame_handler.action_tree.bind('<Motion>', play_frame_handler.motion_handler)
+        play_frame_handler.action_tree.bind('<Leave>', lambda evt: self.root.configure({'cursor': self.CURSOR_DEFAULT}))
         super().run()
     
     def resize_card_labels(self, event):
@@ -70,4 +73,3 @@ class MainGamePhase(GamePhase):
         frame_width = play_frame_handler.get().winfo_width()
         for label in play_frame_handler.labels:
             label.configure({'width': round(frame_width / 50), 'wraplength': round(frame_width / 8)})
-        # play_frame_handler.action_canvas.configure(scrollregion = play_frame_handler.action_canvas.bbox("all"))

@@ -89,6 +89,7 @@ config = {
     'actions': [
             {
                 'name': 'Build road',
+                'const': 'BUILD_ROAD',
                 'cost': {
                     'resource_cards': {
                         'brick': 1,
@@ -101,6 +102,7 @@ config = {
             },
             {
                 'name': 'Build settlement',
+                'const': 'BUILD_SETTLEMENT',
                 'cost': {
                     'resource_cards': {
                         'brick': 1,
@@ -116,6 +118,7 @@ config = {
             },
             {
                 'name': 'Upgrade settlement to city',
+                'const': 'UPGRADE_SETTLEMENT',
                 'cost': {
                     'resource_cards': {
                         'grain': 2,
@@ -126,14 +129,58 @@ config = {
                         'city_token': 1
                     }
                 }
+            },
+            {
+                'name': 'Buy a development card',
+                'const': 'BUY_DEVELOPMENT_CARD',
+                'cost': {
+                    'resource_cards': {
+                        'grain': 1,
+                        'ore': 1,
+                        'wool': 1
+                    },
+                    'other_items': {
+                        'development_card_in_deck': 1 ### Maybe just have unlimited
+                    }
+                }
+            },
+            {
+                'name': 'Use a development card',
+                'const': 'USE_DEVELOPMENT_CARD',
+                'cost': {
+                    'other_items': {
+                        'development_card_in_hand': 1
+                    }
+                }
+            },
+            {
+                'name': 'Trade with the bank',
+                'const': 'BANK_TRADE',
+                'cost': {
+                    'other_items': {
+                        'resource_card_in_hand': 'variable'
+                    }
+                }
+            },
+            {
+                'name': 'Swap two cards with opponent',
+                'const': 'SWAP_CARDS',
+                'cost': {
+                    'other_items': {
+                        'game_token': 'variable', ### 2 if winning else 1
+                        'resource_card_in_hand': 2,
+                        'resource_card_in_opponent_hand': 2
+                    }
+                }
+            },
+            {
+                'name': 'Move robber to desert hex',
+                'const': 'MOVE_ROBBER_TO_DESERT',
+                'cost': {
+                    'other_items': {
+                        'game_token': 'variable' ### 2 if winning else 1
+                    }
+                }
             }
     ]
-    # 'Build road',
-    # 'Build settlement',
-    # 'Upgrade settlement to city',
-    # 'Buy a development card',
-    # 'Use a development card',
-    # 'Trade with the bank',
-    # 'Swap two cards with opponent',
-    # 'Move robber to desert hex'
 }

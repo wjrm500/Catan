@@ -85,14 +85,23 @@ class PlayFrameHandler(BaseFrameHandler):
         self.action_tree = ttk.Treeview(inner_frame, columns = columns, show = 'headings')
         self.action_tree.tag_configure('odd', background = Phase.BG_COLOR)
         self.action_tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
-        self.action_tree.column('#0', width = 200)
+        self.action_tree.tag_configure('disabled', foreground = 'grey')
+        self.action_tree.tag_configure('enabled', foreground = 'black')
+        self.action_tree.column('#1', width = 180, stretch = False)
         self.action_tree.heading('action', text = 'Action', anchor = tkinter.W)
         self.action_tree.heading('cost', text = 'Cost', anchor = tkinter.W)
         for i, action in enumerate(config['actions']):
             cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action['cost'].values() for k, v in v.items()])
-            self.action_tree.insert('', tkinter.END, values = (action['name'], cost_text), tags = ('even' if i % 2 == 0 else 'odd',))
+            self.action_tree.insert('', tkinter.END, iid = action['const'], text = action['const'], values = (action['name'], cost_text), tags = ('even' if i % 2 == 0 else 'odd', 'disabled' if i > 0 else 'enabled'))
         self.action_tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
         scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = self.action_tree.yview, style = 'My.Vertical.TScrollbar')
         self.action_tree.configure(yscrollcommand = scrollbar.set)
         scrollbar.pack(fill = 'y', side = tkinter.LEFT)
         return outer_frame
+    
+    def motion_handler(self, event):
+        item = self.action_tree.identify('item', event.x, event.y)
+        item = self.action_tree.item(item)
+        action, tags = item['text'], item['tags']
+        self.root.configure({'cursor': Phase.CURSOR_HAND if 'enabled' in tags else Phase.CURSOR_DEFAULT})
+        # self.action_tree.item(action, tags = ('enabled'))
