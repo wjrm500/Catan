@@ -17,10 +17,6 @@ class Player(Incrementable, Unserializable):
     def set_color(self, color):
         self.color = color
     
-    def take_resource_card(self, resource_type):
-        resource_card = self.game.resource_cards[resource_type].pop()
-        self.hand.append(resource_card)
-    
     def can_afford(self, action):
         if action == ActionFactory.BUILD_ROAD:
             return self.can_afford_build_road()

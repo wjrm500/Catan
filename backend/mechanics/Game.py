@@ -1,3 +1,4 @@
+from collections import namedtuple
 import copy
 import random
 import string
@@ -6,9 +7,8 @@ from .Distributor import Distributor
 from .drawing.HexagonDrawing import HexagonDrawing
 from ..objects.board.Port import Port
 from ..objects.cards.ResourceCard import ResourceCard
-from ..objects.movable_pieces.City import City
-from ..objects.movable_pieces.Road import Road
-from ..objects.movable_pieces.Settlement import Settlement
+
+DiceRoll = namedtuple('DiceRoll', ['roll_1', 'roll_2', 'total', 'event_text'])
 
 class Game:
     def __init__(self, config, num_hexagons = 19):
@@ -126,3 +126,36 @@ class Game:
         random.shuffle(self.players)
         for player, color in zip(self.players, self.config['player_colors'].keys()):
             player.set_color(color)
+        
+    def roll_dice(self):
+        dice_roll_1 = random.randint(1, 6)
+        dice_roll_2 = random.randint(1, 6)
+        total = dice_roll_1 + dice_roll_2
+        self.dice_rolls.append(total)
+        text_events = []
+        for hexagon in self.distributor.hexagons:
+            if total == hexagon.roll_num:
+                ### Look ahead to make sure the bank has enough resource cards to pay out full bounty to all players
+                total_bounty = sum((2 if node.settlement and node.settlement.city else 1) for node in hexagon.nodes)
+                if total_bounty > len(resource_cards := self.resource_cards[hexagon.resource_type]):
+                    text_event = f"The bank doesn't have enough {hexagon.resource_type} cards to pay out a bounty!"
+                    text_events.append(text_event)
+                    break
+                
+                for node in hexagon.nodes:
+                    if (settlement := node.settlement):
+                        player = settlement.player
+                        bounty = 2 if settlement.city else 1
+                        text_event = f'{player.name} gained {bounty} {hexagon.resource_type}'
+                        if not hexagon.robber:
+                            for _ in range(bounty):
+                                resource_card = resource_cards.pop()
+                                node.settlement.player.hand.append(resource_card)
+                            text_event += '!'
+                        else:
+                            text_event += '... but the robber stole it!'
+                        text_events.append(text_event)
+        if not text_events:
+            text_events = ['Nobody gained anything!']
+        event_text = '\n'.join(text_events)
+        return DiceRoll(dice_roll_1, dice_roll_2, total, event_text)

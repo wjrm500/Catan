@@ -20,10 +20,17 @@ class PlayFrameHandler(BaseFrameHandler):
     def dice_roll_setup(self):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         dice_roll_container = tkinter.Frame(self.frame, background = darker_blue, height = 200, width = 300)
+
         self.dice_roll_text = tkinter.StringVar()
         self.dice_roll_text.set('')
         dice_roll_label = tkinter.Label(dice_roll_container, textvariable = self.dice_roll_text, background = darker_blue, font = ('Arial', 24))
         dice_roll_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.05)
+
+        self.dice_roll_event_text = tkinter.StringVar()
+        self.dice_roll_event_text.set('')
+        dice_roll_event_label = tkinter.Label(dice_roll_container, textvariable = self.dice_roll_event_text, background = darker_blue, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 300)
+        dice_roll_event_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.25)
+
         instruct_label = tkinter.Label(dice_roll_container, text = 'Roll dice', background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
         instruct_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.685)
         dice_roll_container.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
