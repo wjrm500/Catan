@@ -13,6 +13,7 @@ class Chaperone:
         self.root.after(100, self.check_queue)
         self.root.title('Catan')
         self.root.protocol('WM_DELETE_WINDOW', self.on_closing)
+        self.root.state('zoomed')
         Style().setup()
         self.current_phase = None
         self.players = []

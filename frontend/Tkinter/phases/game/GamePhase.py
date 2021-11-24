@@ -11,7 +11,7 @@ from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 class GamePhase(Phase, abc.ABC):
     def __init__(self, chaperone):
         super().__init__(chaperone)
-        self.root.geometry('1000x500')
+        self.root.geometry('1200x600')
         self.frames = {}
         self.place_widget = lambda what, where, anchor: what.place(in_ = where, anchor = anchor, relheight = 1.0, relwidth = 0.5, relx = 0.5, rely = 0.5)
         self.active_player_index = 0

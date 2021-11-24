@@ -23,8 +23,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.movable_piece_frame = self.create_movable_piece_frame(self.frame)
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.action_frame = self.create_action_frame(self.frame)
-        self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
-        self.frame.grid_rowconfigure(3, weight = 1)
+        self.action_frame.grid(row = 3, column = 0, sticky = 'nsew')
     
     def enable(self):
         for title, card_frames in self.card_frames.items():
@@ -42,7 +41,7 @@ class PlayFrameHandler(BaseFrameHandler):
         outer_frame_top = tkinter.Label(outer_frame, text = title, anchor = tkinter.W, background = darker_blue)
         outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
         outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
-        outer_frame_bottom.pack(side = tkinter.TOP)
+        outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
         outer_frame.grid_rowconfigure(0, weight = 1)
         self.card_frames[title] = {}
         self.card_num_label_texts[title] = {}

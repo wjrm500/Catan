@@ -63,6 +63,7 @@ class MainGamePhase(GamePhase):
     
     def run(self):
         self.root.bind('<Configure>', self.resize_card_labels, '+')
+        self.root.bind('<Configure>', lambda evt: self.notebook.config(height = self.inner_frame_middle_right.winfo_height()))
         play_frame_handler = self.notebook_frame_handlers['play']
         play_frame_handler.action_tree.bind('<Motion>', play_frame_handler.motion_handler)
         play_frame_handler.action_tree.bind('<Leave>', lambda evt: self.root.configure({'cursor': self.CURSOR_DEFAULT}))
