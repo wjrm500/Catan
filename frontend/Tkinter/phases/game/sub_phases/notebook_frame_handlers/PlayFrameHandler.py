@@ -1,5 +1,6 @@
 from collections import namedtuple
 from functools import partial
+import random
 import tkinter
 from tkinter import ttk
 
@@ -10,8 +11,30 @@ from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHa
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrame import CardFrame
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLabel import CardFrameLabel
 
+### TODO: factor out "darker_blue" stuff (and any instance of ColourUtils.darken_hex being used elsewhere)
+
 class PlayFrameHandler(BaseFrameHandler):
     def setup(self):
+        self.dice_roll_setup()
+
+    def dice_roll_setup(self):
+        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
+        dice_roll_container = tkinter.Frame(self.frame, background = darker_blue, height = 200, width = 300)
+        self.dice_roll_text = tkinter.StringVar()
+        self.dice_roll_text.set('')
+        dice_roll_label = tkinter.Label(dice_roll_container, textvariable = self.dice_roll_text, background = darker_blue, font = ('Arial', 24))
+        dice_roll_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.05)
+        instruct_label = tkinter.Label(dice_roll_container, text = 'Roll dice', background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
+        instruct_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.685)
+        dice_roll_container.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
+        instruct_label.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
+        instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
+        instruct_label.bind('<Button-1>', self.roll_dice)
+    
+    def roll_dice(self, event):
+        self.phase.chaperone.roll_dice()
+        
+    def post_dice_roll_setup(self):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
         self.card_frames = {}
@@ -123,7 +146,7 @@ class PlayFrameHandler(BaseFrameHandler):
         inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
         inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
         self.action_cost = tkinter.StringVar()
-        self.action_cost.set('Hover over an action to see how much it costs!')
+        self.action_cost.set(self.default_action_cost_text())
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         cost_label = tkinter.Label(inner_frame, textvariable = self.action_cost, background = darker_blue)
         cost_label.pack()
@@ -141,16 +164,21 @@ class PlayFrameHandler(BaseFrameHandler):
         item = self.action_tree.item(item)
         action, tags = item['text'], item['tags']
         self.root.configure({'cursor': Phase.CURSOR_HAND if 'enabled' in tags else Phase.CURSOR_DEFAULT})
-        if action:
-            self.show_action_cost(action)
+        self.show_action_cost(action)
         # self.action_tree.item(action, tags = ('enabled'))
     
     def leave_handler(self, event):
         self.root.configure({'cursor': Phase.CURSOR_DEFAULT})
-        self.action_cost.set('Hover over an action to see how much it costs!')
+        self.action_cost.set(self.default_action_cost_text())
     
     def show_action_cost(self, action):
-        action_config = config['actions'][action]
-        cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action_config['cost'].values() for k, v in v.items()])
-        cost_text = f'Cost: {cost_text}'
+        if action:
+            action_config = config['actions'][action]
+            cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action_config['cost'].values() for k, v in v.items()])
+            cost_text = f'Cost: {cost_text}'
+        else:
+            cost_text = self.default_action_cost_text()
         self.action_cost.set(cost_text)
+    
+    def default_action_cost_text(self):
+        return 'Hover over an action to see how much it costs!'

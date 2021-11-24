@@ -97,6 +97,13 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def roll_dice(self):
+        data = {
+            'action': ActionFactory.ROLL_DICE,
+            'game_code': self.game_code
+        }
+        self.client.interface.send_data(self.client.socket, data)
+
     def start_game_proper(self):
         data = {
             'action': ActionFactory.START_GAME_PROPER,

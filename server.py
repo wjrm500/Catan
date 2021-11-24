@@ -1,3 +1,4 @@
+import random
 import socket
 import threading
 
@@ -79,6 +80,14 @@ class Server:
                     else:
                         output_data['error'] = f'"{game_code}" is not a valid game code'
                         self.broadcast_to_client(client, output_data)
+                elif action == ActionFactory.ROLL_DICE:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    dice_roll = (random.randint(1, 6), random.randint(1, 6))
+                    game.dice_rolls.append(dice_roll)
+                    output_data = {'action': action, 'dice_roll': dice_roll, 'player': player}
+                    self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.START_GAME:
                     game_code = input_data['game_code']
                     game = self.games[game_code]

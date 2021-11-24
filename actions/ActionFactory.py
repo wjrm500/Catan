@@ -5,6 +5,7 @@ from actions.CreateNewGame import CreateNewGame
 from actions.EndGame import EndGame
 from actions.JoinExistingGame import JoinExistingGame
 from actions.RemovePlayer import RemovePlayer
+from actions.RollDice import RollDice
 from actions.StartGame import StartGame
 from actions.StartGameProper import StartGameProper
 from actions.main_game.BuyDevelopmentCard import BuyDevelopmentCard
@@ -26,6 +27,8 @@ class ActionFactory:
     START_GAME_PROPER = 'START_GAME_PROPER'
 
     ### Main game-specific actions
+    ROLL_DICE = 'ROLL_DICE'
+
     UPGRADE_SETTLEMENT = 'UPGRADE_SETTLEMENT'
     BUY_DEVELOPMENT_CARD = 'BUY_DEVELOPMENT_CARD'
     USE_DEVELOPMENT_CARD = 'USE_DEVELOPMENT_CARD'
@@ -49,6 +52,8 @@ class ActionFactory:
             return JoinExistingGame()
         elif action == cls.REMOVE_PLAYER:
             return RemovePlayer()
+        elif action == cls.ROLL_DICE:
+            return RollDice()
         elif action == cls.START_GAME:
             return StartGame()
         elif action == cls.START_GAME_PROPER:
