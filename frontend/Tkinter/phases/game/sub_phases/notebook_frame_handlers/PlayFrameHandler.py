@@ -7,23 +7,34 @@ from config import config
 from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHandler import BaseFrameHandler
+from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrame import CardFrame
+from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLabel import CardFrameLabel
 
 class PlayFrameHandler(BaseFrameHandler):
     def setup(self):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
+        self.card_frames = {}
         self.card_num_label_texts = {}
-        self.resource_card_frame = self.create_resource_card_frame(self.frame)
-        self.resource_card_frame.grid(row = 0, column = 0, sticky = 'ew')
-        self.development_card_frame = self.create_development_card_frame(self.frame)
+        self.resource_cards_frame = self.create_resource_cards_frame(self.frame)
+        self.resource_cards_frame.grid(row = 0, column = 0, sticky = 'ew')
+        self.development_card_frame = self.create_development_cards_frame(self.frame)
         self.development_card_frame.grid(row = 1, column = 0, sticky = 'ew')
         self.movable_piece_frame = self.create_movable_piece_frame(self.frame)
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.action_frame = self.create_action_frame(self.frame)
         self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
         self.frame.grid_rowconfigure(3, weight = 1)
+    
+    def enable(self):
+        for title, card_frames in self.card_frames.items():
+            for type, card_frame in card_frames.items():
+                card_frame.configure()
 
-    def create_card_frame(self, where, title, iterable):
+    def disable(self):
+        pass
+
+    def create_cards_frame(self, where, title, iterable):
         self.root.update_idletasks()
         frame_width = where.master.master.winfo_width() ### Get width of inner frame middle right
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
@@ -33,12 +44,14 @@ class PlayFrameHandler(BaseFrameHandler):
         outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
         outer_frame_bottom.pack(side = tkinter.TOP)
         outer_frame.grid_rowconfigure(0, weight = 1)
+        self.card_frames[title] = {}
         self.card_num_label_texts[title] = {}
         for i, tup in enumerate(iterable):
             outer_frame_bottom.grid_columnconfigure(i, weight = 1, uniform = 'catan')
-            inner_frame = tkinter.Frame(outer_frame_bottom, background = tup.color, highlightbackground = 'black', highlightthickness = 3)
+            inner_frame = CardFrame(outer_frame_bottom, highlightbackground = '#808080', highlightthickness = 3)
+            self.card_frames[title][tup.name] = inner_frame
             type_label_text = tup.name.title().replace('_', ' ')
-            label_partial = partial(tkinter.Label, inner_frame, background = tup.color, foreground = ColorUtils.get_fg_from_bg(tup.color), width = round(frame_width / 50), wraplength = round(frame_width / 8))
+            label_partial = partial(CardFrameLabel, master = inner_frame, background = tup.color, width = round(frame_width / 50), wraplength = round(frame_width / 8))
             type_label = label_partial(height = 1, text = type_label_text)
             num_label_text = tkinter.StringVar()
             num_label_text.set('0')
@@ -50,20 +63,20 @@ class PlayFrameHandler(BaseFrameHandler):
             inner_frame.grid(row = 0, column = i, padx = 2.5)
         return outer_frame
     
-    def create_resource_card_frame(self, where):
+    def create_resource_cards_frame(self, where):
         iterable = [
             namedtuple('ResourceCard', ['name', 'color'])(k, v['color'])
             for k, v in config['resource_types'].items()
             if k != 'desert'
         ]
-        return self.create_card_frame(where, 'Resource cards', iterable)
+        return self.create_cards_frame(where, 'Resource cards', iterable)
     
-    def create_development_card_frame(self, where):
+    def create_development_cards_frame(self, where):
         iterable = [
             namedtuple('DevelopmentCard', ['name', 'color'])(k, v['color'])
             for k, v in config['development_card_types'].items()
         ]
-        return self.create_card_frame(where, 'Development cards', iterable)
+        return self.create_cards_frame(where, 'Development cards', iterable)
     
     def create_movable_piece_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)

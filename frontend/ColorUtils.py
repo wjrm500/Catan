@@ -1,5 +1,5 @@
 from collections import namedtuple
-from colorsys import rgb_to_hls, hls_to_rgb
+from colorsys import rgb_to_hls, hls_to_rgb, hsv_to_rgb, rgb_to_hsv
 from PIL import ImageColor
 
 class ColorUtils:
@@ -46,6 +46,16 @@ class ColorUtils:
         return 0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b
     
     @classmethod
-    def get_fg_from_bg(cls, hex):
+    def get_fg_from_bg(cls, hex, light_fg = None, dark_fg = None):
         luminance = cls.get_luminance(hex)
-        return '#000000' if luminance > (255 / 2) else '#FFFFFF'
+        return dark_fg or '#000000' if luminance > (255 / 2) else light_fg or '#FFFFFF'
+    
+    @classmethod
+    def desaturate_hex(cls, hex, factor):
+        rgb = cls.hex_to_rgb(hex)
+        normalised_rgb = tuple(map(lambda x: x / 256, rgb))
+        hsv = rgb_to_hsv(*normalised_rgb)
+        desaturated_hsv = (hsv[0], hsv[1] * (1 - factor), hsv[2])
+        desaturated_rgb = hsv_to_rgb(*desaturated_hsv)
+        denormalised_rgb = tuple(map(lambda x: int(x * 256), desaturated_rgb))
+        return cls.rgb_to_hex(denormalised_rgb)
