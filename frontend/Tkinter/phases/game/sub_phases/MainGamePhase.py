@@ -6,6 +6,7 @@ from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.ChatFrameHa
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.HistoryFrameHandler import HistoryFrameHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.PlayFrameHandler import PlayFrameHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.StatusFrameHandler import StatusFrameHandler
+from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class MainGamePhase(GamePhase):
     def update_active_player_index(self):
@@ -15,6 +16,10 @@ class MainGamePhase(GamePhase):
     
     def setup_inner_frame_top_right(self):
         super().setup_inner_frame_top_right('MAIN GAME PHASE')
+    
+    def setup_inner_frame_middle_left(self):
+        canvas_mode = HexagonRendering.CANVAS_MODE_DEFAULT
+        return super().setup_inner_frame_middle_left(canvas_mode)
     
     def setup_inner_frame_middle_right(self):
         self.notebook = ttk.Notebook(self.inner_frame_middle_right)

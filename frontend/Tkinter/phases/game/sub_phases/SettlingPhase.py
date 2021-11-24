@@ -5,6 +5,7 @@ from frontend.ColorUtils import ColorUtils
 from frontend.GeneralUtils import GeneralUtils
 from frontend.Tkinter.phases.game.GamePhase import GamePhase
 from frontend.Tkinter.phases.game.sub_phases.MainGamePhase import MainGamePhase
+from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class SettlingPhase(GamePhase):
     def __init__(self, chaperone):
@@ -26,7 +27,11 @@ class SettlingPhase(GamePhase):
     def setup_inner_frame_top_right(self):
         super().setup_inner_frame_top_right('SETTLING PHASE')
     
-    def setup_inner_frame_middle_right(self): ### Specific to settling phase (the rest isn't)
+    def setup_inner_frame_middle_left(self):
+        canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT if self.client_active() else HexagonRendering.CANVAS_MODE_DISABLED
+        return super().setup_inner_frame_middle_left(canvas_mode)
+    
+    def setup_inner_frame_middle_right(self):
         self.text_area = tkinter.scrolledtext.ScrolledText(self.inner_frame_middle_right, font = ('Arial', 12), padx = 10, pady = 10, wrap = 'word', background = ColorUtils.lighten_hex(self.BG_COLOR, 0.2))
         self.text_area.pack(padx = 10, pady = 10)
         self.text_area.config(state = 'normal')

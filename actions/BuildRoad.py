@@ -53,7 +53,12 @@ class BuildRoad(Action):
             text_area.insert('end', f'\n\n{text_to_insert}')
             self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
             if self.chaperone.main:
+                self.game_phase.instruction_text.set('Press the "Proceed" button!')
+                self.game_phase.instruction.configure({'background': '#90EE90'}) ### LightGreen
                 self.game_phase.activate_button()
+            else:
+                self.game_phase.instruction_text.set('Please wait for the game to begin...')
+                self.game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral
         else:
             ### Round X commencing...
             at_start = self.game_phase.active_player_index == 0

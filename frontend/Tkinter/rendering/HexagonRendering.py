@@ -144,7 +144,7 @@ class HexagonRendering:
             self.handle_build_road_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_BUILD_SETTLEMENT:
             self.handle_build_settlement_motion(event_x, event_y)
-        elif self.canvas_mode == self.CANVAS_MODE_DISABLED:
+        elif self.canvas_mode in (self.CANVAS_MODE_DISABLED, self.CANVAS_MODE_DEFAULT):
             pass
     
     def handle_leave(self, event):

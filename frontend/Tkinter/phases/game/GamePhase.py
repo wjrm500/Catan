@@ -86,12 +86,12 @@ class GamePhase(Phase, abc.ABC):
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
         label = tkinter.Label(self.inner_frame_top_right, text = phase_name, font = ('Arial', 12), padx = 5, pady = 5, background = self.BG_COLOR)
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
-        
-    def setup_inner_frame_middle_left(self):
+    
+    def setup_inner_frame_middle_left(self, canvas_mode):
         self.canvas = tkinter.Canvas(self.inner_frame_middle_left, background = 'lightblue', bd = 0, highlightthickness = 0)
         self.canvas.pack(expand = True)
         self.hexagon_rendering = HexagonRendering(self)
-        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT if self.client_active() else HexagonRendering.CANVAS_MODE_DISABLED
+        self.hexagon_rendering.canvas_mode = canvas_mode
     
     @abc.abstractmethod
     def setup_inner_frame_middle_right(self): ### Specific to settling phase (the rest isn't)
