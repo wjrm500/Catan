@@ -23,14 +23,17 @@ class PlayFrameHandler(BaseFrameHandler):
         self.movable_piece_frame = self.create_movable_piece_frame(self.frame)
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.action_frame = self.create_action_frame(self.frame)
+        self.action_cost_frame = self.create_action_cost_frame(self.frame)
         if self.phase.client_active():
             self.enable()
     
     def enable(self):
+        ### Probably don't actually want to enable / disable card frames just based on whether user is active - should be based on whether user has item
         for card_frames in self.card_frames.values():
             for card_frame in card_frames.values():
                 card_frame.enable()
-        self.action_frame.grid(row = 3, column = 0, sticky = 'nsew')
+        self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
+        self.action_cost_frame.grid(row = 4, column = 0, sticky = 'ew')
 
     def disable(self):
         for card_frames in self.card_frames.values():
@@ -101,15 +104,12 @@ class PlayFrameHandler(BaseFrameHandler):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
         inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
-        columns = ['action', 'cost']
-        self.action_tree = ttk.Treeview(inner_frame, columns = columns, show = 'headings')
+        self.action_tree = ttk.Treeview(inner_frame, columns = ['action'], show = 'headings', height = 5)
         self.action_tree.tag_configure('odd', background = Phase.BG_COLOR)
         self.action_tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
         self.action_tree.tag_configure('disabled', foreground = 'grey')
         self.action_tree.tag_configure('enabled', foreground = 'black')
-        self.action_tree.column('#1', width = 180, stretch = False)
         self.action_tree.heading('action', text = 'Action', anchor = tkinter.W)
-        self.action_tree.heading('cost', text = 'Cost', anchor = tkinter.W)
         self.fill_action_tree()
         self.action_tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
         scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = self.action_tree.yview, style = 'My.Vertical.TScrollbar')
@@ -117,17 +117,40 @@ class PlayFrameHandler(BaseFrameHandler):
         scrollbar.pack(fill = 'y', side = tkinter.LEFT)
         return outer_frame
     
+    def create_action_cost_frame(self, where):
+        outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
+        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
+        inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
+        inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
+        self.action_cost = tkinter.StringVar()
+        self.action_cost.set('Hover over an action to see how much it costs!')
+        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
+        cost_label = tkinter.Label(inner_frame, textvariable = self.action_cost, background = darker_blue)
+        cost_label.pack()
+        return outer_frame
+    
     def fill_action_tree(self):
         self.action_tree.delete(*self.action_tree.get_children())
         for i, (action_const, action_data) in enumerate(config['actions'].items()):
-            cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action_data['cost'].values() for k, v in v.items()])
             even_tag = 'even' if i % 2 == 0 else 'odd'
             enabled_tag = 'enabled' if self.player.can_afford(action_const) else 'disabled'
-            self.action_tree.insert('', tkinter.END, iid = action_const, text = action_const, values = (action_data['name'], cost_text), tags = (even_tag, enabled_tag))
+            self.action_tree.insert('', tkinter.END, iid = action_const, text = action_const, values = (action_data['name'],), tags = (even_tag, enabled_tag))
     
     def motion_handler(self, event):
         item = self.action_tree.identify('item', event.x, event.y)
         item = self.action_tree.item(item)
         action, tags = item['text'], item['tags']
         self.root.configure({'cursor': Phase.CURSOR_HAND if 'enabled' in tags else Phase.CURSOR_DEFAULT})
+        if action:
+            self.show_action_cost(action)
         # self.action_tree.item(action, tags = ('enabled'))
+    
+    def leave_handler(self, event):
+        self.root.configure({'cursor': Phase.CURSOR_DEFAULT})
+        self.action_cost.set('Hover over an action to see how much it costs!')
+    
+    def show_action_cost(self, action):
+        action_config = config['actions'][action]
+        cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action_config['cost'].values() for k, v in v.items()])
+        cost_text = f'Cost: {cost_text}'
+        self.action_cost.set(cost_text)
