@@ -23,15 +23,20 @@ class PlayFrameHandler(BaseFrameHandler):
         self.movable_piece_frame = self.create_movable_piece_frame(self.frame)
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.action_frame = self.create_action_frame(self.frame)
-        self.action_frame.grid(row = 3, column = 0, sticky = 'nsew')
+        if self.phase.client_active():
+            self.enable()
     
     def enable(self):
-        for title, card_frames in self.card_frames.items():
-            for type, card_frame in card_frames.items():
-                card_frame.configure()
+        for card_frames in self.card_frames.values():
+            for card_frame in card_frames.values():
+                card_frame.enable()
+        self.action_frame.grid(row = 3, column = 0, sticky = 'nsew')
 
     def disable(self):
-        pass
+        for card_frames in self.card_frames.values():
+            for card_frame in card_frames.values():
+                card_frame.disable()
+        self.action_frame.grid_forget()
 
     def create_cards_frame(self, where, title, iterable):
         self.root.update_idletasks()
