@@ -3,10 +3,10 @@ import copy
 import random
 import string
 
-from .Distributor import Distributor
-from .drawing.HexagonDrawing import HexagonDrawing
-from ..objects.board.Port import Port
-from ..objects.cards.ResourceCard import ResourceCard
+from backend.mechanics.Distributor import Distributor
+from backend.mechanics.drawing.HexagonDrawing import HexagonDrawing
+from backend.objects.board.Port import Port
+from backend.objects.cards.ResourceCard import ResourceCard
 
 DiceRoll = namedtuple('DiceRoll', ['roll_1', 'roll_2', 'total', 'event_text'])
 
@@ -43,6 +43,7 @@ class Game:
         self.assign_resource_types_to_hexagons()
         self.assign_roll_nums_to_hexagons()
         self.assign_ports_to_coast_nodes()
+        self.place_robber_on_desert_hex()
     
     def setup_cards(self):
         self.resource_cards = {
@@ -121,6 +122,11 @@ class Game:
             )[0]
             if iterator >= len(coast_nodes) - 1:
                 break
+        
+    def place_robber_on_desert_hex(self):
+        desert_hexes = [hexagon for hexagon in self.distributor.hexagons if hexagon.resource_type == 'desert'] ### There may be more than one desert hex on larger boards
+        desert_hex = random.choice(desert_hexes)
+        self.distributor.robber.place_on_hexagon(desert_hex)
     
     def randomise_player_order_and_assign_colors(self):
         random.shuffle(self.players)

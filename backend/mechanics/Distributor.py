@@ -1,6 +1,7 @@
 from backend.objects.board.Port import Port
 from backend.objects.movable_pieces.City import City
 from backend.objects.movable_pieces.Road import Road
+from backend.objects.movable_pieces.Robber import Robber
 from backend.objects.movable_pieces.Settlement import Settlement
 from ..objects.board.Hexagon import Hexagon
 from ..objects.board.Line import Line
@@ -28,6 +29,7 @@ class Distributor:
         self.ports = []
         self.roads = []
         self.settlements = []
+        self.robber = Robber()
     
     def get_city(self, player):
         city = City(player)

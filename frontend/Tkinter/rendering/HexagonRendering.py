@@ -21,6 +21,7 @@ class HexagonRendering:
     CT_OBJ_NODE = 'ct_node'
     CT_OBJ_PORT = 'ct_port'
     CT_OBJ_ROAD = 'ct_road'
+    CT_OBJ_ROBBER = 'ct_robber'
     CT_OBJ_SETTLEMENT = 'ct_settlement'
 
     ### Canvas object constants
