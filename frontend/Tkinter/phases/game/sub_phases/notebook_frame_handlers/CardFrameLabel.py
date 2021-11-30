@@ -8,7 +8,7 @@ class CardFrameLabel(tkinter.Label):
         self.disabled_background = ColorUtils.desaturate_hex(self.enabled_background, 0.99)
         self.master = kwargs.get('master')
         kwargs['background'] = self.disabled_background ### To default to disabled background
-        kwargs['foreground'] = ColorUtils.get_fg_from_bg(self.enabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
+        kwargs['foreground'] = ColorUtils.get_fg_from_bg(self.disabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
         super().__init__(*args, **kwargs)
     
     def enable(self):
@@ -21,6 +21,6 @@ class CardFrameLabel(tkinter.Label):
     def disable(self):
         self.configure(
             background = self.disabled_background,
-            foreground = ColorUtils.get_fg_from_bg(self.enabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
+            foreground = ColorUtils.get_fg_from_bg(self.disabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
         )
         self.master.configure(highlightbackground = '#808080')
