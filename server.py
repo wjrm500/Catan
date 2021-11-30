@@ -85,7 +85,7 @@ class Server:
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
                     dice_roll = game.roll_dice()
-                    output_data = {'action': action, 'dice_roll': dice_roll, 'player': player}
+                    output_data = {'action': action, 'dice_roll': dice_roll, 'player': player, 'players': game.players}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.START_GAME:
                     game_code = input_data['game_code']

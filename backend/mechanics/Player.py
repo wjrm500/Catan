@@ -12,7 +12,10 @@ class Player(Incrementable, Unserializable):
         self.client_address = client_address
         self.longest_road = False
         self.largest_army = False
-        self.hand = []
+        self.hand = {
+            'development': [],
+            'resource': []
+        }
     
     def set_color(self, color):
         self.color = color
@@ -27,19 +30,21 @@ class Player(Incrementable, Unserializable):
     def can_afford_build_road(self):
         action_config = config['actions'][ActionFactory.BUILD_ROAD]
         resource_card_dict = action_config['cost']['resource_cards']
-        return self.resource_cards_in_hand(resource_card_dict)
+        return self.can_afford(resource_card_dict)
     
     def can_afford_build_settlement(self):
         action_config = config['actions'][ActionFactory.BUILD_SETTLEMENT]
         resource_card_dict = action_config['cost']['resource_cards']
-        return self.resource_cards_in_hand(resource_card_dict)
+        return self.can_afford(resource_card_dict)
     
-    def resource_cards_in_hand(self, resource_card_dict):
+    def can_afford(self, resource_card_dict):
         resource_card_counter = Counter(resource_card_dict)
-        card_types_in_hand = list(map(lambda card: card.type, self.hand))
-        hand_counter = Counter(card_types_in_hand)
-        hand_counter.subtract(resource_card_counter) ### Pretty sure this won't work
+        hand_counter = Counter([resource_card.type for resource_card in self.hand['resource']])
+        hand_counter.subtract(resource_card_counter)
         return bool(list(filter(lambda x: x > 0, hand_counter.values())))
     
     def unserializable_properties(self):
         return ['game']
+    
+    def num_of_resource_in_hand(self, resource):
+        return len([x for x in self.hand['resource'] if x.type == resource])

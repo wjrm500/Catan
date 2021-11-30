@@ -331,6 +331,7 @@ class HexagonRendering:
                 self.init_render(hexagon)
     
     ### TODO: Below methods crying out for merge
+
     def ct_line_tag(self, line):
         return '{}.{}'.format(self.CT_OBJ_LINE, line.id)
     

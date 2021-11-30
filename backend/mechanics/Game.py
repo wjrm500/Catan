@@ -8,7 +8,7 @@ from backend.mechanics.drawing.HexagonDrawing import HexagonDrawing
 from backend.objects.board.Port import Port
 from backend.objects.cards.ResourceCard import ResourceCard
 
-DiceRoll = namedtuple('DiceRoll', ['roll_1', 'roll_2', 'total', 'event_text'])
+DiceRoll = namedtuple('DiceRoll', ['roll_1', 'roll_2', 'total', 'event_text', 'proceed_to_action_selection'])
 
 class Game:
     def __init__(self, config, num_hexagons = 19):
@@ -70,8 +70,7 @@ class Game:
         for player in self.players:
             player.cities = [self.distributor.get_city(player) for _ in range(round(self.num_hexagons * 4 / 19))]
             player.roads = [self.distributor.get_road(player) for _ in range(round(self.num_hexagons * 15 / 19))]
-            # player.settlements = [self.distributor.get_settlement(player) for _ in range(round(self.num_hexagons * 5 / 19))]
-            player.settlements = [self.distributor.get_settlement(player) for _ in range(round(self.num_hexagons * 50 / 19))] ### TODO: Revert to line above - this one for testing
+            player.settlements = [self.distributor.get_settlement(player) for _ in range(round(self.num_hexagons * 5 / 19))]
 
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])
@@ -139,6 +138,10 @@ class Game:
         total = dice_roll_1 + dice_roll_2
         self.dice_rolls.append(total)
         text_events = []
+        # bounties_gained = {
+        #     player: {resource_type: 0 for resource_type in self.config['resource_types'].keys()}
+        #     for player in self.players
+        # }
         for hexagon in self.distributor.hexagons:
             if total == hexagon.roll_num:
                 ### Look ahead to make sure the bank has enough resource cards to pay out full bounty to all players
@@ -152,11 +155,12 @@ class Game:
                     if (settlement := node.settlement):
                         player = settlement.player
                         bounty = 2 if settlement.city else 1
-                        text_event = f'{player.name} gained {bounty} {hexagon.resource_type}'
+                        # bounties_gained[player][hexagon.resource_type] += bounty
+                        text_event = f'{player.name} gained {bounty} {hexagon.resource_type}' ### TODO: Change so instead of saying e.g. 'Will gained 1 lumber!\nWill gained 1 lumber!' it would say 'Will gained 2 lumber!'
                         if not hexagon.robber:
                             for _ in range(bounty):
                                 resource_card = resource_cards.pop()
-                                node.settlement.player.hand.append(resource_card)
+                                node.settlement.player.hand['resource'].append(resource_card)
                             text_event += '!'
                         else:
                             text_event += '... but the robber stole it!'
@@ -164,4 +168,5 @@ class Game:
         if not text_events:
             text_events = ['Nobody gained anything!']
         event_text = '\n'.join(text_events)
-        return DiceRoll(dice_roll_1, dice_roll_2, total, event_text)
+        proceed_to_action_selection = len(self.dice_rolls) % 2 == 0 ### If total dice rolls is even after this dice roll then it's time for the active player to proceed to action selection
+        return DiceRoll(dice_roll_1, dice_roll_2, total, event_text, proceed_to_action_selection)

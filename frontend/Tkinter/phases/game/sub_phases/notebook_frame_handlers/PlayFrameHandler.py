@@ -1,6 +1,5 @@
 from collections import namedtuple
 from functools import partial
-import random
 import tkinter
 from tkinter import ttk
 
@@ -19,29 +18,34 @@ class PlayFrameHandler(BaseFrameHandler):
 
     def dice_roll_setup(self):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        dice_roll_container = tkinter.Frame(self.frame, background = darker_blue, height = 200, width = 300)
+        self.dice_roll_container = tkinter.Frame(self.frame, background = darker_blue, height = 200, width = 300)
 
         self.dice_roll_text = tkinter.StringVar()
         self.dice_roll_text.set('')
-        dice_roll_label = tkinter.Label(dice_roll_container, textvariable = self.dice_roll_text, background = darker_blue, font = ('Arial', 24))
-        dice_roll_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.05)
+        dice_roll_label = tkinter.Label(self.dice_roll_container, textvariable = self.dice_roll_text, background = darker_blue, font = ('Arial', 24))
+        dice_roll_label.place(in_ = self.dice_roll_container, relx = 0.05, rely = 0.05)
 
         self.dice_roll_event_text = tkinter.StringVar()
         self.dice_roll_event_text.set('')
-        dice_roll_event_label = tkinter.Label(dice_roll_container, textvariable = self.dice_roll_event_text, background = darker_blue, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 300)
-        dice_roll_event_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.25)
+        dice_roll_event_label = tkinter.Label(self.dice_roll_container, textvariable = self.dice_roll_event_text, background = darker_blue, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 275)
+        dice_roll_event_label.place(in_ = self.dice_roll_container, relx = 0.05, rely = 0.25)
 
-        instruct_label = tkinter.Label(dice_roll_container, text = 'Roll dice', background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
-        instruct_label.place(in_ = dice_roll_container, relx = 0.05, rely = 0.685)
-        dice_roll_container.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
-        instruct_label.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
-        instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
-        instruct_label.bind('<Button-1>', self.roll_dice)
-    
-    def roll_dice(self, event):
-        self.phase.chaperone.roll_dice()
+        self.instruct_label_text = tkinter.StringVar()
+        self.instruct_label_text.set('Roll dice')
+        self.instruct_label = tkinter.Label(self.dice_roll_container, textvariable = self.instruct_label_text, background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
+        self.instruct_label.place(in_ = self.dice_roll_container, relx = 0.05, rely = 0.685)
+        self.dice_roll_container.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
+        self.instruct_label.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
+        self.instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
+        self.instruct_label.bind('<Button-1>', self.roll_dice)
+
+    def transition_to_action_selection(self, event):
+        self.dice_roll_container.destroy()
+        self.action_selection_setup()
+        self.action_tree.bind('<Motion>', self.action_tree_motion_handler)
+        self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
         
-    def post_dice_roll_setup(self):
+    def action_selection_setup(self):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
         self.card_frames = {}
@@ -57,6 +61,9 @@ class PlayFrameHandler(BaseFrameHandler):
         if self.phase.client_active():
             self.enable()
     
+    def roll_dice(self, event):
+        self.phase.chaperone.roll_dice()
+    
     def enable(self):
         ### Probably don't actually want to enable / disable card frames just based on whether user is active - should be based on whether user has item
         for card_frames in self.card_frames.values():
@@ -71,28 +78,29 @@ class PlayFrameHandler(BaseFrameHandler):
                 card_frame.disable()
         self.action_frame.grid_forget()
 
-    def create_cards_frame(self, where, title, iterable):
+    def create_cards_frame(self, where, type, iterable):
         self.root.update_idletasks()
         frame_width = where.master.master.winfo_width() ### Get width of inner frame middle right
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        outer_frame_top = tkinter.Label(outer_frame, text = title, anchor = tkinter.W, background = darker_blue)
+        outer_frame_top = tkinter.Label(outer_frame, text = f'{type.upper()} cards', anchor = tkinter.W, background = darker_blue)
         outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
         outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
         outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
         outer_frame.grid_rowconfigure(0, weight = 1)
-        self.card_frames[title] = {}
-        self.card_num_label_texts[title] = {}
+        self.card_frames[type] = {}
+        self.card_num_label_texts[type] = {}
         for i, tup in enumerate(iterable):
             outer_frame_bottom.grid_columnconfigure(i, weight = 1, uniform = 'catan')
             inner_frame = CardFrame(outer_frame_bottom, highlightbackground = '#808080', highlightthickness = 3)
-            self.card_frames[title][tup.name] = inner_frame
+            self.card_frames[type][tup.name] = inner_frame
             type_label_text = tup.name.title().replace('_', ' ')
             label_partial = partial(CardFrameLabel, master = inner_frame, background = tup.color, width = round(frame_width / 50), wraplength = round(frame_width / 8))
             type_label = label_partial(height = 1, text = type_label_text)
             num_label_text = tkinter.StringVar()
-            num_label_text.set('0')
-            self.card_num_label_texts[title][tup.name] = num_label_text
+            num_of_thing = self.phase.chaperone.player.num_of_resource_in_hand(tup.name)
+            num_label_text.set(num_of_thing)
+            self.card_num_label_texts[type][tup.name] = num_label_text
             num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, textvariable = num_label_text)
             type_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
             num_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
@@ -106,14 +114,14 @@ class PlayFrameHandler(BaseFrameHandler):
             for k, v in config['resource_types'].items()
             if k != 'desert'
         ]
-        return self.create_cards_frame(where, 'Resource cards', iterable)
+        return self.create_cards_frame(where, 'resource', iterable)
     
     def create_development_cards_frame(self, where):
         iterable = [
             namedtuple('DevelopmentCard', ['name', 'color'])(k, v['color'])
             for k, v in config['development_card_types'].items()
         ]
-        return self.create_cards_frame(where, 'Development cards', iterable)
+        return self.create_cards_frame(where, 'development', iterable)
     
     def create_movable_piece_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
@@ -166,7 +174,7 @@ class PlayFrameHandler(BaseFrameHandler):
             enabled_tag = 'enabled' if self.player.can_afford(action_const) else 'disabled'
             self.action_tree.insert('', tkinter.END, iid = action_const, text = action_const, values = (action_data['name'],), tags = (even_tag, enabled_tag))
     
-    def motion_handler(self, event):
+    def action_tree_motion_handler(self, event):
         item = self.action_tree.identify('item', event.x, event.y)
         item = self.action_tree.item(item)
         action, tags = item['text'], item['tags']
@@ -174,7 +182,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.show_action_cost(action)
         # self.action_tree.item(action, tags = ('enabled'))
     
-    def leave_handler(self, event):
+    def action_tree_leave_handler(self, event):
         self.root.configure({'cursor': Phase.CURSOR_DEFAULT})
         self.action_cost.set(self.default_action_cost_text())
     

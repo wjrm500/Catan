@@ -8,6 +8,12 @@ class RollDice(Action):
         self.chaperone = chaperone
         self.game_phase = self.chaperone.current_phase
         self.data = data
+
+        ### Update players client side (any player's hand might have changed)
+        for player in data['players']:
+            if self.chaperone.player.id == player.id:
+                self.chaperone.player.__dict__ = player.__dict__
+
         self.update_gui()
     
     def update_gui(self):
@@ -19,3 +25,8 @@ class RollDice(Action):
             play_frame_handler = self.game_phase.notebook_frame_handlers['play']
             play_frame_handler.dice_roll_text.set(display_text)
             play_frame_handler.dice_roll_event_text.set(DiceRoll.event_text)
+            if DiceRoll.proceed_to_action_selection:
+                play_frame_handler.instruct_label_text.set('Take actions')
+                play_frame_handler.instruct_label.bind('<Button-1>', play_frame_handler.transition_to_action_selection)
+            else:
+                play_frame_handler.instruct_label_text.set('Roll dice again')
