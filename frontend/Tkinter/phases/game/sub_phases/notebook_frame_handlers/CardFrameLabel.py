@@ -10,9 +10,6 @@ class CardFrameLabel(tkinter.Label):
         kwargs['background'] = self.disabled_background ### To default to disabled background
         kwargs['foreground'] = ColorUtils.get_fg_from_bg(self.enabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
         super().__init__(*args, **kwargs)
-        # self.bind('<Motion>', lambda evt: print(evt.x, evt.y))
-        self.bind('<Button-1>', self.master.enable)
-        self.bind('<Button-2>', self.master.disable)
     
     def enable(self):
         self.configure(

@@ -58,24 +58,25 @@ class PlayFrameHandler(BaseFrameHandler):
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.action_frame = self.create_action_frame(self.frame)
         self.action_cost_frame = self.create_action_cost_frame(self.frame)
+        self.enable_or_disable_cards()
         if self.phase.client_active():
-            self.enable()
+            self.show_action_frame()
+        else:
+            self.hide_action_frame()
     
     def roll_dice(self, event):
         self.phase.chaperone.roll_dice()
     
-    def enable(self):
-        ### Probably don't actually want to enable / disable card frames just based on whether user is active - should be based on whether user has item
+    def enable_or_disable_cards(self):
         for card_frames in self.card_frames.values():
             for card_frame in card_frames.values():
-                card_frame.enable()
+                card_frame.enable_or_disable_cards()
+    
+    def show_action_frame(self):
         self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
         self.action_cost_frame.grid(row = 4, column = 0, sticky = 'ew')
 
-    def disable(self):
-        for card_frames in self.card_frames.values():
-            for card_frame in card_frames.values():
-                card_frame.disable()
+    def hide_action_frame(self):
         self.action_frame.grid_forget()
 
     def create_cards_frame(self, where, type, iterable):

@@ -1,10 +1,12 @@
 import tkinter
 
 class CardFrame(tkinter.Frame):
-    def enable(self, event = None):
-        for child in self.winfo_children():
-            child.enable()
-    
-    def disable(self, event = None):
-        for child in self.winfo_children():
-            child.disable()
+    def enable_or_disable_cards(self, event = None):
+        children = self.winfo_children()
+        num_label = children[-1]
+        enable = int(num_label.cget('text')) > 0
+        for child in children:
+            if enable:
+                child.enable()
+            else:
+                child.disable()
