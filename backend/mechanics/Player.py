@@ -30,18 +30,18 @@ class Player(Incrementable, Unserializable):
     def can_afford_build_road(self):
         action_config = config['actions'][ActionFactory.BUILD_ROAD]
         resource_card_dict = action_config['cost']['resource_cards']
-        return self.can_afford(resource_card_dict)
+        return self.has_resource_cards_in_hand(resource_card_dict)
     
     def can_afford_build_settlement(self):
         action_config = config['actions'][ActionFactory.BUILD_SETTLEMENT]
         resource_card_dict = action_config['cost']['resource_cards']
-        return self.can_afford(resource_card_dict)
+        return self.has_resource_cards_in_hand(resource_card_dict)
     
-    def can_afford(self, resource_card_dict):
+    def has_resource_cards_in_hand(self, resource_card_dict):
         resource_card_counter = Counter(resource_card_dict)
         hand_counter = Counter([resource_card.type for resource_card in self.hand['resource']])
         hand_counter.subtract(resource_card_counter)
-        return bool(list(filter(lambda x: x > 0, hand_counter.values())))
+        return len(resource_card_counter) == len(list(filter(lambda x: x > 0, hand_counter.values())))
     
     def unserializable_properties(self):
         return ['game']

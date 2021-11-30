@@ -146,7 +146,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.action_tree = ttk.Treeview(inner_frame, columns = ['action'], show = 'headings', height = 5)
         self.action_tree.tag_configure('odd', background = Phase.BG_COLOR)
         self.action_tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
-        self.action_tree.tag_configure('disabled', foreground = 'grey')
+        self.action_tree.tag_configure('disabled', foreground = '#808080')
         self.action_tree.tag_configure('enabled', foreground = 'black')
         self.action_tree.heading('action', text = 'Action', anchor = tkinter.W)
         self.fill_action_tree()
