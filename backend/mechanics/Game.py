@@ -124,8 +124,9 @@ class Game:
         
     def place_robber_on_desert_hex(self):
         desert_hexes = [hexagon for hexagon in self.distributor.hexagons if hexagon.resource_type == 'desert'] ### There may be more than one desert hex on larger boards
-        desert_hex = random.choice(desert_hexes)
-        self.distributor.robber.place_on_hexagon(desert_hex)
+        if desert_hexes:
+            desert_hex = random.choice(desert_hexes)
+            self.distributor.robber.place_on_hexagon(desert_hex)
     
     def randomise_player_order_and_assign_colors(self):
         random.shuffle(self.players)

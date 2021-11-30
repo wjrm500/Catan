@@ -83,7 +83,7 @@ class PlayFrameHandler(BaseFrameHandler):
         frame_width = where.master.master.winfo_width() ### Get width of inner frame middle right
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        outer_frame_top = tkinter.Label(outer_frame, text = f'{type.upper()} cards', anchor = tkinter.W, background = darker_blue)
+        outer_frame_top = tkinter.Label(outer_frame, text = f'{type.title()} cards', anchor = tkinter.W, background = darker_blue)
         outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
         outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
         outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
