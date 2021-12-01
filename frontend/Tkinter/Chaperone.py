@@ -96,6 +96,13 @@ class Chaperone:
             'line': line
         }
         self.client.interface.send_data(self.client.socket, data)
+
+    def start_game_proper(self):
+        data = {
+            'action': ActionFactory.START_GAME_PROPER,
+            'game_code': self.game_code
+        }
+        self.client.interface.send_data(self.client.socket, data)
     
     def roll_dice(self):
         data = {
@@ -103,10 +110,10 @@ class Chaperone:
             'game_code': self.game_code
         }
         self.client.interface.send_data(self.client.socket, data)
-
-    def start_game_proper(self):
+    
+    def end_turn(self):
         data = {
-            'action': ActionFactory.START_GAME_PROPER,
+            'action': ActionFactory.END_TURN,
             'game_code': self.game_code
         }
         self.client.interface.send_data(self.client.socket, data)

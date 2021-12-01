@@ -4,7 +4,6 @@ import tkinter.scrolledtext
 from frontend.ColorUtils import ColorUtils
 from frontend.GeneralUtils import GeneralUtils
 from frontend.Tkinter.phases.game.GamePhase import GamePhase
-from frontend.Tkinter.phases.game.sub_phases.MainGamePhase import MainGamePhase
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class SettlingPhase(GamePhase):
@@ -65,7 +64,10 @@ It is {self.active_player().name}'s turn to settle..."""
         self.button_text.set('Proceed')
         self.button['state'] = 'normal'
         self.button.configure({'background': '#90EE90'}) ### LightGreen
+        self.button.bind('<Motion>', lambda evt: self.root.configure(cursor = self.CURSOR_HAND))
+        self.button.bind('<Leave>', lambda evt: self.root.configure(cursor = self.CURSOR_DEFAULT))
         self.button.bind('<Button-1>', self.start_game_proper)
     
     def start_game_proper(self, event):
+        self.root.configure(cursor = self.CURSOR_DEFAULT)
         self.chaperone.start_game_proper()

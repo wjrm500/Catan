@@ -11,7 +11,7 @@ from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 class MainGamePhase(GamePhase):
     def update_active_player_index(self):
         self.active_player_index += 1
-        if self.active_player_index > len(self.players) - 1:
+        if self.active_player_index > len(self.chaperone.players) - 1:
             self.active_player_index = 0
     
     def setup_inner_frame_top_right(self):
@@ -35,13 +35,21 @@ class MainGamePhase(GamePhase):
     
     def frame_handler_by_name(self, notebook, frame_name):
         if frame_name == 'play':
-            frame_handler = PlayFrameHandler(self, notebook)
+            if not hasattr(self, 'play_frame_handler'):
+                self.play_frame_handler = PlayFrameHandler(self, notebook)
+            frame_handler = self.play_frame_handler
         elif frame_name == 'status':
-            frame_handler = StatusFrameHandler(self, notebook)
+            if not hasattr(self, 'status_frame_handler'):
+                self.status_frame_handler = StatusFrameHandler(self, notebook)
+            frame_handler = self.status_frame_handler
         elif frame_name == 'history':
-            frame_handler = HistoryFrameHandler(self, notebook)
+            if not hasattr(self, 'history_frame_handler'):
+                self.history_frame_handler = HistoryFrameHandler(self, notebook)
+            frame_handler = self.history_frame_handler
         elif frame_name == 'chat':
-            frame_handler = ChatFrameHandler(self, notebook)
+            if not hasattr(self, 'chat_frame_handler'):
+                self.chat_frame_handler = ChatFrameHandler(self, notebook)
+            frame_handler = self.chat_frame_handler
         return frame_handler
 
     def play_frame(self):
@@ -76,3 +84,23 @@ class MainGamePhase(GamePhase):
         frame_width = play_frame_handler.get().winfo_width()
         for label in play_frame_handler.labels:
             label.configure({'width': round(frame_width / 50), 'wraplength': round(frame_width / 8)})
+    
+    def activate_button(self):
+        self.button_text.set('End turn')
+        self.button['state'] = 'normal'
+        self.button.configure({'background': '#90EE90'}) ### LightGreen
+        self.button.bind('<Motion>', lambda evt: self.root.configure(cursor = self.CURSOR_HAND))
+        self.button.bind('<Leave>', lambda evt: self.root.configure(cursor = self.CURSOR_DEFAULT))
+        self.button.bind('<Button-1>', self.end_turn)
+    
+    def deactivate_button(self):
+        self.button_text.set('Disabled')
+        self.button['state'] = 'disable'
+        self.button.configure({'background': '#cccccc'}) ### LightGreen
+        self.button.unbind('<Motion>')
+        self.button.unbind('<Leave>')
+        self.button.unbind('<Button-1>')
+    
+    def end_turn(self, event):
+        self.root.configure(cursor = self.CURSOR_DEFAULT)
+        self.chaperone.end_turn()

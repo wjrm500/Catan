@@ -51,7 +51,7 @@ class Server:
                     line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line'].id)
                     road = player.roads.pop()
                     line.add_road(road)
-                    output_data = {'action': action, 'line': line, 'player': player, 'road': road} ### TODO: Player has spent a road
+                    output_data = {'action': action, 'line': line, 'player': player, 'players': game.players, 'road': road} ### TODO: Player has spent a road
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
@@ -69,6 +69,11 @@ class Server:
                     self.games[game.code] = game
                     output_data = {'action': action, 'game_code': game.code}
                     self.broadcast_to_game(game.code, output_data)
+                elif action == ActionFactory.END_TURN:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    self.broadcast_to_game(game.code, {'action': action, 'player': player})
                 elif action == ActionFactory.JOIN_EXISTING_GAME:
                     game_code = input_data['game_code']
                     output_data = {'action': action}

@@ -3,6 +3,7 @@ from actions.BuildRoad import BuildRoad
 from actions.BuildSettlement import BuildSettlement
 from actions.CreateNewGame import CreateNewGame
 from actions.EndGame import EndGame
+from actions.EndTurn import EndTurn
 from actions.JoinExistingGame import JoinExistingGame
 from actions.RemovePlayer import RemovePlayer
 from actions.RollDice import RollDice
@@ -28,6 +29,7 @@ class ActionFactory:
 
     ### Main game-specific actions
     ROLL_DICE = 'ROLL_DICE'
+    END_TURN = 'END_TURN'
 
     UPGRADE_SETTLEMENT = 'UPGRADE_SETTLEMENT'
     BUY_DEVELOPMENT_CARD = 'BUY_DEVELOPMENT_CARD'
@@ -54,6 +56,8 @@ class ActionFactory:
             return RemovePlayer()
         elif action == cls.ROLL_DICE:
             return RollDice()
+        elif action == cls.END_TURN:
+            return EndTurn()
         elif action == cls.START_GAME:
             return StartGame()
         elif action == cls.START_GAME_PROPER:

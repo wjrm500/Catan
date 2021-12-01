@@ -14,11 +14,29 @@ from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLa
 
 class PlayFrameHandler(BaseFrameHandler):
     def setup(self):
+        if self.phase.client_active():
+            self.dice_roll_setup()
+        else:
+            self.action_selection_setup(client_active = False)
+    
+    def start_turn(self):
+        for child in self.frame.winfo_children():
+            child.destroy()
         self.dice_roll_setup()
+    
+    def transition_to_action_selection(self, event):
+        self.dice_roll_container.destroy()
+        self.action_selection_setup(client_active = True)
+    
+    def end_turn(self):
+        for child in self.frame.winfo_children():
+            child.destroy()
+        self.action_selection_setup(client_active = False)
 
     def dice_roll_setup(self):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         self.dice_roll_container = tkinter.Frame(self.frame, background = darker_blue, height = 200, width = 300)
+        self.dice_roll_container.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
 
         self.dice_roll_text = tkinter.StringVar()
         self.dice_roll_text.set('')
@@ -34,18 +52,11 @@ class PlayFrameHandler(BaseFrameHandler):
         self.instruct_label_text.set('Roll dice')
         self.instruct_label = tkinter.Label(self.dice_roll_container, textvariable = self.instruct_label_text, background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
         self.instruct_label.place(in_ = self.dice_roll_container, relx = 0.05, rely = 0.685)
-        self.dice_roll_container.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
         self.instruct_label.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
         self.instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
         self.instruct_label.bind('<Button-1>', self.roll_dice)
-
-    def transition_to_action_selection(self, event):
-        self.dice_roll_container.destroy()
-        self.action_selection_setup()
-        self.action_tree.bind('<Motion>', self.action_tree_motion_handler)
-        self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
         
-    def action_selection_setup(self):
+    def action_selection_setup(self, client_active):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
         self.card_frames = {}
@@ -59,8 +70,11 @@ class PlayFrameHandler(BaseFrameHandler):
         self.action_frame = self.create_action_frame(self.frame)
         self.action_cost_frame = self.create_action_cost_frame(self.frame)
         self.enable_or_disable_cards()
-        if self.phase.client_active():
+        if client_active:
             self.show_action_frame()
+            self.action_tree.bind('<Motion>', self.action_tree_motion_handler)
+            self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
+            self.phase.activate_button()
         else:
             self.hide_action_frame()
     
