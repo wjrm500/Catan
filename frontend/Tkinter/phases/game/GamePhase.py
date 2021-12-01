@@ -38,7 +38,7 @@ class GamePhase(Phase, abc.ABC):
         """
         Level 1 frames
         """
-        self.outer_frame = tkinter.Frame(self.root)
+        self.outer_frame = tkinter.Frame(self.root, background = self.BG_COLOR)
         self.outer_frame.pack(fill = 'both', expand = True)
         self.inner_frame = frame_partial(self.outer_frame)
         self.inner_frame.pack(fill = 'both', expand = True, padx = 10, pady = 10)
