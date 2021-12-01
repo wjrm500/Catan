@@ -1,3 +1,4 @@
+from collections import Counter
 from actions.Action import Action
 
 class RollDice(Action):
@@ -20,9 +21,9 @@ class RollDice(Action):
         dice_face_chars = {1: '\u2680', 2: '\u2681', 3: '\u2682', 4: '\u2683', 5: '\u2684', 6: '\u2685'}
         DiceRoll = self.data['dice_roll']
         is_instigating_client = self.data['player'].id == self.chaperone.player.id
+        play_frame_handler = self.game_phase.notebook_frame_handlers['play']
         if is_instigating_client:
             display_text = f'{dice_face_chars[DiceRoll.roll_1]} + {dice_face_chars[DiceRoll.roll_2]} = {DiceRoll.total}'
-            play_frame_handler = self.game_phase.notebook_frame_handlers['play']
             play_frame_handler.dice_roll_text.set(display_text)
             play_frame_handler.dice_roll_event_text.set(DiceRoll.event_text)
             if DiceRoll.proceed_to_action_selection:
@@ -30,3 +31,9 @@ class RollDice(Action):
                 play_frame_handler.instruct_label.bind('<Button-1>', play_frame_handler.transition_to_action_selection)
             else:
                 play_frame_handler.instruct_label_text.set('Roll dice again')
+        else: ### Update resource cards in card frame
+            d = dict(Counter([resource_card.type for resource_card in self.chaperone.player.hand['resource']]))
+            for resource_type, num_of_resource in d.items():
+                num_label = play_frame_handler.card_num_label_texts['resource'][resource_type]
+                num_label.set(str(num_of_resource))
+            play_frame_handler.enable_or_disable_cards()
