@@ -1,6 +1,7 @@
 import abc
 from config import config
 from functools import partial
+from PIL import Image, ImageTk
 import tkinter
 import tkinter.scrolledtext
 from frontend.ColorUtils import ColorUtils
@@ -82,8 +83,13 @@ class GamePhase(Phase, abc.ABC):
     def setup_inner_frame_top_right(self, phase_name):
         block_under_title = tkinter.Frame(self.inner_frame_top_right, background = 'black', height = 5, bd = 0, highlightthickness = 0)
         block_under_title.pack(side = tkinter.BOTTOM, fill = 'x')
-        label = tkinter.Label(self.inner_frame_top_right, text = 'CATAN', font = ('Arial', 20, 'bold'), background = self.BG_COLOR, foreground = 'goldenrod')
-        label.pack(anchor = tkinter.S, side = tkinter.LEFT)
+        canvas = tkinter.Canvas(self.inner_frame_top_right, background = self.BG_COLOR, width = 120, bd = 0, highlightthickness = 0)
+        canvas.pack(anchor = tkinter.S, side = tkinter.LEFT)
+        image = Image.open(Phase.CATAN_LOGO_IMG_FILEPATH)
+        resized_image = image.resize((120, 36), Image.ANTIALIAS)
+        new_image = ImageTk.PhotoImage(resized_image)
+        self.root.new_image = new_image ### Prevent garbage collection
+        canvas.create_image(0, 0, image = new_image, anchor = tkinter.NW)
         label = tkinter.Label(self.inner_frame_top_right, text = phase_name, font = ('Arial', 12), padx = 5, pady = 5, background = self.BG_COLOR)
         label.pack(anchor = tkinter.S, side = tkinter.LEFT)
     
