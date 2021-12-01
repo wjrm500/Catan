@@ -75,8 +75,8 @@ class BuildRoad(Action):
                 text_to_insert = f"Round {max_settlements + 1} commencing..."
                 text_area.insert('end', f'\n\n{text_to_insert}')
 
-            ### It is X's turn to settle
-            text_to_insert = f"It is {self.game_phase.active_player().name}'s turn to settle..."
+            ### It's X's turn to settle
+            text_to_insert = f"It's {self.game_phase.active_player().name}'s turn to settle..."
             text_area.insert('end', f'\n\n{text_to_insert}')
 
         text_area.yview('end')
