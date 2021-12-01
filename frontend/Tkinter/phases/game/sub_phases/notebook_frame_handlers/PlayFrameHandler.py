@@ -14,19 +14,15 @@ from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLa
 
 class PlayFrameHandler(BaseFrameHandler):
     def setup(self):
+        self.action_selection_setup()
         if self.phase.client_active():
             self.dice_roll_setup()
-        else:
-            self.action_selection_setup()
     
     def start_turn(self):
-        for child in self.frame.winfo_children():
-            child.destroy()
         self.dice_roll_setup()
     
     def transition_to_action_selection(self, event):
-        self.dice_roll_container.destroy()
-        self.action_selection_setup()
+        self.dice_roll_overlay.destroy()
         self.show_action_frame()
     
     def end_turn(self):
@@ -34,23 +30,26 @@ class PlayFrameHandler(BaseFrameHandler):
 
     def dice_roll_setup(self):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        self.dice_roll_container = tkinter.Frame(self.frame, background = darker_blue, height = 200, width = 300)
-        self.dice_roll_container.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
+        self.dice_roll_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
+        self.dice_roll_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
+
+        self.dice_roll_box = tkinter.Frame(self.dice_roll_overlay, background = darker_blue, height = 200, width = 300)
+        self.dice_roll_box.place(in_ = self.dice_roll_overlay, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
 
         self.dice_roll_text = tkinter.StringVar()
         self.dice_roll_text.set('')
-        dice_roll_label = tkinter.Label(self.dice_roll_container, textvariable = self.dice_roll_text, background = darker_blue, font = ('Arial', 24))
-        dice_roll_label.place(in_ = self.dice_roll_container, relx = 0.05, rely = 0.05)
+        dice_roll_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_text, background = darker_blue, font = ('Arial', 24))
+        dice_roll_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.05)
 
         self.dice_roll_event_text = tkinter.StringVar()
         self.dice_roll_event_text.set('')
-        dice_roll_event_label = tkinter.Label(self.dice_roll_container, textvariable = self.dice_roll_event_text, background = darker_blue, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 275)
-        dice_roll_event_label.place(in_ = self.dice_roll_container, relx = 0.05, rely = 0.25)
+        dice_roll_event_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_event_text, background = darker_blue, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 275)
+        dice_roll_event_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.25)
 
         self.instruct_label_text = tkinter.StringVar()
         self.instruct_label_text.set('Roll dice')
-        self.instruct_label = tkinter.Label(self.dice_roll_container, textvariable = self.instruct_label_text, background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
-        self.instruct_label.place(in_ = self.dice_roll_container, relx = 0.05, rely = 0.685)
+        self.instruct_label = tkinter.Label(self.dice_roll_box, textvariable = self.instruct_label_text, background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
+        self.instruct_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.685)
         self.instruct_label.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
         self.instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
         self.instruct_label.bind('<Button-1>', self.roll_dice)
