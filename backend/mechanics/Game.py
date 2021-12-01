@@ -139,10 +139,10 @@ class Game:
         total = dice_roll_1 + dice_roll_2
         self.dice_rolls.append(total)
         text_events = []
-        # bounties_gained = {
-        #     player: {resource_type: 0 for resource_type in self.config['resource_types'].keys()}
-        #     for player in self.players
-        # }
+        bounties_gained = {
+            player: {resource_type: {'won': 0, 'robbed': 0} for resource_type in self.config['resource_types'].keys()}
+            for player in self.players
+        }
         for hexagon in self.distributor.hexagons:
             if total == hexagon.roll_num:
                 ### Look ahead to make sure the bank has enough resource cards to pay out full bounty to all players
@@ -156,16 +156,31 @@ class Game:
                     if (settlement := node.settlement):
                         player = settlement.player
                         bounty = 2 if settlement.city else 1
-                        # bounties_gained[player][hexagon.resource_type] += bounty
-                        text_event = f'{player.name} gained {bounty} {hexagon.resource_type}' ### TODO: Change so instead of saying e.g. 'Will gained 1 lumber!\nWill gained 1 lumber!' it would say 'Will gained 2 lumber!'
+                        bounties_gained[player][hexagon.resource_type]['won'] += bounty
                         if not hexagon.robber:
                             for _ in range(bounty):
                                 resource_card = resource_cards.pop()
                                 node.settlement.player.hand['resource'].append(resource_card)
-                            text_event += '!'
                         else:
-                            text_event += '... but the robber stole it!'
-                        text_events.append(text_event)
+                            bounties_gained[player][hexagon.resource_type]['robbed'] += bounty
+                            
+        for player, v1 in bounties_gained.items():
+            for resource_type, v2 in v1.items():
+                num_won, num_robbed = v2['won'], v2['robbed']
+                if num_won > 0:
+                    text_event = f'{player.name} gained {num_won} {resource_type}'
+                    if num_robbed > 0:
+                        if num_won == num_robbed:
+                            if num_robbed == 1:
+                                text_event += '... but the robber stole it!'
+                            else: 
+                                text_event += '... but the robber stole it all!'
+                        else:
+                            text_event += f'... but the robber stole {num_robbed}!'
+                    else:
+                        text_event += '!'
+                    text_events.append(text_event)
+
         if not text_events:
             text_events = ['Nobody gained anything!']
         event_text = '\n'.join(text_events)
