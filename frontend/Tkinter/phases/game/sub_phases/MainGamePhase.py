@@ -76,7 +76,7 @@ class MainGamePhase(GamePhase):
     
     def run(self):
         self.root.bind('<Configure>', self.resize_card_labels, '+')
-        self.root.bind('<Configure>', lambda evt: self.notebook.config(height = self.inner_frame_middle_right.winfo_height()))
+        self.root.bind('<Configure>', lambda evt: self.notebook.config(height = self.inner_frame_middle_right.winfo_height()), '+')
         super().run()
     
     def resize_card_labels(self, event):

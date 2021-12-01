@@ -32,7 +32,6 @@ class SettlingPhase(GamePhase):
     
     def setup_inner_frame_middle_right(self):
         self.text_area = tkinter.scrolledtext.ScrolledText(self.inner_frame_middle_right, font = ('Arial', 12), padx = 10, pady = 10, wrap = 'word', background = ColorUtils.lighten_hex(self.BG_COLOR, 0.2))
-        self.text_area.pack(padx = 10, pady = 10)
         self.text_area.config(state = 'normal')
         self.text_area.insert('end', self.get_introductory_text())
         self.text_area.yview('end')
@@ -71,3 +70,12 @@ It is {self.active_player().name}'s turn to settle..."""
     def start_game_proper(self, event):
         self.root.configure(cursor = self.CURSOR_DEFAULT)
         self.chaperone.start_game_proper()
+    
+    def run(self):
+        self.root.bind('<Configure>', self.resize_text_area, '+')
+        super().run()
+    
+    def resize_text_area(self, event):
+        self.root.update_idletasks()
+        ifmr = self.inner_frame_middle_right
+        self.text_area.place(in_ = ifmr, x = 10, y = 10, height = ifmr.winfo_height() - 20, width = ifmr.winfo_width() - 20)
