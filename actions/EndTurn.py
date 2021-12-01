@@ -17,6 +17,5 @@ class EndTurn(Action):
             game_phase.instruction.configure({'background': '#90EE90'}) ### LightGreen
         elif chaperone.player.id == data['player'].id:
             frame_handler.end_turn()
-            game_phase.deactivate_button()
             game_phase.instruction_text.set("Please wait for your turn")
             game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral

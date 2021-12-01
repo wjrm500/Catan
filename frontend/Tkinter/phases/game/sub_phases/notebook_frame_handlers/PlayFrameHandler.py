@@ -17,7 +17,7 @@ class PlayFrameHandler(BaseFrameHandler):
         if self.phase.client_active():
             self.dice_roll_setup()
         else:
-            self.action_selection_setup(client_active = False)
+            self.action_selection_setup()
     
     def start_turn(self):
         for child in self.frame.winfo_children():
@@ -26,12 +26,11 @@ class PlayFrameHandler(BaseFrameHandler):
     
     def transition_to_action_selection(self, event):
         self.dice_roll_container.destroy()
-        self.action_selection_setup(client_active = True)
+        self.action_selection_setup()
+        self.show_action_frame()
     
     def end_turn(self):
-        for child in self.frame.winfo_children():
-            child.destroy()
-        self.action_selection_setup(client_active = False)
+        self.hide_action_frame()
 
     def dice_roll_setup(self):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
@@ -56,7 +55,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
         self.instruct_label.bind('<Button-1>', self.roll_dice)
         
-    def action_selection_setup(self, client_active):
+    def action_selection_setup(self):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
         self.card_frames = {}
@@ -70,13 +69,6 @@ class PlayFrameHandler(BaseFrameHandler):
         self.action_frame = self.create_action_frame(self.frame)
         self.action_cost_frame = self.create_action_cost_frame(self.frame)
         self.enable_or_disable_cards()
-        if client_active:
-            self.show_action_frame()
-            self.action_tree.bind('<Motion>', self.action_tree_motion_handler)
-            self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
-            self.phase.activate_button()
-        else:
-            self.hide_action_frame()
     
     def roll_dice(self, event):
         self.phase.chaperone.roll_dice()
@@ -89,9 +81,14 @@ class PlayFrameHandler(BaseFrameHandler):
     def show_action_frame(self):
         self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
         self.action_cost_frame.grid(row = 4, column = 0, sticky = 'ew')
+        self.action_tree.bind('<Motion>', self.action_tree_motion_handler)
+        self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
+        self.phase.activate_button()
 
     def hide_action_frame(self):
         self.action_frame.grid_forget()
+        self.action_cost_frame.grid_forget()
+        self.phase.deactivate_button()
 
     def create_cards_frame(self, where, type, iterable):
         self.root.update_idletasks()
