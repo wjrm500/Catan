@@ -30,4 +30,6 @@ class AddPlayer(Action):
         if self.chaperone.main and len(self.chaperone.players) > 0: ### TODO: Replace with commented line above - temporary change for testing
             lobby_phase.proceed_button = lobby_phase.render_button(where = lobby_phase.inner_frame, text = 'Start game')
             lobby_phase.proceed_button.pack(side = tkinter.TOP, pady = 10)
+            lobby_phase.proceed_button.bind('<Motion>', lambda evt: lobby_phase.root.configure(cursor = lobby_phase.CURSOR_HAND))
+            lobby_phase.proceed_button.bind('<Leave>', lambda evt: lobby_phase.root.configure(cursor = lobby_phase.CURSOR_DEFAULT))
             lobby_phase.proceed_button.bind('<Button-1>', lobby_phase.start_game)

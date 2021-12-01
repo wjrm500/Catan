@@ -32,6 +32,8 @@ class LobbyPhase(SetupPhase):
         self.new_player_input.focus()
 
     def run(self):
+        self.add_new_player_button.bind('<Motion>', lambda evt: self.root.configure(cursor = self.CURSOR_HAND))
+        self.add_new_player_button.bind('<Leave>', lambda evt: self.root.configure(cursor = self.CURSOR_DEFAULT))
         self.add_new_player_button.bind('<Button-1>', self.add_player)
         self.new_player_input.bind('<Return>', self.add_player)
         self.root.mainloop()

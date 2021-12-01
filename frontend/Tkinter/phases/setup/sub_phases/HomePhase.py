@@ -14,7 +14,11 @@ class HomePhase(SetupPhase):
         self.existing_game_button.pack(side = tkinter.RIGHT, padx = 10)
 
     def run(self):
+        self.new_game_button.bind('<Motion>', lambda evt: self.root.configure(cursor = self.CURSOR_HAND))
+        self.new_game_button.bind('<Leave>', lambda evt: self.root.configure(cursor = self.CURSOR_DEFAULT))
         self.new_game_button.bind('<Button-1>', self.create_new_game)
+        self.existing_game_button.bind('<Motion>', lambda evt: self.root.configure(cursor = self.CURSOR_HAND))
+        self.existing_game_button.bind('<Leave>', lambda evt: self.root.configure(cursor = self.CURSOR_DEFAULT))
         self.existing_game_button.bind('<Button-1>', self.join_existing_game)
         self.root.mainloop()
     

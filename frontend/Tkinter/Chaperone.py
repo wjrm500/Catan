@@ -4,6 +4,7 @@ from tkinter import messagebox
 
 from actions.ActionFactory import ActionFactory
 from frontend.Tkinter.Style import Style
+from frontend.Tkinter.phases.Phase import Phase
 
 class Chaperone:
     def __init__(self, client, queue):
@@ -50,6 +51,7 @@ class Chaperone:
             to_destroy = to_destroy or self.current_phase.outer_frame
             to_destroy.destroy()
         self.current_phase = phase(self)
+        self.root.configure(cursor = Phase.CURSOR_DEFAULT)
         self.current_phase.run()
     
     def add_player(self, name):

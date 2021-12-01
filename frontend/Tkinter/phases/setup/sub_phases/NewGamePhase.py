@@ -16,6 +16,8 @@ class NewGamePhase(SetupPhase):
         self.num_hexagons_input.focus()
 
     def run(self):
+        self.submit_button.bind('<Motion>', lambda evt: self.root.configure(cursor = self.CURSOR_HAND))
+        self.submit_button.bind('<Leave>', lambda evt: self.root.configure(cursor = self.CURSOR_DEFAULT))
         self.submit_button.bind('<Button-1>', self.submit_form)
         self.num_hexagons_input.bind('<Return>', self.submit_form)
         self.root.mainloop()
