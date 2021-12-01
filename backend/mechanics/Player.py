@@ -41,7 +41,7 @@ class Player(Incrementable, Unserializable):
         resource_card_counter = Counter(resource_card_dict)
         hand_counter = Counter([resource_card.type for resource_card in self.hand['resource']])
         hand_counter.subtract(resource_card_counter)
-        return len(resource_card_counter) == len(list(filter(lambda x: x > 0, hand_counter.values())))
+        return len(list(filter(lambda x: x < 0, hand_counter.values()))) == 0
     
     def unserializable_properties(self):
         return ['game']
