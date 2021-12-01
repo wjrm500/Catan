@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import Counter, namedtuple
 from functools import partial
 import tkinter
 from tkinter import ttk
@@ -23,6 +23,8 @@ class PlayFrameHandler(BaseFrameHandler):
     
     def transition_to_action_selection(self, event):
         self.dice_roll_overlay.destroy()
+        self.update_resource_cards()
+        self.fill_action_tree()
         self.show_action_frame()
     
     def end_turn(self):
@@ -208,3 +210,10 @@ class PlayFrameHandler(BaseFrameHandler):
     
     def default_action_cost_text(self):
         return 'Hover over an action to see how much it costs!'
+    
+    def update_resource_cards(self):
+        d = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
+        for resource_type, num_of_resource in d.items():
+            num_label = self.card_num_label_texts['resource'][resource_type]
+            num_label.set(str(num_of_resource))
+        self.enable_or_disable_cards()

@@ -1,4 +1,3 @@
-from collections import Counter
 from actions.Action import Action
 
 class RollDice(Action):
@@ -32,8 +31,5 @@ class RollDice(Action):
             else:
                 play_frame_handler.instruct_label_text.set('Roll dice again')
         else: ### Update resource cards in card frame
-            d = dict(Counter([resource_card.type for resource_card in self.chaperone.player.hand['resource']]))
-            for resource_type, num_of_resource in d.items():
-                num_label = play_frame_handler.card_num_label_texts['resource'][resource_type]
-                num_label.set(str(num_of_resource))
-            play_frame_handler.enable_or_disable_cards()
+            play_frame_handler.update_resource_cards()
+            play_frame_handler.fill_action_tree()
