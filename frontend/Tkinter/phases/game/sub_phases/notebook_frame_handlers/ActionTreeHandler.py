@@ -67,9 +67,18 @@ class ActionTreeHandler:
     
     def show_action_cost(self, action):
         if action:
-            action_config = config['actions'][action]
-            cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action_config['cost'].values() for k, v in v.items()])
-            cost_text = f'Cost: {cost_text}'
+            if (cost := config['actions'][action].get('cost')):
+                cost_texts = []
+                if (resources := cost.get('resources')):
+                    resources_text = f'Resources: {", ".join(resources)}'
+                    cost_texts.append(resources_text)
+                if (other := cost.get('other')):
+                    other_text = f'Other: {", ".join(other)}'
+                    cost_texts.append(other_text)
+                cost_text = ' | '.join(cost_texts)
+            else:
+                ### Calculate cost dynamically
+                cost_text = ''
         else:
             cost_text = self.default_action_cost_text()
         self.action_cost.set(cost_text)

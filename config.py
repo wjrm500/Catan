@@ -90,88 +90,50 @@ config = {
         'BUILD_ROAD': {
             'name': 'Build road',
             'cost': {
-                'resource_cards': {
-                    'brick': 1,
-                    'lumber': 1
-                },
-                'other_items': {
-                    'game_token': 1
-                }
+                'resources': ['1 brick', '1 lumber'],
+                'other': ['1 road token', '1 roadworthy line']
             }
         },
         'BUILD_SETTLEMENT': {
             'name': 'Build settlement',
             'cost': {
-                'resource_cards': {
-                    'brick': 1,
-                    'grain': 1,
-                    'lumber': 1,
-                    'wool': 1
-                },
-                'other_items': {
-                    'available_node': 1,
-                    'settlement_token': 1
-                }
+                'resources': ['1 brick', '1 grain', '1 lumber', '1 wool'],
+                'other': ['1 settlement token', '1 settleworthy node']
             }
         },
         'UPGRADE_SETTLEMENT': {
             'name': 'Upgrade settlement to city',
             'cost': {
-                'resource_cards': {
-                    'grain': 2,
-                    'ore': 3
-                },
-                'other_items': {
-                    'available_settlement': 1,
-                    'city_token': 1
-                }
+                'resources': ['2 grain', '3 ore'],
+                'other': ['1 city token', '1 settlement on board']
             }
         },
         'BUY_DEVELOPMENT_CARD': {
             'name': 'Buy a development card',
             'cost': {
-                'resource_cards': {
-                    'grain': 1,
-                    'ore': 1,
-                    'wool': 1
-                },
-                'other_items': {
-                    'development_card_in_deck': 1 ### Maybe just have unlimited
-                }
+                'resources': ['1 grain', '1 ore', '1 wool'],
+                'other': ['1 development card in deck']
             }
         },
         'USE_DEVELOPMENT_CARD': {
             'name': 'Use a development card',
             'cost': {
-                'other_items': {
-                    'development_card_in_hand': 1
-                }
+                'other': ['1 development card in hand']
             }
         },
         'TRADE_WITH_BANK': {
-            'name': 'Trade with the bank',
-            'cost': {
-                'other_items': {
-                    'resource_card_in_hand': 'variable'
-                }
-            }
+            'name': 'Trade with the bank'
         },
         'SWAP_CARDS': {
             'name': 'Swap two cards with opponent',
             'cost': {
-                'other_items': {
-                    'game_token': 'variable', ### 2 if winning else 1
-                    'resource_card_in_hand': 2,
-                    'resource_card_in_opponent_hand': 2
-                }
+                'other': ['2 resource cards in hand', "2 resource cards in opponent's hand", '1 game token'] ### Variable num. of game tokens
             }
         },
         'MOVE_ROBBER_TO_DESERT': {
             'name': 'Move robber to desert hex',
             'cost': {
-                'other_items': {
-                    'game_token': 'variable' ### 2 if winning else 1
-                }
+                'other': ['1 game token'] ### Variable num. of game tokens
             }
         }
     }

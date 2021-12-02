@@ -1,8 +1,6 @@
 from collections import Counter
-from actions.ActionFactory import ActionFactory
 from backend.Incrementable import Incrementable
 from backend.Unserializable import Unserializable
-from config import config
 
 class Player(Incrementable, Unserializable):
     def __init__(self, game, name, client_address):
@@ -21,11 +19,37 @@ class Player(Incrementable, Unserializable):
         self.color = color
     
     def can_afford(self, action):
-        if action not in [ActionFactory.BUILD_ROAD, ActionFactory.BUILD_SETTLEMENT]:
-            return ### Just temporary
-        action_config = config['actions'][action]
-        resource_card_dict = action_config['cost']['resource_cards']
-        return self.has_resource_cards_in_hand(resource_card_dict)
+        if action == 'BUILD_ROAD':
+            return self.can_afford_build_road()
+        elif action == 'BUILD_SETTLEMENT':
+            return self.can_afford_build_settlement()
+        elif action == 'TRADE_WITH_BANK':
+            return self.can_afford_trade_with_bank()
+    
+    def can_afford_build_road(self):
+        resource_card_dict = self.get_resource_card_dict('BUILD_ROAD')
+        has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
+        return has_resource_cards_in_hand and len(self.roads) > 0
+    
+    def can_afford_build_settlement(self):
+        resource_card_dict = self.get_resource_card_dict('BUILD_SETTLEMENT')
+        has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
+        return has_resource_cards_in_hand and len(self.settlements) > 0
+    
+    def can_afford_trade_with_bank(self):
+        port_settlements = [settlement for settlement in self.settlements if settlement.node and settlement.node.port]
+        port_types = set([settlement.port.type for settlement in port_settlements])
+        resources = dict(Counter([resource_card.type for resource_card in self.hand['resource']]))
+        if resources:
+            for port_type in port_types:
+                if resources.get(port_type, 0) >= 2:
+                    return True
+            if 'general' in port_types:
+                if max(resources.values()) >= 3:
+                    return True
+            if max(resources.values()) >= 4:
+                return True
+        return False
     
     def has_resource_cards_in_hand(self, resource_card_dict):
         resource_card_counter = Counter(resource_card_dict)
@@ -39,12 +63,16 @@ class Player(Incrementable, Unserializable):
     def num_of_resource_in_hand(self, resource):
         return len([x for x in self.hand['resource'] if x.type == resource])
     
-    def pay_for_action(self, action):
+    def get_resource_card_dict(self, action):
+        d = {
+            'BUILD_ROAD': {'brick': 1, 'lumber': 1},
+            'BUILD_SETTLEMENT': {'brick': 1, 'grain': 1, 'lumber': 1, 'wool': 1}
+        }
+        return d[action]
+    
+    def subtract_resource_cards_from_hand(self, action):
+        resource_card_dict = self.get_resource_card_dict(action)
         if self.game.started_proper: ### No need to pay for road in settle phase
-            if not self.can_afford(action):
-                raise Exception
-            action_config = config['actions'][action]
-            resource_card_dict = action_config['cost']['resource_cards'].copy()
             marked_for_removal = []
             for resource_card in self.hand['resource']:
                 if resource_card.type in resource_card_dict:
