@@ -24,7 +24,8 @@ class RollDice(Action):
         if is_instigating_client:
             display_text = f'{dice_face_chars[DiceRoll.roll_1]} + {dice_face_chars[DiceRoll.roll_2]} = {DiceRoll.total}'
             play_frame_handler.dice_roll_text.set(display_text)
-            play_frame_handler.dice_roll_event_text.set(DiceRoll.event_text)
+            event_text = '\n'.join(DiceRoll.text_events)
+            play_frame_handler.dice_roll_event_text.set(event_text)
             if DiceRoll.proceed_to_action_selection:
                 play_frame_handler.instruct_label_text.set('Take actions')
                 play_frame_handler.instruct_label.bind('<Button-1>', play_frame_handler.transition_to_action_selection)
@@ -33,3 +34,9 @@ class RollDice(Action):
         else:
             play_frame_handler.update_resource_cards()
             play_frame_handler.action_tree_handler.fill_action_tree()
+        text_area = self.game_phase.notebook_frame_handlers['history'].text_area
+        text_area.config(state = 'normal')
+        event_text = ' '.join(DiceRoll.text_events)
+        text_area.insert('end', f'\n\n{self.data["player"].name} rolled a {DiceRoll.total}. {event_text}')
+        text_area.yview('end')
+        text_area.config(state = 'disabled')

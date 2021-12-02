@@ -8,7 +8,7 @@ from backend.mechanics.drawing.HexagonDrawing import HexagonDrawing
 from backend.objects.board.Port import Port
 from backend.objects.cards.ResourceCard import ResourceCard
 
-DiceRoll = namedtuple('DiceRoll', ['roll_1', 'roll_2', 'total', 'event_text', 'proceed_to_action_selection'])
+DiceRoll = namedtuple('DiceRoll', ['roll_1', 'roll_2', 'total', 'text_events', 'proceed_to_action_selection'])
 
 class Game:
     def __init__(self, config, num_hexagons = 19):
@@ -184,6 +184,5 @@ class Game:
 
         if not text_events:
             text_events = ['Nobody gained anything!']
-        event_text = '\n'.join(text_events)
         proceed_to_action_selection = len(self.dice_rolls) % 2 == 0 ### If total dice rolls is even after this dice roll then it's time for the active player to proceed to action selection
-        return DiceRoll(dice_roll_1, dice_roll_2, total, event_text, proceed_to_action_selection)
+        return DiceRoll(dice_roll_1, dice_roll_2, total, text_events, proceed_to_action_selection)
