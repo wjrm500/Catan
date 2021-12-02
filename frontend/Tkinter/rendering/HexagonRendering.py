@@ -387,7 +387,11 @@ class HexagonRendering:
             circle_color = '#0000FF' if port_type == 'general' else BACKGROUND_COLORS[port_node.port.type]
             line_width = round(self.scale / 15)
             r = line_width * 2 ### Circle radius
-            if hovered_node is not None and port_node is hovered_node and not port_node.adjacent_to_settled_node():
+            
+            current_phase = self.parent_phase.chaperone.current_phase
+            in_main_game = GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase')
+            node_on_road = [line for line in port_node.lines if line.road and line.road.player is self.parent_phase.active_player()]
+            if hovered_node is not None and port_node is hovered_node and not port_node.adjacent_to_settled_node() and not (in_main_game and not node_on_road):
                 r = max(r, draw_node_args['circle_radius'] * 2)
             if port_node.settlement:
                 r = max(r, self.scale * 0.3)
