@@ -36,8 +36,9 @@ class BuildSettlement(Action):
         else:
             self.hexagon_rendering.draw_board_items()
 
-        text_area = self.game_phase.text_area if in_settling_phase else self.game_phase.notebook_frame_handlers['history'].text_area
-        text_area.config(state = 'normal')
+        text_area = self.get_text_area(in_settling_phase)
+        self.enable_text_area(text_area)
+
         node = self.data['settlement'].node
         port_text = ''
         if (port := node.port):
@@ -49,16 +50,11 @@ class BuildSettlement(Action):
         nominal_values = ' + '.join(f'{v} {k}' for k, v in d.items() if k != 'desert')
         text_to_insert = f'{self.data["player"].name} built a settlement{port_text}! This settlement has a nominal value of {nominal_value} ({nominal_values}).'
         text_area.insert('end', f'\n\n{text_to_insert}')
-        text_area.yview('end')
-        text_area.config(state = 'disabled')
+
+        self.disable_text_area(text_area)
 
         if in_settling_phase:
             self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
             self.game_phase.instruction_text.set('Build a road!')
         else: ### In main game phase
-            play_frame_handler = self.game_phase.notebook_frame_handlers['play']
-            action_tree_handler = play_frame_handler.action_tree_handler
-            action_tree_handler.cancel(event = None)
-            play_frame_handler.update_resource_cards()
-            play_frame_handler.update_movable_pieces()
-            action_tree_handler.fill_action_tree()
+            self.refresh_play_frame_handler()

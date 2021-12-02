@@ -23,32 +23,22 @@ class BuildRoad(Action):
             chaperone.current_phase.update_active_player_index()
         move_on_to_next_phase = sum([bool(settlement.node) for player in self.chaperone.players for settlement in player.settlements]) == len(self.chaperone.players) * 2
         if move_on_to_next_phase:
-            ### Update all players client side at settling / main game transition (to reflect settlements and roads spent in settling phase)
-            for player in data['players']:
-                if self.chaperone.player.id == player.id:
-                    self.chaperone.player.__dict__ = player.__dict__
+            self.reload_all_players()
         if not in_settling_phase:
-            ### Update active player client side (to reflect paid for action)
-            if self.chaperone.player.id == data['player'].id:
-                self.chaperone.player.__dict__ = data['player'].__dict__
-
+            self.reload_active_player()
         self.update_gui(in_settling_phase, move_on_to_next_phase)
     
     def update_gui(self, in_settling_phase, move_on_to_next_phase):
-        is_instigating_client = self.data['player'].id == self.chaperone.player.id
-        is_active = self.game_phase.client_active()
-        if is_instigating_client:
-            self.hexagon_rendering.handle_leave(event = None)
-        else:
-            self.hexagon_rendering.draw_board_items()
-        
-        text_area = self.game_phase.text_area if in_settling_phase else self.game_phase.notebook_frame_handlers['history'].text_area
-        text_area.config(state = 'normal')
+        self.refresh_game_board()
+        text_area = self.get_text_area(in_settling_phase)
+        self.enable_text_area(text_area)
+
         ### X built a road
         text_to_insert = f'{self.data["player"].name} built a road.'
         text_area.insert('end', f'\n\n{text_to_insert}')
 
         if in_settling_phase:
+            is_active = self.game_phase.client_active()
             if is_active:
                 self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
                 self.game_phase.instruction_text.set('Build a settlement!')
@@ -84,12 +74,6 @@ class BuildRoad(Action):
                 text_to_insert = f"It's {self.game_phase.active_player().name}'s turn to settle..."
                 text_area.insert('end', f'\n\n{text_to_insert}')
         else: ### In main game phase
-            play_frame_handler = self.game_phase.notebook_frame_handlers['play']
-            action_tree_handler = play_frame_handler.action_tree_handler
-            action_tree_handler.cancel(event = None)
-            play_frame_handler.update_resource_cards()
-            play_frame_handler.update_movable_pieces()
-            action_tree_handler.fill_action_tree()
+            self.refresh_play_frame_handler()
 
-        text_area.yview('end')
-        text_area.config(state = 'disabled')
+        self.disable_text_area(text_area)
