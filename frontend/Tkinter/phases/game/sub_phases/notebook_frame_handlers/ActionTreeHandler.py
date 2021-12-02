@@ -114,4 +114,4 @@ class ActionTreeHandler:
         phase.button_text.set('End turn')
         button_bg_color = '#90EE90' ### LightGreen
         phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
-        phase.button.bind('<Button-1>', self.play_frame_handler.end_turn)
+        phase.button.bind('<Button-1>', phase.end_turn)

@@ -50,6 +50,7 @@ class Server:
                     player = game.get_player_from_client_address(client_address)
                     line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line'].id)
                     road = player.roads.pop()
+                    player.pay_for_action(action)
                     line.add_road(road)
                     output_data = {'action': action, 'line': line, 'player': player, 'players': game.players, 'road': road} ### TODO: Player has spent a road
                     self.broadcast_to_game(game.code, output_data)
@@ -102,6 +103,9 @@ class Server:
                     game.started = True
                     self.broadcast_to_game(game.code, {'action': action, 'distributor': game.distributor, 'players': game.players})
                 elif action == ActionFactory.START_GAME_PROPER:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    game.started_proper = True
                     self.broadcast_to_game(input_data['game_code'], {'action': action})
             except Exception as e:
                 print(str(e))

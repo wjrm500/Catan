@@ -155,7 +155,11 @@ class PlayFrameHandler(BaseFrameHandler):
     
     def update_resource_cards(self):
         d = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
-        for resource_type, num_of_resource in d.items():
-            num_label = self.card_num_label_texts['resource'][resource_type]
+        # for resource_type, num_of_resource in d.items():
+        #     num_label = self.card_num_label_texts['resource'][resource_type]
+        #     num_label.set(str(num_of_resource))
+        
+        for resource_type, num_label in self.card_num_label_texts['resource'].items():
+            num_of_resource = d.get(resource_type, 0)
             num_label.set(str(num_of_resource))
         self.enable_or_disable_cards()

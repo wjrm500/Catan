@@ -22,8 +22,8 @@ class BuildRoad(Action):
         if in_settling_phase:
             chaperone.current_phase.update_active_player_index()
         move_on_to_next_phase = sum([bool(settlement.node) for player in self.chaperone.players for settlement in player.settlements]) == len(self.chaperone.players) * 2
-        if move_on_to_next_phase:
-            ### Update players client side (to reflect reduction in settlement and road tokens)
+        if move_on_to_next_phase or not in_settling_phase:
+            ### Update players client side (to reflect paid for action)
             for player in data['players']:
                 if self.chaperone.player.id == player.id:
                     self.chaperone.player.__dict__ = player.__dict__
@@ -79,8 +79,11 @@ class BuildRoad(Action):
                 text_to_insert = f"It's {self.game_phase.active_player().name}'s turn to settle..."
                 text_area.insert('end', f'\n\n{text_to_insert}')
         else: ### In main game phase
-            action_tree_handler = self.game_phase.notebook_frame_handlers['play'].action_tree_handler
+            play_frame_handler = self.game_phase.notebook_frame_handlers['play']
+            action_tree_handler = play_frame_handler.action_tree_handler
             action_tree_handler.cancel(event = None)
+            play_frame_handler.update_resource_cards()
+            action_tree_handler.fill_action_tree()
 
         text_area.yview('end')
         text_area.config(state = 'disabled')

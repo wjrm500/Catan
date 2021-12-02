@@ -21,19 +21,9 @@ class Player(Incrementable, Unserializable):
         self.color = color
     
     def can_afford(self, action):
-        if action == ActionFactory.BUILD_ROAD:
-            return self.can_afford_build_road()
-        elif action == ActionFactory.BUILD_SETTLEMENT:
-            return self.can_afford_build_settlement()
-    
-    ### Can potentially combine can_afford_build_road and can_afford_built_settlement but wait until other methods have been implemented to see what is truly generic
-    def can_afford_build_road(self):
-        action_config = config['actions'][ActionFactory.BUILD_ROAD]
-        resource_card_dict = action_config['cost']['resource_cards']
-        return self.has_resource_cards_in_hand(resource_card_dict)
-    
-    def can_afford_build_settlement(self):
-        action_config = config['actions'][ActionFactory.BUILD_SETTLEMENT]
+        if action not in [ActionFactory.BUILD_ROAD, ActionFactory.BUILD_SETTLEMENT]:
+            return ### Just temporary
+        action_config = config['actions'][action]
         resource_card_dict = action_config['cost']['resource_cards']
         return self.has_resource_cards_in_hand(resource_card_dict)
     
@@ -48,3 +38,19 @@ class Player(Incrementable, Unserializable):
     
     def num_of_resource_in_hand(self, resource):
         return len([x for x in self.hand['resource'] if x.type == resource])
+    
+    def pay_for_action(self, action):
+        if self.game.started_proper: ### No need to pay for road in settle phase
+            if not self.can_afford(action):
+                raise Exception
+            action_config = config['actions'][action]
+            resource_card_dict = action_config['cost']['resource_cards'].copy()
+            marked_for_removal = []
+            for resource_card in self.hand['resource']:
+                if resource_card.type in resource_card_dict:
+                    marked_for_removal.append(resource_card)
+                    resource_card_dict[resource_card.type] -= 1
+                    if resource_card_dict[resource_card.type] == 0:
+                        del resource_card_dict[resource_card.type]
+                    self.game.resource_cards[resource_card.type].append(resource_card)
+            self.hand['resource'] = [resource_card for resource_card in self.hand['resource'] if resource_card not in marked_for_removal]

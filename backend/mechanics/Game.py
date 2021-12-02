@@ -18,6 +18,7 @@ class Game:
         self.players = []
         self.distributor = Distributor()
         self.started = False
+        self.started_proper = False
         self.code = ''.join(random.choices(string.ascii_lowercase, k = 5))
         self.dice_rolls = []
     

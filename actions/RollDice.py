@@ -30,6 +30,6 @@ class RollDice(Action):
                 play_frame_handler.instruct_label.bind('<Button-1>', play_frame_handler.transition_to_action_selection)
             else:
                 play_frame_handler.instruct_label_text.set('Roll dice again')
-        else: ### Update resource cards in card frame
+        else:
             play_frame_handler.update_resource_cards()
             play_frame_handler.fill_action_tree()
