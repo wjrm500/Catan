@@ -36,6 +36,13 @@ class BuildRoad(Action):
             self.hexagon_rendering.handle_leave(event = None)
         else:
             self.hexagon_rendering.draw_board_items()
+        
+        text_area = self.game_phase.text_area if in_settling_phase else self.game_phase.notebook_frame_handlers['history'].text_area
+        text_area.config(state = 'normal')
+        ### X built a road
+        text_to_insert = f'{self.data["player"].name} built a road.'
+        text_area.insert('end', f'\n\n{text_to_insert}')
+
         if in_settling_phase:
             if is_active:
                 self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
@@ -45,39 +52,35 @@ class BuildRoad(Action):
                 self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
                 self.game_phase.instruction_text.set('Please wait for your turn')
                 self.game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral
-        text_area = self.game_phase.text_area
-        text_area.config(state = 'normal')
-
-        ### X built a road
-        text_to_insert = f'{self.data["player"].name} built a road.'
-        text_area.insert('end', f'\n\n{text_to_insert}')
-
-        if move_on_to_next_phase:
-            ### Move to main game phase prompt
-            text_to_insert = f'The settling phase is now complete! The game creator should now click the "Proceed" button in the bottom right corner of their screen to advance all players to the main game.'
-            text_area.insert('end', f'\n\n{text_to_insert}')
-            self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
-            if self.chaperone.main:
-                self.game_phase.instruction_text.set('Press the "Proceed" button!')
-                self.game_phase.instruction.configure({'background': '#90EE90'}) ### LightGreen
-                self.game_phase.activate_button()
-            else:
-                self.game_phase.instruction_text.set('Please wait for the game to begin...')
-                self.game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral
-        else:
-            ### Round X commencing...
-            at_start = self.game_phase.active_player_index == 0
-            at_end = self.game_phase.active_player_index == len(self.chaperone.players) - 1
-            commencing_at_start = at_start and self.game_phase.active_player_index_incrementing
-            commencing_at_end = at_end and not self.game_phase.active_player_index_incrementing
-            if commencing_at_start or commencing_at_end:
-                max_settlements = max(sum(bool(settlement.node) for settlement in player.settlements) for player in self.chaperone.players)
-                text_to_insert = f"Round {max_settlements + 1} commencing..."
+            if move_on_to_next_phase:
+                ### Move to main game phase prompt
+                text_to_insert = f'The settling phase is now complete! The game creator should now click the "Proceed" button in the bottom right corner of their screen to advance all players to the main game.'
                 text_area.insert('end', f'\n\n{text_to_insert}')
+                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+                if self.chaperone.main:
+                    self.game_phase.instruction_text.set('Press the "Proceed" button!')
+                    self.game_phase.instruction.configure({'background': '#90EE90'}) ### LightGreen
+                    self.game_phase.activate_button()
+                else:
+                    self.game_phase.instruction_text.set('Please wait for the game to begin...')
+                    self.game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral
+            else:
+                ### Round X commencing...
+                at_start = self.game_phase.active_player_index == 0
+                at_end = self.game_phase.active_player_index == len(self.chaperone.players) - 1
+                commencing_at_start = at_start and self.game_phase.active_player_index_incrementing
+                commencing_at_end = at_end and not self.game_phase.active_player_index_incrementing
+                if commencing_at_start or commencing_at_end:
+                    max_settlements = max(sum(bool(settlement.node) for settlement in player.settlements) for player in self.chaperone.players)
+                    text_to_insert = f"Round {max_settlements + 1} commencing..."
+                    text_area.insert('end', f'\n\n{text_to_insert}')
 
-            ### It's X's turn to settle
-            text_to_insert = f"It's {self.game_phase.active_player().name}'s turn to settle..."
-            text_area.insert('end', f'\n\n{text_to_insert}')
+                ### It's X's turn to settle
+                text_to_insert = f"It's {self.game_phase.active_player().name}'s turn to settle..."
+                text_area.insert('end', f'\n\n{text_to_insert}')
+        else: ### In main game phase
+            action_tree_handler = self.game_phase.notebook_frame_handlers['play'].action_tree_handler
+            action_tree_handler.cancel(event = None)
 
         text_area.yview('end')
         text_area.config(state = 'disabled')
