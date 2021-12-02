@@ -99,7 +99,7 @@ class PlayFrameHandler(BaseFrameHandler):
         frame_width = where.master.master.winfo_width() ### Get width of inner frame middle right
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        outer_frame_top = tkinter.Label(outer_frame, text = f'{type.title()} cards', anchor = tkinter.W, background = darker_blue)
+        outer_frame_top = tkinter.Label(outer_frame, text = f'{type.title()} cards', anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
         outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
         outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
         outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
@@ -142,16 +142,18 @@ class PlayFrameHandler(BaseFrameHandler):
     def create_movable_piece_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        inner_frame = tkinter.Frame(outer_frame, background = darker_blue)
-        inner_frame.pack(fill = 'x', side = tkinter.TOP)
+        top_label = tkinter.Label(outer_frame, text = 'Tokens remaining', background = darker_blue, anchor = tkinter.W, font = ('Arial', 10, 'bold'))
+        top_label.pack(fill = 'x', side = tkinter.TOP)
+        bottom_frame = tkinter.Frame(outer_frame, background = darker_blue)
+        bottom_frame.pack(fill = 'x', side = tkinter.TOP)
         self.movable_piece_label_texts = {}
         for i, movable_piece in enumerate(['roads', 'settlements', 'cities', 'game_tokens']): ### Only add tokens if two players
-            piece_label = tkinter.Label(inner_frame, text = f'{movable_piece.title()}:', background = darker_blue)
+            piece_label = tkinter.Label(bottom_frame, text = f'{movable_piece.title().replace("_", " ")}:', background = darker_blue)
             piece_label.grid(row = 0, column = i * 2)
             num_label_text = tkinter.StringVar() ### Needs to be accessible later
             num_label_text.set(str(len(getattr(self.player, movable_piece, []))))
             self.movable_piece_label_texts[movable_piece] = num_label_text
-            num_label = tkinter.Label(inner_frame, textvariable = num_label_text, background = darker_blue)
+            num_label = tkinter.Label(bottom_frame, textvariable = num_label_text, background = darker_blue)
             num_label.grid(row = 0, column = i * 2 + 1)
         return outer_frame
     

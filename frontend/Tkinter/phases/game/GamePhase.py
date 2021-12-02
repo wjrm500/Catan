@@ -128,7 +128,7 @@ class GamePhase(Phase, abc.ABC):
     def setup_inner_frame_bottom_right(self):
         self.button_text = tkinter.StringVar()
         self.button_text.set('Disabled')
-        self.button = tkinter.Button(self.inner_frame_bottom_right, textvariable = self.button_text, background = '#cccccc')
+        self.button = tkinter.Button(self.inner_frame_bottom_right, textvariable = self.button_text, background = '#cccccc', font = ('Arial', 10))
         self.button.place(anchor = tkinter.W, relheight = 0.75, relwidth = 0.5, relx = 0.5, rely = 0.5)
         self.button['state'] = 'disable'
     
