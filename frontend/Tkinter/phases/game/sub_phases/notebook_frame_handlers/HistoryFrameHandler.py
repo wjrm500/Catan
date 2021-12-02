@@ -11,4 +11,4 @@ class HistoryFrameHandler(BaseFrameHandler):
         self.text_area.insert('end', self.phase.chaperone.settling_phase_text)
         self.text_area.yview('end')
         self.text_area.config(state = 'disabled')
-        self.text_area.place(in_ = self.frame, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5, relwidth = 1, relheight = 1)
+        self.text_area.pack(expand = True, fill = 'both', padx = 5, pady = 5)
