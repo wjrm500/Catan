@@ -1,11 +1,11 @@
 from collections import Counter, namedtuple
 from functools import partial
 import tkinter
-from tkinter import ttk
 
 from config import config
 from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
+from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.ActionTreeHandler import ActionTreeHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHandler import BaseFrameHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrame import CardFrame
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLabel import CardFrameLabel
@@ -13,6 +13,10 @@ from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLa
 ### TODO: factor out "darker_blue" stuff (and any instance of ColourUtils.darken_hex being used elsewhere)
 
 class PlayFrameHandler(BaseFrameHandler):
+    def __init__(self, phase, notebook):
+        super().__init__(phase, notebook)
+        self.action_tree_handler = ActionTreeHandler(self)
+
     def setup(self):
         self.action_selection_setup()
         if self.phase.client_active():
@@ -24,7 +28,7 @@ class PlayFrameHandler(BaseFrameHandler):
     def transition_to_action_selection(self, event):
         self.dice_roll_overlay.destroy()
         self.update_resource_cards()
-        self.fill_action_tree()
+        self.action_tree_handler.fill_action_tree()
         self.show_action_frame()
     
     def end_turn(self):
@@ -67,8 +71,8 @@ class PlayFrameHandler(BaseFrameHandler):
         self.development_card_frame.grid(row = 1, column = 0, sticky = 'ew')
         self.movable_piece_frame = self.create_movable_piece_frame(self.frame)
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
-        self.action_frame = self.create_action_frame(self.frame)
-        self.action_cost_frame = self.create_action_cost_frame(self.frame)
+        self.action_frame = self.action_tree_handler.create_action_frame(self.frame)
+        self.action_cost_frame = self.action_tree_handler.create_action_cost_frame(self.frame)
         self.enable_or_disable_cards()
     
     def roll_dice(self, event):
@@ -82,8 +86,7 @@ class PlayFrameHandler(BaseFrameHandler):
     def show_action_frame(self):
         self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
         self.action_cost_frame.grid(row = 4, column = 0, sticky = 'ew')
-        self.action_tree.bind('<Motion>', self.action_tree_motion_handler)
-        self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
+        self.action_tree_handler.bind_events()
         self.phase.activate_button()
 
     def hide_action_frame(self):
@@ -141,7 +144,7 @@ class PlayFrameHandler(BaseFrameHandler):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         inner_frame = tkinter.Frame(outer_frame, background = darker_blue)
         inner_frame.pack(fill = 'x', side = tkinter.TOP)
-        for i, movable_pieces in enumerate(['roads', 'settlements', 'cities', 'tokens']): ### Only add tokens if two players
+        for i, movable_pieces in enumerate(['roads', 'settlements', 'cities', 'game_tokens']): ### Only add tokens if two players
             piece_label = tkinter.Label(inner_frame, text = f'{movable_pieces.title()}:', background = darker_blue)
             piece_label.grid(row = 0, column = i * 2)
             num_label_text = tkinter.StringVar() ### Needs to be accessible later
@@ -149,67 +152,6 @@ class PlayFrameHandler(BaseFrameHandler):
             num_label = tkinter.Label(inner_frame, textvariable = num_label_text, background = darker_blue)
             num_label.grid(row = 0, column = i * 2 + 1)
         return outer_frame
-    
-    def create_action_frame(self, where):
-        outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
-        inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
-        self.action_tree = ttk.Treeview(inner_frame, columns = ['action'], show = 'headings', height = 5)
-        self.action_tree.tag_configure('odd', background = Phase.BG_COLOR)
-        self.action_tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
-        self.action_tree.tag_configure('disabled', foreground = '#808080')
-        self.action_tree.tag_configure('enabled', foreground = 'black')
-        self.action_tree.heading('action', text = 'Action', anchor = tkinter.W)
-        self.fill_action_tree()
-        self.action_tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
-        scrollbar = ttk.Scrollbar(inner_frame, orient = tkinter.VERTICAL, command = self.action_tree.yview, style = 'My.Vertical.TScrollbar')
-        self.action_tree.configure(yscrollcommand = scrollbar.set)
-        scrollbar.pack(fill = 'y', side = tkinter.LEFT)
-        return outer_frame
-    
-    def create_action_cost_frame(self, where):
-        outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
-        inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
-        self.action_cost = tkinter.StringVar()
-        self.action_cost.set(self.default_action_cost_text())
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        cost_label = tkinter.Label(inner_frame, textvariable = self.action_cost, background = darker_blue)
-        cost_label.pack()
-        return outer_frame
-    
-    def fill_action_tree(self):
-        self.action_tree.delete(*self.action_tree.get_children())
-        for i, (action_const, action_data) in enumerate(config['actions'].items()):
-            even_tag = 'even' if i % 2 == 0 else 'odd'
-            enabled_tag = 'enabled' if self.player.can_afford(action_const) else 'disabled'
-            self.action_tree.insert('', tkinter.END, iid = action_const, text = action_const, values = (action_data['name'],), tags = (even_tag, enabled_tag))
-    
-    def action_tree_motion_handler(self, event):
-        item = self.action_tree.identify('item', event.x, event.y)
-        item = self.action_tree.item(item)
-        action, tags = item['text'], item['tags']
-        self.root.configure({'cursor': Phase.CURSOR_HAND if 'enabled' in tags else Phase.CURSOR_DEFAULT})
-        self.show_action_cost(action)
-        # self.action_tree.item(action, tags = ('enabled'))
-    
-    def action_tree_leave_handler(self, event):
-        self.root.configure({'cursor': Phase.CURSOR_DEFAULT})
-        self.action_cost.set(self.default_action_cost_text())
-    
-    def show_action_cost(self, action):
-        if action:
-            action_config = config['actions'][action]
-            cost_text = ' | '.join([f'{k.title().replace("_", " ")} - {v}' for v in action_config['cost'].values() for k, v in v.items()])
-            cost_text = f'Cost: {cost_text}'
-        else:
-            cost_text = self.default_action_cost_text()
-        self.action_cost.set(cost_text)
-    
-    def default_action_cost_text(self):
-        return 'Hover over an action to see how much it costs!'
     
     def update_resource_cards(self):
         d = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
