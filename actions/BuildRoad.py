@@ -83,6 +83,7 @@ class BuildRoad(Action):
             action_tree_handler = play_frame_handler.action_tree_handler
             action_tree_handler.cancel(event = None)
             play_frame_handler.update_resource_cards()
+            play_frame_handler.update_movable_pieces()
             action_tree_handler.fill_action_tree()
 
         text_area.yview('end')
