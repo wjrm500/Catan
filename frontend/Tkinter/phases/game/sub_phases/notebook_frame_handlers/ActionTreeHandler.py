@@ -85,6 +85,8 @@ class ActionTreeHandler:
     def fire_method_from_action(self, action):
         if action == 'BUILD_ROAD':
             self.handle_build_road()
+        elif action == 'BUILD_SETTLEMENT':
+            self.handle_build_settlement()
     
     def handle_build_road(self):
         phase = self.play_frame_handler.phase
@@ -92,6 +94,21 @@ class ActionTreeHandler:
         hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
 
         phase.instruction_text.set('Build a road!')
+        instruction_bg_color = '#9400D3' ### DarkViolet
+        phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
+
+        ### Bottom right corner button
+        phase.button_text.set('Cancel')
+        button_bg_color = '#FF0000' ### Red
+        phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
+        phase.button.bind('<Button-1>', self.cancel)
+    
+    def handle_build_settlement(self):
+        phase = self.play_frame_handler.phase
+        hexagon_rendering = phase.hexagon_rendering
+        hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
+
+        phase.instruction_text.set('Build a settlement!')
         instruction_bg_color = '#9400D3' ### DarkViolet
         phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
 

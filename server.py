@@ -52,7 +52,7 @@ class Server:
                     road = player.roads.pop()
                     player.pay_for_action(action)
                     line.add_road(road)
-                    output_data = {'action': action, 'line': line, 'player': player, 'players': game.players, 'road': road} ### TODO: Player has spent a road
+                    output_data = {'action': action, 'line': line, 'player': player, 'players': game.players, 'road': road}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
@@ -60,6 +60,7 @@ class Server:
                     player = game.get_player_from_client_address(client_address)
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
                     settlement = player.settlements.pop()
+                    player.pay_for_action(action)
                     node.add_settlement(settlement)
                     output_data = {'action': action, 'node': node, 'player': player, 'settlement': settlement} ### TODO: Player has spent a settlement
                     self.broadcast_to_game(game.code, output_data)

@@ -20,6 +20,12 @@ class BuildSettlement(Action):
         settlement = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement'].id)
         node.add_settlement(settlement)
 
+        in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')
+        if not in_settling_phase:
+            ### Update active player client side (to reflect paid for action)
+            if self.chaperone.player.id == data['player'].id:
+                self.chaperone.player.__dict__ = data['player'].__dict__
+
         self.update_gui()
     
     def update_gui(self):
@@ -27,12 +33,10 @@ class BuildSettlement(Action):
         in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')
         if is_instigating_client:
             self.hexagon_rendering.handle_leave(event = None)
-            if in_settling_phase:
-                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
-                self.game_phase.instruction_text.set('Build a road!')
         else:
             self.hexagon_rendering.draw_board_items()
-        text_area = self.game_phase.text_area
+
+        text_area = self.game_phase.text_area if in_settling_phase else self.game_phase.notebook_frame_handlers['history'].text_area
         text_area.config(state = 'normal')
         node = self.data['settlement'].node
         port_text = ''
@@ -47,3 +51,14 @@ class BuildSettlement(Action):
         text_area.insert('end', f'\n\n{text_to_insert}')
         text_area.yview('end')
         text_area.config(state = 'disabled')
+
+        if in_settling_phase:
+            self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
+            self.game_phase.instruction_text.set('Build a road!')
+        else: ### In main game phase
+            play_frame_handler = self.game_phase.notebook_frame_handlers['play']
+            action_tree_handler = play_frame_handler.action_tree_handler
+            action_tree_handler.cancel(event = None)
+            play_frame_handler.update_resource_cards()
+            play_frame_handler.update_movable_pieces()
+            action_tree_handler.fill_action_tree()

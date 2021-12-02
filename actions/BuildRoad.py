@@ -22,11 +22,16 @@ class BuildRoad(Action):
         if in_settling_phase:
             chaperone.current_phase.update_active_player_index()
         move_on_to_next_phase = sum([bool(settlement.node) for player in self.chaperone.players for settlement in player.settlements]) == len(self.chaperone.players) * 2
-        if move_on_to_next_phase or not in_settling_phase:
-            ### Update players client side (to reflect paid for action)
+        if move_on_to_next_phase:
+            ### Update all players client side at settling / main game transition (to reflect settlements and roads spent in settling phase)
             for player in data['players']:
                 if self.chaperone.player.id == player.id:
                     self.chaperone.player.__dict__ = player.__dict__
+        if not in_settling_phase:
+            ### Update active player client side (to reflect paid for action)
+            if self.chaperone.player.id == data['player'].id:
+                self.chaperone.player.__dict__ = data['player'].__dict__
+
         self.update_gui(in_settling_phase, move_on_to_next_phase)
     
     def update_gui(self, in_settling_phase, move_on_to_next_phase):

@@ -279,24 +279,31 @@ class HexagonRendering:
         self.draw_settlements()
 
         node = draw_node_args['node']
-        if not node.settlement and not node.adjacent_to_settled_node():
-            ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
-            r = draw_node_args['circle_radius']
-            fill = draw_node_args['fill']
-            width = draw_node_args['width']
-            tags = [
-                self.CT_OBJ_NODE,
-                self.ct_node_tag(node),
-                self.CV_OBJ_RECT
-            ]
-            x, y = self.real_x(node), self.real_y(node)
-            rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
-            self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_build_settlement_click)
-            self.rectangle_node_dict[rectangle_id] = node
-        
-            ### Change cursor pointer to hand icon if cursor near node
-            cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
-            self.canvas.config(cursor = cursor)
+        current_phase = self.parent_phase.chaperone.current_phase
+        if GeneralUtils.safe_isinstance(current_phase, 'SettlingPhase'):
+            if node.settlement or node.adjacent_to_settled_node():
+                return
+        elif GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase'):
+            node_on_road = [line for line in node.lines if line.road and line.road.player is self.parent_phase.active_player()]
+            if node.settlement or node.adjacent_to_settled_node() or not node_on_road:
+                return
+        ### Draw node (must come after hexagon drawing, hence the separation of argument collection and rendering)
+        r = draw_node_args['circle_radius']
+        fill = draw_node_args['fill']
+        width = draw_node_args['width']
+        tags = [
+            self.CT_OBJ_NODE,
+            self.ct_node_tag(node),
+            self.CV_OBJ_RECT
+        ]
+        x, y = self.real_x(node), self.real_y(node)
+        rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
+        self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_build_settlement_click)
+        self.rectangle_node_dict[rectangle_id] = node
+    
+        ### Change cursor pointer to hand icon if cursor near node
+        cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
+        self.canvas.config(cursor = cursor)
     
     def handle_build_settlement_click(self, event):
         rectangle_id = event.widget.find_withtag('current')[0]
@@ -329,8 +336,6 @@ class HexagonRendering:
             self.centre_points = []
             for hexagon in self.distributor.hexagons:
                 self.init_render(hexagon)
-    
-    ### TODO: Below methods crying out for merge
 
     def ct_line_tag(self, line):
         return '{}.{}'.format(self.CT_OBJ_LINE, line.id)
