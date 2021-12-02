@@ -4,6 +4,7 @@ from tkinter import ttk
 from config import config
 from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
+from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class ActionTreeHandler:
     def __init__(self, play_frame_handler):
@@ -58,7 +59,7 @@ class ActionTreeHandler:
         item = self.action_tree.item(item)
         action, tags = item['text'], item['tags']
         if 'enabled' in tags:
-            print(action)
+            self.fire_method_from_action(action)
     
     def action_tree_leave_handler(self, event):
         self.play_frame_handler.root.configure({'cursor': Phase.CURSOR_DEFAULT})
@@ -80,3 +81,37 @@ class ActionTreeHandler:
         self.action_tree.bind('<Motion>', self.action_tree_motion_handler)
         self.action_tree.bind('<Button-1>', self.action_tree_click_handler)
         self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
+    
+    def fire_method_from_action(self, action):
+        if action == 'BUILD_ROAD':
+            self.handle_build_road()
+    
+    def handle_build_road(self):
+        phase = self.play_frame_handler.phase
+        hexagon_rendering = phase.hexagon_rendering
+        hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
+
+        phase.instruction_text.set('Build a road!')
+        instruction_bg_color = '#9400D3' ### DarkViolet
+        phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
+
+        ### Bottom right corner button
+        phase.button_text.set('Cancel')
+        button_bg_color = '#FF0000' ### Red
+        phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
+        phase.button.bind('<Button-1>', self.cancel)
+    
+    def cancel(self, event):
+        phase = self.play_frame_handler.phase
+        hexagon_rendering = phase.hexagon_rendering
+        hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DEFAULT
+
+        phase.instruction_text.set("It's your turn!")
+        instruction_bg_color = '#90EE90' ### LightGreen
+        phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
+
+        ### Bottom right corner button
+        phase.button_text.set('End turn')
+        button_bg_color = '#90EE90' ### LightGreen
+        phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
+        phase.button.bind('<Button-1>', self.play_frame_handler.end_turn)
