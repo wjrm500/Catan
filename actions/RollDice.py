@@ -32,4 +32,4 @@ class RollDice(Action):
                 play_frame_handler.instruct_label_text.set('Roll dice again')
         else:
             play_frame_handler.update_resource_cards()
-            play_frame_handler.fill_action_tree()
+            play_frame_handler.action_tree_handler.fill_action_tree()
