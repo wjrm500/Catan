@@ -41,6 +41,7 @@ class HexagonRendering:
     CANVAS_MODE_CITY_UPGRADE = 'city_upgrade'
     CANVAS_MODE_DEFAULT = 'default'
     CANVAS_MODE_DISABLED = 'disabled'
+    CANVAS_MODE_PLACE_ROBBER = 'place_robber'
     
     IN_DEVELOPMENT = False
 
@@ -56,6 +57,7 @@ class HexagonRendering:
         ### Below dicts are for keeping track of canvas objects when they are clicked
         self.rectangle_node_dict = {}
         self.line_dict = {}
+        self.polygon_hexagon_dict = {}
     
     def reset_canvas_objects(self):
         self.canvas_objects = {
@@ -78,8 +80,9 @@ class HexagonRendering:
         return line_id
     
     def create_polygon(self, *args, **kwargs):
-        self.canvas.create_polygon(*args, **kwargs)
+        polygon_id = self.canvas.create_polygon(*args, **kwargs)
         self.update_canvas_object_count(self.CV_OBJ_POLYGON, self.ACTION_CREATE)
+        return polygon_id
     
     def create_oval(self, *args, **kwargs):
         self.canvas.create_oval(*args, **kwargs)
@@ -145,6 +148,8 @@ class HexagonRendering:
             self.handle_build_road_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_BUILD_SETTLEMENT:
             self.handle_build_settlement_motion(event_x, event_y)
+        elif self.canvas_mode == self.CANVAS_MODE_PLACE_ROBBER:
+            self.handle_place_robber_motion(event_x, event_y)
         elif self.canvas_mode in (self.CANVAS_MODE_DISABLED, self.CANVAS_MODE_DEFAULT):
             pass
     
@@ -309,6 +314,43 @@ class HexagonRendering:
         rectangle_id = event.widget.find_withtag('current')[0]
         node = self.rectangle_node_dict[rectangle_id]
         self.parent_phase.chaperone.build_settlement(node)
+    
+    def handle_place_robber_motion(self, event_x, event_y):
+        get_dist_to_centre_point = lambda centre_point: math.sqrt(pow(self.real_x(centre_point) - event_x, 2) + pow(self.real_y(centre_point) - event_y, 2))
+        hex_centre_dists = [(hexagon, get_dist_to_centre_point(hexagon.centre_point())) for hexagon in self.distributor.hexagons]
+        min_hex_centre_dist = min(map(lambda x: x[1], hex_centre_dists))
+        for hexagon, dist in hex_centre_dists:
+            closest_to_cursor = dist == min_hex_centre_dist
+            if closest_to_cursor:
+                hexagons_to_focus = [hexagon]
+                break
+
+        ### Focus / unfocus hexagons
+        for hexagon in self.focused_hexagons:
+            if hexagon not in hexagons_to_focus:
+                hexagon_render = self.hexagon_renders[hexagon.id]
+                hexagon_render.unfocus(hexagons_to_focus)
+        self.focused_hexagons = [hexagon for hexagon in self.focused_hexagons if hexagon in hexagons_to_focus]
+        for hexagon in hexagons_to_focus:
+            if hexagon not in self.focused_hexagons:
+                hexagon_render = self.hexagon_renders[hexagon.id]
+                polygon_id = hexagon_render.focus()
+                self.canvas.tag_bind(polygon_id, '<Button-1>', self.handle_place_robber_click)
+                self.polygon_hexagon_dict[polygon_id] = hexagon
+                self.focused_hexagons.append(hexagon)
+        
+        self.draw_roads()
+        self.draw_ports()
+        self.draw_settlements()
+    
+        ### Change cursor pointer to hand icon if cursor near node
+        cursor = self.parent_phase.CURSOR_HAND if len(self.focused_hexagons) > 0 else ''
+        self.canvas.config(cursor = cursor)
+    
+    def handle_place_robber_click(self, event):
+        polygon_id = event.widget.find_withtag('current')[0]
+        hexagon = self.polygon_hexagon_dict[polygon_id]
+        # self.parent_phase.chaperone.place_robber(hexagon)
 
     def unfocus_focused_hexagons(self):
         for hexagon in self.focused_hexagons:

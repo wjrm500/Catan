@@ -32,7 +32,7 @@ class HexagonBodyRender:
             self.render.rendering.CV_OBJ_POLYGON
         ]
         line_width = round(rendering.scale / 10) if focused == self.render.FOCUSED else 1
-        self.render.rendering.create_polygon(points, fill = fill, outline = 'black', tags = tags, width = line_width)
+        return self.render.rendering.create_polygon(points, fill = fill, outline = 'black', tags = tags, width = line_width)
 
     def render_text_elements(self, focused):
         tags = [
