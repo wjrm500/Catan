@@ -52,12 +52,14 @@ class HexagonRendering:
         self.scale = 1
         self.focused_hexagons = []
         self.reset_canvas_objects()
-        self.distributor = self.parent_phase.chaperone.distributor
-        self.hexagon_renders = {hexagon.id: HexagonRender(self, hexagon) for hexagon in self.distributor.hexagons}
+        self.hexagon_renders = {hexagon.id: HexagonRender(self, hexagon) for hexagon in self.distributor().hexagons}
         ### Below dicts are for keeping track of canvas objects when they are clicked
         self.rectangle_node_dict = {}
         self.line_dict = {}
         self.polygon_hexagon_dict = {}
+    
+    def distributor(self):
+        return self.parent_phase.chaperone.distributor
     
     def reset_canvas_objects(self):
         self.canvas_objects = {
@@ -153,10 +155,12 @@ class HexagonRendering:
         elif self.canvas_mode in (self.CANVAS_MODE_DISABLED, self.CANVAS_MODE_DEFAULT):
             pass
     
-    def handle_leave(self, event):
+    def handle_leave(self, event, full_refresh = False):
         self.delete_tag(self.CT_OBJ_LINE)
         self.delete_tag(self.CT_OBJ_NODE)
         self.unfocus_focused_hexagons()
+        if full_refresh:
+            self.draw_board()
         self.draw_board_items()
         self.canvas.config(cursor = '')
         
@@ -186,7 +190,7 @@ class HexagonRendering:
                 res = abs(x1 * y2 - y1 * x2) / mod
             return res
         
-        line_dists = [(line, get_dist_to_line(event_x, event_y, line)) for line in self.distributor.lines]
+        line_dists = [(line, get_dist_to_line(event_x, event_y, line)) for line in self.distributor().lines]
         min_line_dist = min(map(lambda x: x[1], line_dists))
         for line, dist in line_dists:
             closest_to_cursor = dist == min_line_dist
@@ -253,7 +257,7 @@ class HexagonRendering:
 
         ### Find closest node to cursor and collect arguments for rendering
         get_dist_to_node = lambda node: math.sqrt(pow(self.real_x(node) - event_x, 2) + pow(self.real_y(node) - event_y, 2))
-        node_dists = [(node, get_dist_to_node(node)) for node in self.distributor.nodes]
+        node_dists = [(node, get_dist_to_node(node)) for node in self.distributor().nodes]
         min_node_dist = min(map(lambda x: x[1], node_dists))
         for node, dist in node_dists:
             closest_to_cursor = dist == min_node_dist
@@ -317,7 +321,7 @@ class HexagonRendering:
     
     def handle_place_robber_motion(self, event_x, event_y):
         get_dist_to_centre_point = lambda centre_point: math.sqrt(pow(self.real_x(centre_point) - event_x, 2) + pow(self.real_y(centre_point) - event_y, 2))
-        hex_centre_dists = [(hexagon, get_dist_to_centre_point(hexagon.centre_point())) for hexagon in self.distributor.hexagons]
+        hex_centre_dists = [(hexagon, get_dist_to_centre_point(hexagon.centre_point())) for hexagon in self.distributor().hexagons]
         min_hex_centre_dist = min(map(lambda x: x[1], hex_centre_dists))
         for hexagon, dist in hex_centre_dists:
             closest_to_cursor = dist == min_hex_centre_dist
@@ -350,7 +354,7 @@ class HexagonRendering:
     def handle_place_robber_click(self, event):
         polygon_id = event.widget.find_withtag('current')[0]
         hexagon = self.polygon_hexagon_dict[polygon_id]
-        # self.parent_phase.chaperone.place_robber(hexagon)
+        self.parent_phase.chaperone.place_robber(hexagon)
 
     def unfocus_focused_hexagons(self):
         for hexagon in self.focused_hexagons:
@@ -364,8 +368,8 @@ class HexagonRendering:
         if self.canvas_width > 11: ### Width on initial render before resize
             self.canvas.delete('all')
             self.reset_canvas_objects()
-            node_x_values = [node.x for node in self.distributor.nodes]
-            node_y_values = [node.y for node in self.distributor.nodes]
+            node_x_values = [node.x for node in self.distributor().nodes]
+            node_y_values = [node.y for node in self.distributor().nodes]
             self.x_shift = -min(node_x_values)
             self.y_shift = -min(node_y_values)
             x_max = max(node_x_values) + self.x_shift
@@ -376,7 +380,7 @@ class HexagonRendering:
             self.x_centre_shift = (self.canvas_width - x_max * self.scale) / 2
             self.y_centre_shift = (self.canvas_height - y_max * self.scale) / 2
             self.centre_points = []
-            for hexagon in self.distributor.hexagons:
+            for hexagon in self.distributor().hexagons:
                 self.init_render(hexagon)
 
     def ct_line_tag(self, line):
@@ -399,7 +403,7 @@ class HexagonRendering:
     
     def draw_roads(self):
         self.delete_tag(self.CT_OBJ_ROAD)
-        for line in self.distributor.lines:
+        for line in self.distributor().lines:
             if line.road:
                 tags = [
                     self.CT_OBJ_ROAD,
@@ -421,7 +425,7 @@ class HexagonRendering:
 
     def draw_ports(self, hovered_node = None, draw_node_args = None):
         self.delete_tag(self.CT_OBJ_PORT)
-        port_nodes = [node for node in self.distributor.nodes if node.port]
+        port_nodes = [node for node in self.distributor().nodes if node.port]
         for port_node in port_nodes:
             if not hasattr(self, 'scale'):
                 continue
@@ -447,7 +451,7 @@ class HexagonRendering:
     
     def draw_settlements(self):
         self.delete_tag(self.CT_OBJ_SETTLEMENT)
-        for node in self.distributor.nodes:
+        for node in self.distributor().nodes:
             if node.settlement:
                 tags = [
                     self.CT_OBJ_SETTLEMENT,

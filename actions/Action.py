@@ -21,12 +21,14 @@ class Action:
         play_frame_handler.update_movable_pieces()
         action_tree_handler.fill_action_tree()
     
-    def refresh_game_board(self):
+    def refresh_game_board(self, full_refresh = False):
         is_instigating_client = self.data['player'].id == self.chaperone.player.id
         if is_instigating_client:
-            self.hexagon_rendering.handle_leave(event = None)
+            self.game_phase.hexagon_rendering.handle_leave(event = None, full_refresh = full_refresh)
         else:
-            self.hexagon_rendering.draw_board_items()
+            if full_refresh:
+                self.game_phase.hexagon_rendering.draw_board()
+            self.game_phase.hexagon_rendering.draw_board_items()
         
     def get_text_area(self, in_settling_phase):
         return self.game_phase.text_area if in_settling_phase else self.game_phase.notebook_frame_handlers['history'].text_area

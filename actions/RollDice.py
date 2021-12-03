@@ -1,4 +1,6 @@
 from actions.Action import Action
+from frontend.ColorUtils import ColorUtils
+from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class RollDice(Action):
     def __init__(self):
@@ -24,13 +26,17 @@ class RollDice(Action):
         if is_instigating_client:
             display_text = f'{dice_face_chars[DiceRoll.roll_1]} + {dice_face_chars[DiceRoll.roll_2]} = {DiceRoll.total}'
             play_frame_handler.dice_roll_text.set(display_text)
-            event_text = '\n'.join(DiceRoll.text_events)
-            play_frame_handler.dice_roll_event_text.set(event_text)
+            
             if DiceRoll.proceed_to_action_selection:
                 play_frame_handler.instruct_label_text.set('Take actions')
                 play_frame_handler.instruct_label.bind('<Button-1>', play_frame_handler.transition_to_action_selection)
             else:
                 play_frame_handler.instruct_label_text.set('Roll dice again')
+            event_text = '\n'.join(DiceRoll.text_events)
+            if DiceRoll.total == 7:
+                event_text = 'Click on the hexagon you want to move the robber to!'
+                self.prepare_for_robber_moving(play_frame_handler)
+            play_frame_handler.dice_roll_event_text.set(event_text)
         else:
             play_frame_handler.update_resource_cards()
             play_frame_handler.action_tree_handler.fill_action_tree()
@@ -39,3 +45,13 @@ class RollDice(Action):
         event_text = ' '.join(DiceRoll.text_events)
         text_area.insert('end', f'\n\n{self.data["player"].name} rolled a {DiceRoll.total}. {event_text}')
         self.disable_text_area(text_area)
+    
+    def prepare_for_robber_moving(self, play_frame_handler):
+        self.game_phase.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_PLACE_ROBBER
+        play_frame_handler.instruct_label.configure({'background': '#808080'})
+        play_frame_handler.instruct_label.unbind('<Button-1>')
+        play_frame_handler.instruct_label.unbind('<Motion>')
+        play_frame_handler.instruct_label.unbind('<Leave>')
+        self.game_phase.instruction_text.set('Place the robber!')
+        instruction_bg_color = '#9400D3' ### DarkViolet
+        self.game_phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})

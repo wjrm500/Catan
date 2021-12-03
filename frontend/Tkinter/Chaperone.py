@@ -120,6 +120,14 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def place_robber(self, hexagon):
+        data = {
+            'action': ActionFactory.PLACE_ROBBER,
+            'game_code': self.game_code,
+            'hexagon': hexagon
+        }
+        self.client.interface.send_data(self.client.socket, data)
+    
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()

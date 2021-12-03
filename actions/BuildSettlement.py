@@ -16,8 +16,8 @@ class BuildSettlement(Action):
         self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
 
         ### Following two lines necessary to work with client-side versions of objects
-        node = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, data['node'].id)
-        settlement = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement'].id)
+        node = self.hexagon_rendering.distributor().get_object_by_id(Distributor.OBJ_NODE, data['node'].id)
+        settlement = self.hexagon_rendering.distributor().get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement'].id)
         node.add_settlement(settlement)
 
         in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')

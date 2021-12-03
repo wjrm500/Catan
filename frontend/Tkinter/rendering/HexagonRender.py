@@ -1,3 +1,4 @@
+from backend.mechanics.Distributor import Distributor
 from frontend.Tkinter.rendering.HexagonBorderRender import HexagonBorderRender
 from frontend.Tkinter.rendering.HexagonBodyRender import HexagonBodyRender
 
@@ -37,8 +38,9 @@ class HexagonRender:
         self.rendering.delete_tag('{}.{}'.format(self.hexagon_tag, self.FOCUSED))
     
     def render_robber(self, focused):
-        if self.hexagon.robber:
-            centre_point = self.hexagon.centre_point()
+        hexagon = self.rendering.distributor().get_object_by_id(Distributor.OBJ_HEXAGON, self.hexagon.id)
+        if hexagon.robber:
+            centre_point = hexagon.centre_point()
             x, y = (self.rendering.real_x(centre_point), self.rendering.real_y(centre_point))
             dist = self.rendering.scale / 4
             point_1 = (x, y - dist)
