@@ -49,7 +49,7 @@ class BuildSettlement(Action):
         d = functools.reduce(fun, [(hexagon.resource_type, hexagon.num_pips) for hexagon in node.hexagons], {})
         nominal_values = ' + '.join(f'{v} {k}' for k, v in d.items() if k != 'desert')
         text_to_insert = f'{self.data["player"].name} built a settlement{port_text}! This settlement has a nominal value of {nominal_value} ({nominal_values}).'
-        text_area.insert('end', f'\n\n{text_to_insert}')
+        text_area.insert('end', f'\n\n{text_to_insert}', 'green_font')
 
         self.disable_text_area(text_area)
 

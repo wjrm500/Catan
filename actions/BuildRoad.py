@@ -35,7 +35,7 @@ class BuildRoad(Action):
 
         ### X built a road
         text_to_insert = f'{self.data["player"].name} built a road.'
-        text_area.insert('end', f'\n\n{text_to_insert}')
+        text_area.insert('end', f'\n\n{text_to_insert}', 'green_font')
 
         if in_settling_phase:
             is_active = self.game_phase.client_active()
