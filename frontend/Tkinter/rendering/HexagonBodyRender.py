@@ -35,6 +35,7 @@ class HexagonBodyRender:
         return self.render.rendering.create_polygon(points, fill = fill, outline = 'black', tags = tags, width = line_width)
 
     def render_text_elements(self, focused):
+        text_ids = []
         tags = [
             self.render.rendering.CT_OBJ_HEXAGON,
             self.render.hexagon_tag,
@@ -52,9 +53,13 @@ class HexagonBodyRender:
         font_size = round(self.render.rendering.scale / 3.5 if self.render.focused else self.render.rendering.scale / 4)
         roll_num_font_size = round(font_size * 0.75 * math.sqrt(self.render.hexagon.num_pips))
         roll_num_text = self.render.hexagon.roll_num
-        self.render.rendering.create_text(x, y + roll_num_offset, fill = text_fill, font = 'Arial {} bold'.format(roll_num_font_size), text = roll_num_text, tags = tags)
+        text_id = self.render.rendering.create_text(x, y + roll_num_offset, fill = text_fill, font = 'Arial {} bold'.format(roll_num_font_size), text = roll_num_text, tags = tags)
+        text_ids.append(text_id)
         if show_resource_type:
             resource_type_text = self.render.hexagon.resource_type.upper()
-            self.render.rendering.create_text(x, y + resource_type_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size - 4), text = resource_type_text, tags = tags)
+            text_id = self.render.rendering.create_text(x, y + resource_type_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size - 4), text = resource_type_text, tags = tags)
+            text_ids.append(text_id)
         pips_text = ''.join(['·' for _ in range(self.render.hexagon.num_pips)])
-        self.render.rendering.create_text(x, y + pips_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size), text = pips_text, tags = tags)
+        text_id = self.render.rendering.create_text(x, y + pips_offset, fill = text_fill, font = 'Arial {} bold'.format(font_size), text = pips_text, tags = tags)
+        text_ids.append(text_id)
+        return text_ids

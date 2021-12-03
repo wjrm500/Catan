@@ -96,8 +96,9 @@ class HexagonRendering:
         return rectangle_id
     
     def create_text(self, *args, **kwargs):
-        self.canvas.create_text(*args, **kwargs)
+        text_id = self.canvas.create_text(*args, **kwargs)
         self.update_canvas_object_count(self.CV_OBJ_TEXT, self.ACTION_CREATE)
+        return text_id
     
     def delete_tag(self, tag):
         if not self.IN_DEVELOPMENT:
@@ -338,9 +339,10 @@ class HexagonRendering:
         for hexagon in hexagons_to_focus:
             if hexagon not in self.focused_hexagons:
                 hexagon_render = self.hexagon_renders[hexagon.id]
-                polygon_id = hexagon_render.focus()
-                self.canvas.tag_bind(polygon_id, '<Button-1>', self.handle_place_robber_click)
-                self.polygon_hexagon_dict[polygon_id] = hexagon
+                object_ids = hexagon_render.focus()
+                for object_id in object_ids:
+                    self.canvas.tag_bind(object_id, '<Button-1>', self.handle_place_robber_click)
+                    self.polygon_hexagon_dict[object_id] = hexagon
                 self.focused_hexagons.append(hexagon)
         
         self.draw_roads()
