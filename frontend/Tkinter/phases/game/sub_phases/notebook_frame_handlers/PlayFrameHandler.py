@@ -147,11 +147,11 @@ class PlayFrameHandler(BaseFrameHandler):
         bottom_frame = tkinter.Frame(outer_frame, background = darker_blue)
         bottom_frame.pack(fill = 'x', side = tkinter.TOP)
         self.movable_piece_label_texts = {}
-        for i, movable_piece in enumerate(['roads', 'settlements', 'cities', 'game_tokens']): ### Only add tokens if two players
+        for i, movable_piece in enumerate(['road', 'settlement', 'city', 'game']): ### Only add tokens if two players
             piece_label = tkinter.Label(bottom_frame, text = f'{movable_piece.title().replace("_", " ")}:', background = darker_blue)
             piece_label.grid(row = 0, column = i * 2)
             num_label_text = tkinter.StringVar() ### Needs to be accessible later
-            num_label_text.set(str(len(getattr(self.player, movable_piece, []))))
+            num_label_text.set(str(self.player.num_tokens_available(movable_piece)))
             self.movable_piece_label_texts[movable_piece] = num_label_text
             num_label = tkinter.Label(bottom_frame, textvariable = num_label_text, background = darker_blue)
             num_label.grid(row = 0, column = i * 2 + 1)
@@ -166,4 +166,4 @@ class PlayFrameHandler(BaseFrameHandler):
     
     def update_movable_pieces(self):
         for movable_piece, num_label_text in self.movable_piece_label_texts.items():
-            num_label_text.set(str(len(getattr(self.player, movable_piece, []))))
+            num_label_text.set(str(self.player.num_tokens_available(movable_piece)))

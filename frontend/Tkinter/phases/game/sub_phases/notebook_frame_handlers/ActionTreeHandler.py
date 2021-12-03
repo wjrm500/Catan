@@ -44,7 +44,7 @@ class ActionTreeHandler:
         self.action_tree.delete(*self.action_tree.get_children())
         for i, (action_const, action_data) in enumerate(config['actions'].items()):
             even_tag = 'even' if i % 2 == 0 else 'odd'
-            enabled_tag = 'enabled' if self.play_frame_handler.player.can_afford(action_const) else 'disabled'
+            enabled_tag = 'enabled' if self.play_frame_handler.player.can_do(action_const) else 'disabled'
             self.action_tree.insert('', tkinter.END, iid = action_const, text = action_const, values = (action_data['name'],), tags = (even_tag, enabled_tag))
     
     def action_tree_motion_handler(self, event):

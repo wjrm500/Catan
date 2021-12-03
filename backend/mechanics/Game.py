@@ -7,10 +7,11 @@ from backend.mechanics.Distributor import Distributor
 from backend.mechanics.drawing.HexagonDrawing import HexagonDrawing
 from backend.objects.board.Port import Port
 from backend.objects.cards.ResourceCard import ResourceCard
+from backend.Unserializable import Unserializable
 
 DiceRoll = namedtuple('DiceRoll', ['roll_1', 'roll_2', 'total', 'text_events', 'proceed_to_action_selection'])
 
-class Game:
+class Game(Unserializable):
     def __init__(self, config, num_hexagons = 19):
         self.config = config
         self.num_hexagons = num_hexagons
@@ -147,7 +148,13 @@ class Game:
         for hexagon in self.distributor.hexagons:
             if total == hexagon.roll_num:
                 ### Look ahead to make sure the bank has enough resource cards to pay out full bounty to all players
-                total_bounty = sum((2 if node.settlement and node.settlement.city else 1) for node in hexagon.nodes)
+                def bounty_from_node(node):
+                    if node.settlement:
+                        if node.settlement.city:
+                            return 2
+                        return 1
+                    return 0
+                total_bounty = sum(bounty_from_node(node) for node in hexagon.nodes)
                 if total_bounty > len(resource_cards := self.resource_cards[hexagon.resource_type]):
                     text_event = f"The bank doesn't have enough {hexagon.resource_type} cards to pay out a bounty!"
                     text_events.append(text_event)
@@ -186,3 +193,6 @@ class Game:
             text_events = ['Nobody gained anything!']
         proceed_to_action_selection = len(self.dice_rolls) % 2 == 0 ### If total dice rolls is even after this dice roll then it's time for the active player to proceed to action selection
         return DiceRoll(dice_roll_1, dice_roll_2, total, text_events, proceed_to_action_selection)
+    
+    def unserializable_properties(self):
+        return ['clients', 'main_client', 'players']
