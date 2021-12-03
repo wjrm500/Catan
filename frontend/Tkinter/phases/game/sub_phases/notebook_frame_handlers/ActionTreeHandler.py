@@ -20,6 +20,7 @@ class ActionTreeHandler:
         self.action_tree.tag_configure('even', background = ColorUtils.darken_hex(Phase.BG_COLOR, 0.05))
         self.action_tree.tag_configure('disabled', foreground = '#808080')
         self.action_tree.tag_configure('enabled', foreground = 'black')
+        self.action_tree.tag_configure('clicked', background = '#9400D3', foreground = '#FFFFFF') ### DarkViolet | White
         self.action_tree.heading('action', text = 'Action', anchor = tkinter.W)
         self.fill_action_tree()
         self.action_tree.pack(expand = True, fill = 'x', side = tkinter.LEFT)
@@ -55,11 +56,18 @@ class ActionTreeHandler:
         self.show_action_cost(action)
     
     def action_tree_click_handler(self, event):
+        ### If another action already clicked, reset
+        for iid in self.action_tree.tag_has('clicked'):
+            even_tag = self.clicked_treeview_item_even_tag
+            self.action_tree.item(iid, tags = (even_tag, 'enabled'))
+
         item = self.action_tree.identify('item', event.x, event.y)
         item = self.action_tree.item(item)
         action, tags = item['text'], item['tags']
         if 'enabled' in tags:
             self.fire_method_from_action(action)
+            self.action_tree.item(action, tags = ('clicked'))
+            self.clicked_treeview_item_even_tag = 'even' if 'even' in tags else 'odd'
     
     def action_tree_leave_handler(self, event):
         self.play_frame_handler.root.configure({'cursor': Phase.CURSOR_DEFAULT})
@@ -75,7 +83,7 @@ class ActionTreeHandler:
                 if (other := cost.get('other')):
                     other_text = f'Other: {", ".join(other)}'
                     cost_texts.append(other_text)
-                cost_text = ' | '.join(cost_texts)
+                cost_text = ' | '.join(cost_texts)                                                  
             else:
                 ### Calculate cost dynamically
                 cost_text = ''
@@ -141,3 +149,7 @@ class ActionTreeHandler:
         button_bg_color = '#90EE90' ### LightGreen
         phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
         phase.button.bind('<Button-1>', phase.end_turn)
+
+        for iid in self.action_tree.tag_has('clicked'):
+            even_tag = self.clicked_treeview_item_even_tag
+            self.action_tree.item(iid, tags = (even_tag, 'enabled'))
