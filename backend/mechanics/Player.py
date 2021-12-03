@@ -28,18 +28,25 @@ class Player(Incrementable):
     def can_build_road(self):
         resource_card_dict = self.get_resource_card_dict('BUILD_ROAD')
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
+
         ### Check for roadworthy line
         roads_on_board = [x for x in self.roads if x.line]
         nodes_on_roads = [node for road in roads_on_board for node in road.line.nodes if not (node.settlement and node.settlement.player is not self)]
         lines_from_nodes = [line for node in nodes_on_roads for line in node.lines]
         roadworthy_lines = [line for line in lines_from_nodes if not line.road]
+        
         return has_resource_cards_in_hand and self.num_tokens_available('road') > 0 and len(roadworthy_lines) > 0
     
     def can_build_settlement(self):
         resource_card_dict = self.get_resource_card_dict('BUILD_SETTLEMENT')
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
+
         ### Check for settleworthy node
-        return has_resource_cards_in_hand and len(self.settlements) > 0
+        roads_on_board = [x for x in self.roads if x.line]
+        nodes_on_roads = [node for road in roads_on_board for node in road.line.nodes]
+        settleworthy_nodes = [node for node in nodes_on_roads if not node.settlement and not node.adjacent_to_settled_node()]
+
+        return has_resource_cards_in_hand and self.num_tokens_available('settlement') > 0 and len(settleworthy_nodes) > 0
     
     def can_trade_with_bank(self):
         port_settlements = [settlement for settlement in self.settlements if settlement.node and settlement.node.port]
