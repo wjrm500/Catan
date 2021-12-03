@@ -136,9 +136,13 @@ class Game(Unserializable):
             player.set_color(color)
         
     def roll_dice(self):
-        dice_roll_1 = random.randint(1, 6)
-        dice_roll_2 = random.randint(1, 6)
-        total = dice_roll_1 + dice_roll_2
+        while True:
+            dice_roll_1 = random.randint(1, 6)
+            dice_roll_2 = random.randint(1, 6)
+            total = dice_roll_1 + dice_roll_2
+            if len(self.dice_rolls) % 2 != 0 and self.dice_rolls[-1] == total: ### Same turn, same number
+                continue
+            break
         self.dice_rolls.append(total)
         text_events = []
         bounties_gained = {
