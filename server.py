@@ -88,9 +88,12 @@ class Server:
                 elif action == ActionFactory.PLACE_ROBBER:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
                     hexagon = game.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, input_data['hexagon'].id)
-                    game.distributor.robber.place_on_hexagon(hexagon)
-                    output_data = {'action': action, 'hexagon': hexagon, 'player': player}
+                    robber = game.distributor.robber
+                    robber.place_on_hexagon(hexagon)
+                    text_events = robber.do_the_robbing(robber_mover = player)
+                    output_data = {'action': action, 'hexagon': hexagon, 'player': player, 'players': game.players, 'text_events': text_events} ### Need to update player client side
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.ROLL_DICE:
                     game_code = input_data['game_code']

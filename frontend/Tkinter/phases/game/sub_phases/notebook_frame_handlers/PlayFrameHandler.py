@@ -28,6 +28,7 @@ class PlayFrameHandler(BaseFrameHandler):
     def transition_to_action_selection(self, event):
         self.dice_roll_overlay.destroy()
         self.update_resource_cards()
+        self.update_movable_pieces()
         self.action_tree_handler.fill_action_tree()
         self.show_action_frame()
     

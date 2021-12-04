@@ -21,7 +21,8 @@ class Distributor:
     OBJ_ROAD = 'road'
     OBJ_SETTLEMENT = 'settlement'
 
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.cities = []
         self.hexagons = []
         self.lines = []
@@ -29,7 +30,7 @@ class Distributor:
         self.ports = []
         self.roads = []
         self.settlements = []
-        self.robber = Robber()
+        self.robber = Robber(self)
     
     def get_city(self, player):
         city = City(player)

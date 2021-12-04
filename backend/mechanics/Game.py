@@ -17,7 +17,7 @@ class Game(Unserializable):
         self.num_hexagons = num_hexagons
         self.clients = {}
         self.players = []
-        self.distributor = Distributor()
+        self.distributor = Distributor(self)
         self.started = False
         self.started_proper = False
         self.code = ''.join(random.choices(string.ascii_lowercase, k = 5))
