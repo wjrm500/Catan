@@ -94,12 +94,14 @@ class MainGamePhase(GamePhase):
         self.button.bind('<Button-1>', self.end_turn)
     
     def deactivate_button(self):
-        self.button_text.set('Disabled')
-        self.button['state'] = 'disable'
-        self.button.configure({'background': '#cccccc'}) ### LightGreen
-        self.button.unbind('<Motion>')
-        self.button.unbind('<Leave>')
-        self.button.unbind('<Button-1>')
+        if hasattr(self, 'button_text'):
+            self.button_text.set('Disabled')
+        if hasattr(self, 'button'):
+            self.button['state'] = 'disable'
+            self.button.configure({'background': '#cccccc'}) ### LightGreen
+            self.button.unbind('<Motion>')
+            self.button.unbind('<Leave>')
+            self.button.unbind('<Button-1>')
     
     def end_turn(self, event):
         self.root.configure(cursor = self.CURSOR_DEFAULT)

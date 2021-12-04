@@ -61,6 +61,8 @@ class PlayFrameHandler(BaseFrameHandler):
         self.instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
         self.instruct_label.bind('<Button-1>', self.roll_dice)
         
+        self.phase.deactivate_button()
+        
     def action_selection_setup(self):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
