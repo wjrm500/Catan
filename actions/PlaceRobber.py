@@ -1,4 +1,5 @@
 from actions.Action import Action
+from backend.mechanics.Distributor import Distributor
 from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
@@ -11,7 +12,14 @@ class PlaceRobber(Action):
         self.chaperone = chaperone
         self.game_phase = self.chaperone.current_phase
         self.data = data
-        self.chaperone.distributor = self.data['distributor']
+        
+        self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
+
+        ### Following three lines necessary to work with client-side versions of objects
+        hexagon = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, data['hexagon'].id)
+        robber = self.hexagon_rendering.distributor.robber
+        robber.place_on_hexagon(hexagon)
+
         self.update_gui()
     
     def update_gui(self):

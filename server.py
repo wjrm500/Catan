@@ -89,8 +89,7 @@ class Server:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     hexagon = game.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, input_data['hexagon'].id)
-                    game.distributor.robber.place_on_hexagon(hexagon)
-                    output_data = {'action': action, 'distributor': game.distributor, 'hexagon': hexagon, 'player': player}
+                    output_data = {'action': action, 'hexagon': hexagon, 'player': player}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.ROLL_DICE:
                     game_code = input_data['game_code']
