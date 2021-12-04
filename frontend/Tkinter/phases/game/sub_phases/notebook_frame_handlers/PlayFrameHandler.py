@@ -60,7 +60,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.instruct_label.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
         self.instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
         self.instruct_label.bind('<Button-1>', self.roll_dice)
-        
+
         self.phase.deactivate_button()
         
     def action_selection_setup(self):
@@ -84,7 +84,7 @@ class PlayFrameHandler(BaseFrameHandler):
     def enable_or_disable_cards(self):
         for card_frames in self.card_frames.values():
             for card_frame in card_frames.values():
-                card_frame.enable_or_disable_cards()
+                card_frame.enable_or_disable_labels()
     
     def show_action_frame(self):
         self.action_frame.grid(row = 3, column = 0, sticky = 'ew')

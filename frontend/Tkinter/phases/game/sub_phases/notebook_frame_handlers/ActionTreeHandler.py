@@ -158,6 +158,8 @@ class ActionTreeHandler:
             self.trade_with_bank_overlay.destroy()
 
     def trade_with_bank_setup(self):
+        self.give_type = ''
+        self.receive_type = ''
         self.play_frame_handler.root.update_idletasks()
         frame_width = self.frame.master.master.winfo_width() ### Get width of inner frame middle right
         self.trade_with_bank_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
@@ -170,17 +172,23 @@ class ActionTreeHandler:
         hand_dict = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
         port_types = player.port_types()
         Card = namedtuple('Card', ['resource_type', 'cost'])
-        give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(port_types, resource_type))]
+        give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(resource_type, port_types))]
         receive_iterable = [Card(resource_type, 1) for resource_type in config['resource_types'].keys() if resource_type != 'desert']
         give_iterable = {
+            'name': 'give',
             'title': 'What do you want to give?',
+            'card_click_event_handler': self.give_card_click,
             'iterable': give_iterable
         }
         receive_iterable = {
+            'name': 'receive',
             'title': 'What do you want to receive?',
+            'card_click_event_handler': self.receive_card_click,
             'iterable': receive_iterable
         }
+        self.trade_with_bank_card_frames = {}
         for i, iterable in enumerate([give_iterable, receive_iterable]):
+            self.trade_with_bank_card_frames[iterable['name']] = []
             outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
             outer_frame_top = tkinter.Label(outer_frame, text = iterable['title'], anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
             outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
@@ -196,7 +204,12 @@ class ActionTreeHandler:
                 num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, text = tup.cost)
                 type_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
                 num_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
+                for label in [type_label, num_label]:
+                    label.bind('<Button-1>', iterable['card_click_event_handler'])
+                    label.bind('<Motion>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_HAND))
+                    label.bind('<Leave>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_DEFAULT))
                 inner_frame.grid(row = 0, column = j, padx = 2.5)
+                self.trade_with_bank_card_frames[iterable['name']].append(inner_frame)
             outer_frame.grid(row = i, column = 0, sticky = 'ew')
         
         ### Summary section
@@ -211,6 +224,44 @@ class ActionTreeHandler:
 
         ### Confirm button
         outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        confirm_button = tkinter.Button(outer_frame, text = 'Confirm', background = '#DCDCDC', foreground = '#808080', anchor = tkinter.W) ### Disabled before activated
-        confirm_button.pack(side = tkinter.TOP)
+        self.trade_with_bank_confirm_button = tkinter.Button(outer_frame, text = 'Confirm', background = '#DCDCDC', foreground = '#808080', anchor = tkinter.W) ### Disabled before activated
+        self.trade_with_bank_confirm_button.pack(side = tkinter.TOP)
         outer_frame.grid(row = 3, column = 0, sticky = 'ew')
+    
+    def give_card_click(self, event):
+        for card_frame in self.trade_with_bank_card_frames['give']:
+            card_frame.disable_labels()
+        card_frame = event.widget.master
+        card_frame.enable_labels()
+        self.give_type = card_frame.get_type()
+        self.update_trade_with_bank_summary_text()
+        self.activate_confirm_button_if_give_and_receive()
+    
+    def receive_card_click(self, event):
+        for card_frame in self.trade_with_bank_card_frames['receive']:
+            card_frame.disable_labels()
+        card_frame = event.widget.master
+        card_frame.enable_labels()
+        self.receive_type = card_frame.get_type()
+        self.update_trade_with_bank_summary_text()
+        self.activate_confirm_button_if_give_and_receive()
+    
+    def update_trade_with_bank_summary_text(self):
+        summary_text_components = ['You will']
+        give_and_receive_text_components = []
+        if self.give_type != '':
+            give_and_receive_text_components.append(f'give {self.give_type}')
+        if self.receive_type != '':
+            give_and_receive_text_components.append(f'receive {self.receive_type}')
+        summary_text_components.append(' and '.join(give_and_receive_text_components))
+        self.trade_with_bank_summary_text.set('{}.'.format(' '.join(summary_text_components)))
+    
+    def activate_confirm_button_if_give_and_receive(self):
+        if self.give_type != '' and self.receive_type != '':
+            self.trade_with_bank_confirm_button.configure({'background': '#90EE90', 'foreground': '#000000'}) ### LightGreen | Black
+            self.trade_with_bank_confirm_button.bind('<Button-1>', self.trade_with_bank)
+            self.trade_with_bank_confirm_button.bind('<Motion>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_HAND))
+            self.trade_with_bank_confirm_button.bind('<Leave>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_DEFAULT))
+    
+    def trade_with_bank(self, event):
+        self.phase.chaperone.trade_with_bank(self.give_type, self.receive_type)

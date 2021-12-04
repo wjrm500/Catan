@@ -128,6 +128,15 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def trade_with_bank(self, give_type, receive_type):
+        data = {
+            'action': ActionFactory.TRADE_WITH_BANK,
+            'game_code': self.game_code,
+            'give_type': give_type,
+            'receive_type': receive_type
+        }
+        self.client.interface.send_data(self.client.socket, data)
+    
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()

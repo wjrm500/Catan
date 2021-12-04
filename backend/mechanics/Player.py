@@ -48,7 +48,8 @@ class Player(Incrementable):
 
         return has_resource_cards_in_hand and self.num_tokens_available('settlement') > 0 and len(settleworthy_nodes) > 0
     
-    def bank_trade_cost(self, port_types, resource_type):
+    def bank_trade_cost(self, resource_type, port_types = None):
+        port_types = port_types or self.port_types()
         if resource_type in port_types:
             return 2
         if 'general' in port_types:
@@ -63,7 +64,7 @@ class Player(Incrementable):
         port_types = self.port_types()
         resource_nums = dict(Counter([resource_card.type for resource_card in self.hand['resource']]))
         for resource_type, num in resource_nums.items():
-            cost = self.bank_trade_cost(port_types, resource_type)
+            cost = self.bank_trade_cost(resource_type, port_types)
             if num >= cost:
                 return True
         return False
@@ -84,8 +85,7 @@ class Player(Incrementable):
         }
         return d[action]
     
-    def subtract_resource_cards_from_hand(self, action):
-        resource_card_dict = self.get_resource_card_dict(action)
+    def transfer_resources_to_bank(self, resource_card_dict):
         if self.game.started_proper: ### No need to pay for road in settle phase
             marked_for_removal = []
             for resource_card in self.hand['resource']:

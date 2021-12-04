@@ -49,7 +49,7 @@ class Server:
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
                     line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line'].id)
-                    player.subtract_resource_cards_from_hand(action)
+                    player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     line.add_road(road := player.get_free_road())
                     output_data = {'action': action, 'line': line, 'player': player, 'players': game.players, 'road': road}
                     self.broadcast_to_game(game.code, output_data)
@@ -58,7 +58,7 @@ class Server:
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
-                    player.subtract_resource_cards_from_hand(action)
+                    player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     node.add_settlement(settlement := player.get_free_settlement())
                     output_data = {'action': action, 'node': node, 'player': player, 'settlement': settlement} ### TODO: Player has spent a settlement
                     self.broadcast_to_game(game.code, output_data)
@@ -116,6 +116,17 @@ class Server:
                     game = self.games[game_code]
                     game.started_proper = True
                     self.broadcast_to_game(input_data['game_code'], {'action': action})
+                elif action == ActionFactory.TRADE_WITH_BANK:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    give_type = input_data['give_type']
+                    cost = player.bank_trade_cost(give_type)
+                    player.transfer_resources_to_bank({give_type: cost})
+                    resource_card = game.resource_cards[input_data['receive_type']].pop()
+                    player.hand['resource'].append(resource_card)
+                    output_data = {'action': action, 'player': player}
+                    self.broadcast_to_game(game_code, output_data)
             except Exception as e:
                 print(str(e))
                 ### End any games for which the client was the main client
