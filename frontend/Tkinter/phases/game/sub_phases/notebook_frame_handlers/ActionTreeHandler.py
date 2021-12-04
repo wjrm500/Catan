@@ -164,7 +164,8 @@ class ActionTreeHandler:
         self.trade_with_bank_overlay.grid_columnconfigure(0, weight = 1)
         self.trade_with_bank_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-    
+
+        ### "What do you want to give?" and "What do you want to receive?" sections
         player = self.play_frame_handler.player
         hand_dict = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
         port_types = player.port_types()
@@ -197,3 +198,19 @@ class ActionTreeHandler:
                 num_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
                 inner_frame.grid(row = 0, column = j, padx = 2.5)
             outer_frame.grid(row = i, column = 0, sticky = 'ew')
+        
+        ### Summary section
+        outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
+        outer_frame_top = tkinter.Label(outer_frame, text = 'Summary', anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
+        self.trade_with_bank_summary_text = tkinter.StringVar()
+        self.trade_with_bank_summary_text.set('')
+        outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_summary_text, background = darker_blue, anchor = tkinter.W, font = ('Arial', 10))
+        outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
+        outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
+        outer_frame.grid(row = 2, column = 0, sticky = 'ew')
+
+        ### Confirm button
+        outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
+        confirm_button = tkinter.Button(outer_frame, text = 'Confirm', background = '#DCDCDC', foreground = '#808080', anchor = tkinter.W) ### Disabled before activated
+        confirm_button.pack(side = tkinter.TOP)
+        outer_frame.grid(row = 3, column = 0, sticky = 'ew')
