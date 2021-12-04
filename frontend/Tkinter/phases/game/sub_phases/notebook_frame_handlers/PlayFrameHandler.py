@@ -115,7 +115,7 @@ class PlayFrameHandler(BaseFrameHandler):
             label_partial = partial(CardFrameLabel, master = inner_frame, background = tup.color, width = round(frame_width / 50), wraplength = round(frame_width / 8))
             type_label = label_partial(height = 1, text = type_label_text)
             num_label_text = tkinter.StringVar()
-            num_of_thing = self.phase.chaperone.player.num_of_resource_in_hand(tup.name)
+            num_of_thing = self.phase.chaperone.player.num_of_resource_in_hand(tup.name) ### Doesn't make sense for development cards
             num_label_text.set(num_of_thing)
             self.card_num_label_texts[type][tup.name] = num_label_text
             num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, textvariable = num_label_text)

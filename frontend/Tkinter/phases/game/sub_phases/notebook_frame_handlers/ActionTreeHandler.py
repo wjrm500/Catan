@@ -1,14 +1,21 @@
+from collections import Counter, namedtuple
+from functools import partial
 import tkinter
 from tkinter import ttk
 
 from config import config
 from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
+from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrame import CardFrame
+from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLabel import CardFrameLabel
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class ActionTreeHandler:
     def __init__(self, play_frame_handler):
         self.play_frame_handler = play_frame_handler
+        self.frame = self.play_frame_handler.frame
+        self.phase = self.play_frame_handler.phase
+        self.hexagon_rendering = self.phase.hexagon_rendering
 
     def create_action_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
@@ -104,52 +111,89 @@ class ActionTreeHandler:
             self.handle_build_road()
         elif action == 'BUILD_SETTLEMENT':
             self.handle_build_settlement()
+        elif action == 'TRADE_WITH_BANK':
+            self.handle_trade_with_bank()
+    
+    def set_cancel_button(self):
+        self.phase.button_text.set('Cancel')
+        button_bg_color = '#FF0000' ### Red
+        self.phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
+        self.phase.button.bind('<Button-1>', self.cancel)
+    
+    def set_instruction(self, instruction_text):
+        self.phase.instruction_text.set(instruction_text)
+        instruction_bg_color = '#9400D3' ### DarkViolet
+        self.phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
     
     def handle_build_road(self):
-        phase = self.play_frame_handler.phase
-        hexagon_rendering = phase.hexagon_rendering
-        hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
-
-        phase.instruction_text.set('Build a road!')
-        instruction_bg_color = '#9400D3' ### DarkViolet
-        phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
-
-        ### Bottom right corner button
-        phase.button_text.set('Cancel')
-        button_bg_color = '#FF0000' ### Red
-        phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
-        phase.button.bind('<Button-1>', self.cancel)
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
+        self.set_instruction('Build a road!')
+        self.set_cancel_button()
     
     def handle_build_settlement(self):
-        phase = self.play_frame_handler.phase
-        hexagon_rendering = phase.hexagon_rendering
-        hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
-
-        phase.instruction_text.set('Build a settlement!')
-        instruction_bg_color = '#9400D3' ### DarkViolet
-        phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
-
-        ### Bottom right corner button
-        phase.button_text.set('Cancel')
-        button_bg_color = '#FF0000' ### Red
-        phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
-        phase.button.bind('<Button-1>', self.cancel)
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
+        self.set_instruction('Build a settlement!')
+        self.set_cancel_button()
+        
+    def handle_trade_with_bank(self):
+        self.trade_with_bank_setup()
+        self.set_instruction('Trade with the bank!')
+        self.set_cancel_button()
     
     def cancel(self, event):
         phase = self.play_frame_handler.phase
         hexagon_rendering = phase.hexagon_rendering
         hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DEFAULT
-
         phase.instruction_text.set("It's your turn!")
         instruction_bg_color = '#90EE90' ### LightGreen
         phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
-
-        ### Bottom right corner button
         phase.button_text.set('End turn')
         button_bg_color = '#90EE90' ### LightGreen
         phase.button.configure({'background': button_bg_color, 'foreground': ColorUtils.get_fg_from_bg(button_bg_color)})
         phase.button.bind('<Button-1>', phase.end_turn)
-
         for iid in self.action_tree.tag_has('clicked'):
             even_tag = self.clicked_treeview_item_even_tag
             self.action_tree.item(iid, tags = (even_tag, 'enabled'))
+        if hasattr(self, 'trade_with_bank_overlay'):
+            self.trade_with_bank_overlay.destroy()
+
+    def trade_with_bank_setup(self):
+        self.play_frame_handler.root.update_idletasks()
+        frame_width = self.frame.master.master.winfo_width() ### Get width of inner frame middle right
+        self.trade_with_bank_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
+        self.trade_with_bank_overlay.grid_columnconfigure(0, weight = 1)
+        self.trade_with_bank_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
+        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
+    
+        player = self.play_frame_handler.player
+        hand_dict = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
+        port_types = player.port_types()
+        Card = namedtuple('Card', ['resource_type', 'cost'])
+        give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(port_types, resource_type))]
+        receive_iterable = [Card(resource_type, 1) for resource_type in config['resource_types'].keys() if resource_type != 'desert']
+        give_iterable = {
+            'title': 'What do you want to give?',
+            'iterable': give_iterable
+        }
+        receive_iterable = {
+            'title': 'What do you want to receive?',
+            'iterable': receive_iterable
+        }
+        for i, iterable in enumerate([give_iterable, receive_iterable]):
+            outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
+            outer_frame_top = tkinter.Label(outer_frame, text = iterable['title'], anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
+            outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
+            outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
+            outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
+            outer_frame.grid_rowconfigure(0, weight = 1)
+            for j, tup in enumerate(iterable['iterable']):
+                outer_frame_bottom.grid_columnconfigure(j, weight = 1, uniform = 'catan')
+                inner_frame = CardFrame(outer_frame_bottom, highlightbackground = '#808080', highlightthickness = 3)
+                bg_color = config['resource_types'][tup.resource_type]['color']
+                label_partial = partial(CardFrameLabel, master = inner_frame, background = bg_color, width = round(frame_width / 50), wraplength = round(frame_width / 8))
+                type_label = label_partial(height = 1, text = tup.resource_type.title())
+                num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, text = tup.cost)
+                type_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
+                num_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
+                inner_frame.grid(row = 0, column = j, padx = 2.5)
+            outer_frame.grid(row = i, column = 0, sticky = 'ew')

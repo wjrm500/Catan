@@ -45,5 +45,5 @@ class PlaceRobber(Action):
         text_area = self.get_text_area(in_settling_phase = False)
         self.enable_text_area(text_area)
         hexagon = self.data['hexagon']
-        text_area.insert('end', f'\n\n{self.data["player"].name} placed the robber on a {hexagon.num_pips}-pip {hexagon.resource_type} hexagon!')
+        text_area.insert('end', f'\n\n{self.data["player"].name} placed the robber on a {hexagon.num_pips}-pip {hexagon.resource_type} hexagon.')
         self.disable_text_area(text_area)

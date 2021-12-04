@@ -48,18 +48,23 @@ class Player(Incrementable):
 
         return has_resource_cards_in_hand and self.num_tokens_available('settlement') > 0 and len(settleworthy_nodes) > 0
     
-    def can_trade_with_bank(self):
+    def bank_trade_cost(self, port_types, resource_type):
+        if resource_type in port_types:
+            return 2
+        if 'general' in port_types:
+            return 3
+        return 4
+    
+    def port_types(self):
         port_settlements = [settlement for settlement in self.settlements if settlement.node and settlement.node.port]
-        port_types = set([settlement.node.port.type for settlement in port_settlements])
-        resources = dict(Counter([resource_card.type for resource_card in self.hand['resource']]))
-        if resources:
-            for port_type in port_types:
-                if resources.get(port_type, 0) >= 2:
-                    return True
-            if 'general' in port_types:
-                if max(resources.values()) >= 3:
-                    return True
-            if max(resources.values()) >= 4:
+        return set([settlement.node.port.type for settlement in port_settlements])
+
+    def can_trade_with_bank(self):
+        port_types = self.port_types()
+        resource_nums = dict(Counter([resource_card.type for resource_card in self.hand['resource']]))
+        for resource_type, num in resource_nums.items():
+            cost = self.bank_trade_cost(port_types, resource_type)
+            if num >= cost:
                 return True
         return False
     

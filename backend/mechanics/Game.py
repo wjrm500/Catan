@@ -194,7 +194,7 @@ class Game(Unserializable):
                     text_events.append(text_event)
 
         if not text_events:
-            text_events = ['Nobody gained anything!']
+            text_events = ['Nobody gained anything.']
         proceed_to_action_selection = len(self.dice_rolls) % 2 == 0 ### If total dice rolls is even after this dice roll then it's time for the active player to proceed to action selection
         return DiceRoll(dice_roll_1, dice_roll_2, total, text_events, proceed_to_action_selection)
     
