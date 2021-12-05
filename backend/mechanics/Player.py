@@ -24,6 +24,8 @@ class Player(Incrementable):
             return self.can_build_settlement()
         elif action == 'TRADE_WITH_BANK':
             return self.can_trade_with_bank()
+        elif action == 'BUY_DEVELOPMENT_CARD':
+            return self.can_buy_development_card()
     
     def can_build_road(self):
         resource_card_dict = self.get_resource_card_dict('BUILD_ROAD')
@@ -69,6 +71,11 @@ class Player(Incrementable):
                 return True
         return False
     
+    def can_buy_development_card(self):
+        resource_card_dict = self.get_resource_card_dict('BUY_DEVELOPMENT_CARD')
+        has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
+        return has_resource_cards_in_hand and len(self.game.development_cards) > 0
+    
     def has_resource_cards_in_hand(self, resource_card_dict):
         resource_card_counter = Counter(resource_card_dict)
         hand_counter = Counter([resource_card.type for resource_card in self.hand['resource']])
@@ -81,7 +88,8 @@ class Player(Incrementable):
     def get_resource_card_dict(self, action):
         d = {
             'BUILD_ROAD': {'brick': 1, 'lumber': 1},
-            'BUILD_SETTLEMENT': {'brick': 1, 'grain': 1, 'lumber': 1, 'wool': 1}
+            'BUILD_SETTLEMENT': {'brick': 1, 'grain': 1, 'lumber': 1, 'wool': 1},
+            'BUY_DEVELOPMENT_CARD': {'grain': 1, 'ore': 1, 'wool': 1}
         }
         return d[action]
     
