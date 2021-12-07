@@ -76,6 +76,9 @@ class Player(Incrementable):
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
         return has_resource_cards_in_hand and len(self.game.development_cards) > 0
     
+    def can_use_development_card(self):
+        return len(self.hand['development']) > 0
+    
     def has_resource_cards_in_hand(self, resource_card_dict):
         resource_card_counter = Counter(resource_card_dict)
         hand_counter = Counter([resource_card.type for resource_card in self.hand['resource']])
