@@ -161,78 +161,88 @@ class ActionTreeHandler:
             even_tag = self.clicked_treeview_item_even_tag
             self.action_tree.item(iid, tags = (even_tag, 'enabled'))
         if hasattr(self, 'trade_with_bank_overlay'):
-            self.trade_with_bank_overlay.destroy()
+            # self.trade_with_bank_overlay.destroy()
+            for verb in ['give', 'receive']:
+                for card_frame in self.trade_with_bank_card_frames[verb]:
+                    card_frame.disable_labels()
+            self.trade_with_bank_confirm_button.configure({'background': '#DCDCDC', 'foreground': '#808080'})
+            self.trade_with_bank_confirm_button.unbind('<Button-1>')
+            self.trade_with_bank_confirm_button.unbind('<Motion>')
+            self.trade_with_bank_confirm_button.unbind('<Leave>')
+            self.trade_with_bank_overlay.place_forget()
 
     def trade_with_bank_setup(self):
         self.give_type = ''
         self.receive_type = ''
         self.play_frame_handler.root.update_idletasks()
         frame_width = self.frame.master.master.winfo_width() ### Get width of inner frame middle right
-        self.trade_with_bank_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
-        self.trade_with_bank_overlay.grid_columnconfigure(0, weight = 1)
-        self.trade_with_bank_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
+        if not hasattr(self, 'trade_with_bank_overlay'):
+            self.trade_with_bank_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
+            self.trade_with_bank_overlay.grid_columnconfigure(0, weight = 1)
+            darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
 
-        ### "What do you want to give?" and "What do you want to receive?" sections
-        player = self.play_frame_handler.player
-        hand_dict = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
-        port_types = player.port_types()
-        Card = namedtuple('Card', ['resource_type', 'cost'])
-        give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(resource_type, port_types))]
-        receive_iterable = [Card(resource_type, 1) for resource_type in config['resource_types'].keys() if resource_type != 'desert']
-        give_iterable = {
-            'name': 'give',
-            'title': 'What do you want to give?',
-            'card_click_event_handler': self.give_card_click,
-            'iterable': give_iterable
-        }
-        receive_iterable = {
-            'name': 'receive',
-            'title': 'What do you want to receive?',
-            'card_click_event_handler': self.receive_card_click,
-            'iterable': receive_iterable
-        }
-        self.trade_with_bank_card_frames = {}
-        for i, iterable in enumerate([give_iterable, receive_iterable]):
-            self.trade_with_bank_card_frames[iterable['name']] = []
+            ### "What do you want to give?" and "What do you want to receive?" sections
+            player = self.play_frame_handler.player
+            hand_dict = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
+            port_types = player.port_types()
+            Card = namedtuple('Card', ['resource_type', 'cost'])
+            give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(resource_type, port_types))]
+            receive_iterable = [Card(resource_type, 1) for resource_type in config['resource_types'].keys() if resource_type != 'desert']
+            give_iterable = {
+                'name': 'give',
+                'title': 'What do you want to give?',
+                'card_click_event_handler': self.give_card_click,
+                'iterable': give_iterable
+            }
+            receive_iterable = {
+                'name': 'receive',
+                'title': 'What do you want to receive?',
+                'card_click_event_handler': self.receive_card_click,
+                'iterable': receive_iterable
+            }
+            self.trade_with_bank_card_frames = {}
+            for i, iterable in enumerate([give_iterable, receive_iterable]):
+                self.trade_with_bank_card_frames[iterable['name']] = []
+                outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
+                outer_frame_top = tkinter.Label(outer_frame, text = iterable['title'], anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
+                outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
+                outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
+                outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
+                outer_frame.grid_rowconfigure(0, weight = 1)
+                for j, tup in enumerate(iterable['iterable']):
+                    outer_frame_bottom.grid_columnconfigure(j, weight = 1, uniform = 'catan')
+                    inner_frame = CardFrame(outer_frame_bottom, highlightbackground = '#808080', highlightthickness = 3)
+                    bg_color = config['resource_types'][tup.resource_type]['color']
+                    label_partial = partial(CardFrameLabel, master = inner_frame, background = bg_color, width = round(frame_width / 50), wraplength = round(frame_width / 8))
+                    type_label = label_partial(height = 1, text = tup.resource_type.title())
+                    num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, text = tup.cost)
+                    type_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
+                    num_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
+                    for label in [type_label, num_label]:
+                        label.bind('<Button-1>', iterable['card_click_event_handler'])
+                        label.bind('<Motion>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_HAND))
+                        label.bind('<Leave>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_DEFAULT))
+                    inner_frame.grid(row = 0, column = j, padx = 2.5)
+                    self.trade_with_bank_card_frames[iterable['name']].append(inner_frame)
+                outer_frame.grid(row = i, column = 0, sticky = 'ew')
+        
+            ### Summary section
             outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
-            outer_frame_top = tkinter.Label(outer_frame, text = iterable['title'], anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
-            outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
+            outer_frame_top = tkinter.Label(outer_frame, text = 'Summary', anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
+            self.trade_with_bank_summary_text = tkinter.StringVar()
+            self.trade_with_bank_summary_text.set('')
+            outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_summary_text, background = darker_blue, anchor = tkinter.W, font = ('Arial', 10))
             outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
             outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
-            outer_frame.grid_rowconfigure(0, weight = 1)
-            for j, tup in enumerate(iterable['iterable']):
-                outer_frame_bottom.grid_columnconfigure(j, weight = 1, uniform = 'catan')
-                inner_frame = CardFrame(outer_frame_bottom, highlightbackground = '#808080', highlightthickness = 3)
-                bg_color = config['resource_types'][tup.resource_type]['color']
-                label_partial = partial(CardFrameLabel, master = inner_frame, background = bg_color, width = round(frame_width / 50), wraplength = round(frame_width / 8))
-                type_label = label_partial(height = 1, text = tup.resource_type.title())
-                num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, text = tup.cost)
-                type_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
-                num_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
-                for label in [type_label, num_label]:
-                    label.bind('<Button-1>', iterable['card_click_event_handler'])
-                    label.bind('<Motion>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_HAND))
-                    label.bind('<Leave>', lambda evt: self.play_frame_handler.root.configure(cursor = Phase.CURSOR_DEFAULT))
-                inner_frame.grid(row = 0, column = j, padx = 2.5)
-                self.trade_with_bank_card_frames[iterable['name']].append(inner_frame)
-            outer_frame.grid(row = i, column = 0, sticky = 'ew')
-        
-        ### Summary section
-        outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        outer_frame_top = tkinter.Label(outer_frame, text = 'Summary', anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
-        self.trade_with_bank_summary_text = tkinter.StringVar()
-        self.trade_with_bank_summary_text.set('')
-        outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_summary_text, background = darker_blue, anchor = tkinter.W, font = ('Arial', 10))
-        outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
-        outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
-        outer_frame.grid(row = 2, column = 0, sticky = 'ew')
+            outer_frame.grid(row = 2, column = 0, sticky = 'ew')
 
-        ### Confirm button
-        outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        self.trade_with_bank_confirm_button = tkinter.Button(outer_frame, text = 'Confirm', background = '#DCDCDC', foreground = '#808080', anchor = tkinter.W) ### Disabled before activated
-        self.trade_with_bank_confirm_button.pack(side = tkinter.TOP)
-        outer_frame.grid(row = 3, column = 0, sticky = 'ew')
+            ### Confirm button
+            outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
+            self.trade_with_bank_confirm_button = tkinter.Button(outer_frame, text = 'Confirm', background = '#DCDCDC', foreground = '#808080', anchor = tkinter.W) ### Disabled before activated
+            self.trade_with_bank_confirm_button.pack(side = tkinter.TOP)
+            outer_frame.grid(row = 3, column = 0, sticky = 'ew')
+
+        self.trade_with_bank_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
     
     def give_card_click(self, event):
         for card_frame in self.trade_with_bank_card_frames['give']:
