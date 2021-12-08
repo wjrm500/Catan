@@ -69,6 +69,7 @@ class Server:
                     player = game.get_player_from_client_address(client_address)
                     development_card = game.development_cards.pop()
                     player.hand['development'].append(development_card)
+                    player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     output_data = {'action': action, 'player': player}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
