@@ -29,9 +29,8 @@ class BuildSettlement(Action):
         self.update_gui()
     
     def update_gui(self):
-        is_instigating_client = self.data['player'].id == self.chaperone.player.id
         in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')
-        if is_instigating_client:
+        if self.is_instigating_client():
             self.hexagon_rendering.handle_leave(event = None)
         else:
             self.hexagon_rendering.draw_board_items()

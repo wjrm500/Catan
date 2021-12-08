@@ -136,6 +136,13 @@ class Chaperone:
             'receive_type': receive_type
         }
         self.client.interface.send_data(self.client.socket, data)
+
+    def buy_development_card(self):
+        data = {
+            'action': ActionFactory.BUY_DEVELOPMENT_CARD,
+            'game_code': self.game_code
+        }
+        self.client.interface.send_data(self.client.socket, data)
     
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):

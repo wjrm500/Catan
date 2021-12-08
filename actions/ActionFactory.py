@@ -1,6 +1,7 @@
 from actions.AddPlayer import AddPlayer
 from actions.BuildRoad import BuildRoad
 from actions.BuildSettlement import BuildSettlement
+from actions.BuyDevelopmentCard import BuyDevelopmentCard
 from actions.CreateNewGame import CreateNewGame
 from actions.EndGame import EndGame
 from actions.EndTurn import EndTurn
@@ -11,7 +12,6 @@ from actions.RollDice import RollDice
 from actions.StartGame import StartGame
 from actions.StartGameProper import StartGameProper
 from actions.TradeWithBank import TradeWithBank
-from actions.main_game.BuyDevelopmentCard import BuyDevelopmentCard
 from actions.main_game.MoveRobberToDesert import MoveRobberToDesert
 from actions.main_game.SwapCards import SwapCards
 from actions.main_game.UpgradeSettlement import UpgradeSettlement

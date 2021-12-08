@@ -2,6 +2,9 @@ class Action:
     def __init__(self):
         pass
 
+    def is_instigating_client(self):
+        return self.data['player'].id == self.chaperone.player.id
+
     def reload_active_player(self):
         ### Update active player client side (to reflect paid for action)
         if self.chaperone.player.id == self.data['player'].id:
@@ -18,12 +21,12 @@ class Action:
         action_tree_handler = play_frame_handler.action_tree_handler
         action_tree_handler.cancel(event = None)
         play_frame_handler.update_resource_cards()
+        play_frame_handler.update_development_cards()
         play_frame_handler.update_movable_pieces()
         action_tree_handler.fill_action_tree()
     
     def refresh_game_board(self, full_refresh = False):
-        is_instigating_client = self.data['player'].id == self.chaperone.player.id
-        if is_instigating_client:
+        if self.is_instigating_client():
             self.game_phase.hexagon_rendering.handle_leave(event = None, full_refresh = full_refresh)
         else:
             if full_refresh:

@@ -117,7 +117,7 @@ class PlayFrameHandler(BaseFrameHandler):
             label_partial = partial(CardFrameLabel, master = inner_frame, background = tup.color, width = round(frame_width / 50), wraplength = round(frame_width / 8))
             type_label = label_partial(height = 1, text = type_label_text)
             num_label_text = tkinter.StringVar()
-            num_of_thing = self.phase.chaperone.player.num_of_resource_in_hand(tup.name) ### Doesn't make sense for development cards
+            num_of_thing = self.phase.chaperone.player.num_of_card_type_in_hand(tup.name)
             num_label_text.set(num_of_thing)
             self.card_num_label_texts[type][tup.name] = num_label_text
             num_label = label_partial(font = ('Arial', '12', 'bold'), height = 1, textvariable = num_label_text)
@@ -165,6 +165,13 @@ class PlayFrameHandler(BaseFrameHandler):
         for resource_type, num_label in self.card_num_label_texts['resource'].items():
             num_of_resource = d.get(resource_type, 0)
             num_label.set(str(num_of_resource))
+        self.enable_or_disable_cards()
+    
+    def update_development_cards(self):
+        d = dict(Counter([development_card.type for development_card in self.phase.chaperone.player.hand['development']]))
+        for development_card_type, num_label in self.card_num_label_texts['development'].items():
+            num_of_card = d.get(development_card_type, 0)
+            num_label.set(str(num_of_card))
         self.enable_or_disable_cards()
     
     def update_movable_pieces(self):

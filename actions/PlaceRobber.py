@@ -25,8 +25,7 @@ class PlaceRobber(Action):
         self.update_gui()
     
     def update_gui(self):
-        is_instigating_client = self.data['player'].id == self.chaperone.player.id
-        if is_instigating_client:
+        if self.is_instigating_client():
             self.game_phase.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
             play_frame_handler = self.game_phase.notebook_frame_handlers['play']
             event_text = '\n'.join(self.data['text_events'])

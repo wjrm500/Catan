@@ -3,6 +3,7 @@ import socket
 import threading
 
 from ClientServerInterface import ClientServerInterface
+from actions.Action import Action
 from actions.ActionFactory import ActionFactory
 from backend.mechanics.Distributor import Distributor
 from backend.mechanics.Player import Player
@@ -61,6 +62,14 @@ class Server:
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     node.add_settlement(settlement := player.get_free_settlement())
                     output_data = {'action': action, 'node': node, 'player': player, 'settlement': settlement} ### TODO: Player has spent a settlement
+                    self.broadcast_to_game(game.code, output_data)
+                elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    development_card = game.development_cards.pop()
+                    player.hand['development'].append(development_card)
+                    output_data = {'action': action, 'player': player}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = input_data['num_hexagons']

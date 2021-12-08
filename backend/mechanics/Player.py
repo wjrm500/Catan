@@ -85,8 +85,10 @@ class Player(Incrementable):
         hand_counter.subtract(resource_card_counter)
         return len(list(filter(lambda x: x < 0, hand_counter.values()))) == 0
 
-    def num_of_resource_in_hand(self, resource):
-        return len([x for x in self.hand['resource'] if x.type == resource])
+    def num_of_card_type_in_hand(self, card_type):
+        resource_card_num = len([x for x in self.hand['resource'] if x.type == card_type])
+        development_card_num = len([x for x in self.hand['development'] if x.type == card_type])
+        return resource_card_num or development_card_num
     
     def get_resource_card_dict(self, action):
         d = {

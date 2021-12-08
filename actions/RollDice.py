@@ -21,9 +21,8 @@ class RollDice(Action):
     def update_gui(self):
         dice_face_chars = {1: '\u2680', 2: '\u2681', 3: '\u2682', 4: '\u2683', 5: '\u2684', 6: '\u2685'}
         DiceRoll = self.data['dice_roll']
-        is_instigating_client = self.data['player'].id == self.chaperone.player.id
         play_frame_handler = self.game_phase.notebook_frame_handlers['play']
-        if is_instigating_client:
+        if self.is_instigating_client():
             display_text = f'{dice_face_chars[DiceRoll.roll_1]} + {dice_face_chars[DiceRoll.roll_2]} = {DiceRoll.total}'
             play_frame_handler.dice_roll_text.set(display_text)
             

@@ -107,10 +107,13 @@ class ActionTreeHandler:
         self.action_tree.bind('<Leave>', self.action_tree_leave_handler)
     
     def fire_method_from_action(self, action):
+        ### Consts from ActionFactory not used due to circular import error
         if action == 'BUILD_ROAD':
             self.handle_build_road()
         elif action == 'BUILD_SETTLEMENT':
             self.handle_build_settlement()
+        elif action == 'BUY_DEVELOPMENT_CARD':
+            self.handle_buy_development_card()
         elif action == 'TRADE_WITH_BANK':
             self.handle_trade_with_bank()
     
@@ -134,6 +137,9 @@ class ActionTreeHandler:
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
         self.set_instruction('Build a settlement!')
         self.set_cancel_button()
+    
+    def handle_buy_development_card(self):
+        self.phase.chaperone.buy_development_card()
         
     def handle_trade_with_bank(self):
         self.trade_with_bank_setup()
