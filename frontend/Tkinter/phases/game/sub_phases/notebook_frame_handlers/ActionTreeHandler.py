@@ -166,16 +166,17 @@ class ActionTreeHandler:
             return self.year_of_plenty_card_click
     
     def knight_card_click(self, event):
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_PLACE_ROBBER
         self.set_instruction('Place the robber!')
     
     def monopoly_card_click(self, event):
-        pass
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
 
     def road_building_card_click(self, event):
-        pass
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
 
     def year_of_plenty_card_click(self, event):
-        pass
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
     
     def cancel(self, event):
         phase = self.play_frame_handler.phase
@@ -192,7 +193,6 @@ class ActionTreeHandler:
             even_tag = self.clicked_treeview_item_even_tag
             self.action_tree.item(iid, tags = (even_tag, 'enabled'))
         if hasattr(self, 'trade_with_bank_overlay'):
-            # self.trade_with_bank_overlay.destroy()
             for verb in ['give', 'receive']:
                 for card_frame in self.trade_with_bank_card_frames[verb]:
                     card_frame.disable_labels()
@@ -201,6 +201,8 @@ class ActionTreeHandler:
             self.trade_with_bank_confirm_button.unbind('<Motion>')
             self.trade_with_bank_confirm_button.unbind('<Leave>')
             self.trade_with_bank_overlay.place_forget()
+        for card_frame in self.play_frame_handler.card_frames['development'].values():
+            card_frame.make_labels_unclickable()
 
     def trade_with_bank_setup(self):
         self.give_type = ''

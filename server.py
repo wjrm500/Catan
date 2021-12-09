@@ -103,7 +103,11 @@ class Server:
                     robber = game.distributor.robber
                     robber.place_on_hexagon(hexagon)
                     text_events = robber.do_the_robbing(robber_mover = player)
-                    output_data = {'action': action, 'hexagon': hexagon, 'player': player, 'players': game.players, 'text_events': text_events} ### Need to update player client side
+                    if (from_development_card := input_data['from_development_card']):
+                        card_to_remove = next(card for card in player.hand['development'] if card.type == 'knight')
+                        player.hand['development'].remove(card_to_remove)
+                        player.army_size += 1
+                    output_data = {'action': action, 'from_development_card': from_development_card, 'hexagon': hexagon, 'player': player, 'players': game.players, 'text_events': text_events}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.ROLL_DICE:
                     game_code = input_data['game_code']

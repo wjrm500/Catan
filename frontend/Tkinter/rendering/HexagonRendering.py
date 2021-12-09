@@ -354,7 +354,10 @@ class HexagonRendering:
     def handle_place_robber_click(self, event):
         polygon_id = event.widget.find_withtag('current')[0]
         hexagon = self.polygon_hexagon_dict[polygon_id]
-        self.parent_phase.chaperone.place_robber(hexagon)
+        current_phase = self.parent_phase.chaperone.current_phase
+        play_frame_handler = current_phase.notebook_frame_handlers['play']
+        from_development_card = not play_frame_handler.in_dice_roll_stage
+        self.parent_phase.chaperone.place_robber(hexagon, from_development_card = from_development_card)
 
     def unfocus_focused_hexagons(self):
         for hexagon in self.focused_hexagons:

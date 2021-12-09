@@ -120,9 +120,10 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
-    def place_robber(self, hexagon):
+    def place_robber(self, hexagon, from_development_card):
         data = {
             'action': ActionFactory.PLACE_ROBBER,
+            'from_development_card': from_development_card,
             'game_code': self.game_code,
             'hexagon': hexagon
         }

@@ -26,6 +26,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.dice_roll_setup()
     
     def transition_to_action_selection(self, event):
+        self.in_dice_roll_stage = False
         self.dice_roll_overlay.destroy()
         self.update_resource_cards()
         self.update_movable_pieces()
@@ -36,6 +37,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.hide_action_frame()
 
     def dice_roll_setup(self):
+        self.in_dice_roll_stage = True
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         self.dice_roll_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
         self.dice_roll_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)

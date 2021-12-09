@@ -25,8 +25,8 @@ class PlaceRobber(Action):
         self.update_gui()
     
     def update_gui(self):
-        if self.is_instigating_client():
-            self.game_phase.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+        self.game_phase.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+        if self.is_instigating_client() and not self.data['from_development_card']:
             play_frame_handler = self.game_phase.notebook_frame_handlers['play']
             event_text = '\n'.join(self.data['text_events'])
             play_frame_handler.dice_roll_event_text.set(event_text)

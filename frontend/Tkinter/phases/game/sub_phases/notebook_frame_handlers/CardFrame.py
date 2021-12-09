@@ -19,6 +19,11 @@ class CardFrame(tkinter.Frame):
         children = self.winfo_children()
         for child in children:
             child.disable()
+        
+    def make_labels_unclickable(self):
+        children = self.winfo_children()
+        for child in children:
+            child.make_unclickable()
     
     def get_type(self):
         children = self.winfo_children()
