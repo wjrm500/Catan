@@ -30,7 +30,6 @@ class CardFrameLabel(tkinter.Label):
             foreground = ColorUtils.get_fg_from_bg(self.disabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
         )
         self.master.configure(highlightbackground = '#808080')
-        self.make_unclickable()
     
     def make_unclickable(self):
         self.unbind('<Button-1>')
