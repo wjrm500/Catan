@@ -150,9 +150,32 @@ class ActionTreeHandler:
     
     def handle_use_development_card(self):
         for type, card_frame in self.play_frame_handler.card_frames['development'].items():
-            card_frame.enable_or_disable_labels(clickable = True)
+            func = self.get_development_card_func_from_type(type)
+            card_frame.enable_or_disable_labels(clickable = True, event_handler = func)
         self.set_instruction('Select a development card!')
         self.set_cancel_button()
+    
+    def get_development_card_func_from_type(self, type):
+        if type == 'knight':
+            return self.knight_card_click
+        elif type == 'monopoly':
+            return self.monopoly_card_click
+        elif type == 'road_building':
+            return self.road_building_card_click
+        elif type == 'year_of_plenty':
+            return self.year_of_plenty_card_click
+    
+    def knight_card_click(self, event):
+        self.set_instruction('Place the robber!')
+    
+    def monopoly_card_click(self, event):
+        pass
+
+    def road_building_card_click(self, event):
+        pass
+
+    def year_of_plenty_card_click(self, event):
+        pass
     
     def cancel(self, event):
         phase = self.play_frame_handler.phase
