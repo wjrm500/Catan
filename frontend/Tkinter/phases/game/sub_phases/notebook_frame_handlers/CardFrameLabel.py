@@ -1,6 +1,7 @@
 import tkinter
 
 from frontend.ColorUtils import ColorUtils
+from frontend.Tkinter.phases.Phase import Phase
 
 class CardFrameLabel(tkinter.Label):
     def __init__(self, *args, **kwargs):
@@ -11,12 +12,16 @@ class CardFrameLabel(tkinter.Label):
         kwargs['foreground'] = ColorUtils.get_fg_from_bg(self.disabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
         super().__init__(*args, **kwargs)
     
-    def enable(self):
+    def enable(self, clickable):
         self.configure(
             background = self.enabled_background,
             foreground = ColorUtils.get_fg_from_bg(self.enabled_background)
         )
         self.master.configure(highlightbackground = '#000000')
+        if clickable:
+            root = self.winfo_toplevel()
+            self.bind('<Motion>', lambda evt: root.configure(cursor = Phase.CURSOR_HAND))
+            self.bind('<Leave>', lambda evt: root.configure(cursor = Phase.CURSOR_DEFAULT))
     
     def disable(self):
         self.configure(
@@ -24,3 +29,5 @@ class CardFrameLabel(tkinter.Label):
             foreground = ColorUtils.get_fg_from_bg(self.disabled_background, light_fg = '#DCDCDC', dark_fg = '#808080')
         )
         self.master.configure(highlightbackground = '#808080')
+        self.unbind('<Motion>')
+        self.unbind('<Leave>')

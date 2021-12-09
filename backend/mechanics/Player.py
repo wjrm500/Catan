@@ -26,6 +26,8 @@ class Player(Incrementable):
             return self.can_trade_with_bank()
         elif action == 'BUY_DEVELOPMENT_CARD':
             return self.can_buy_development_card()
+        elif action == 'USE_DEVELOPMENT_CARD':
+            return self.can_use_development_card()
     
     def can_build_road(self):
         resource_card_dict = self.get_resource_card_dict('BUILD_ROAD')

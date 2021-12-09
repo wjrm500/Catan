@@ -116,6 +116,8 @@ class ActionTreeHandler:
             self.handle_buy_development_card()
         elif action == 'TRADE_WITH_BANK':
             self.handle_trade_with_bank()
+        elif action == 'USE_DEVELOPMENT_CARD':
+            self.handle_use_development_card()
     
     def set_cancel_button(self):
         self.phase.button_text.set('Cancel')
@@ -140,10 +142,16 @@ class ActionTreeHandler:
     
     def handle_buy_development_card(self):
         self.phase.chaperone.buy_development_card()
-        
+    
     def handle_trade_with_bank(self):
         self.trade_with_bank_setup()
         self.set_instruction('Trade with the bank!')
+        self.set_cancel_button()
+    
+    def handle_use_development_card(self):
+        for type, card_frame in self.play_frame_handler.card_frames['development'].items():
+            card_frame.enable_or_disable_labels(clickable = True)
+        self.set_instruction('Select a development card!')
         self.set_cancel_button()
     
     def cancel(self, event):
