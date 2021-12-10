@@ -27,6 +27,8 @@ class Player(Incrementable):
             return self.can_trade_with_bank()
         elif action == 'BUY_DEVELOPMENT_CARD':
             return self.can_buy_development_card()
+        elif action == 'UPGRADE_SETTLEMENT':
+            return self.can_upgrade_settlement()
         elif action == 'USE_DEVELOPMENT_CARD':
             return self.can_use_development_card()
     
@@ -65,6 +67,11 @@ class Player(Incrementable):
         port_settlements = [settlement for settlement in self.settlements if settlement.node and settlement.node.port]
         return set([settlement.node.port.type for settlement in port_settlements])
 
+    def can_buy_development_card(self):
+        resource_card_dict = self.get_resource_card_dict('BUY_DEVELOPMENT_CARD')
+        has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
+        return has_resource_cards_in_hand and len(self.game.development_cards) > 0
+
     def can_trade_with_bank(self):
         port_types = self.port_types()
         resource_nums = dict(Counter([resource_card.type for resource_card in self.hand['resource']]))
@@ -74,11 +81,13 @@ class Player(Incrementable):
                 return True
         return False
     
-    def can_buy_development_card(self):
-        resource_card_dict = self.get_resource_card_dict('BUY_DEVELOPMENT_CARD')
+    def can_upgrade_settlement(self):
+        resource_card_dict = self.get_resource_card_dict('UPGRADE_SETTLEMENT')
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
-        return has_resource_cards_in_hand and len(self.game.development_cards) > 0
-    
+        has_settlement_on_board = len([settlement for settlement in self.settlements if settlement.node]) > 0
+        has_token_available = self.num_tokens_available('city') > 0
+        return has_resource_cards_in_hand and has_settlement_on_board and has_token_available
+
     def can_use_development_card(self):
         return len([card for card in self.hand['development'] if not card.type == 'victory_point']) > 0
     
@@ -97,7 +106,8 @@ class Player(Incrementable):
         d = {
             'BUILD_ROAD': {'brick': 1, 'lumber': 1},
             'BUILD_SETTLEMENT': {'brick': 1, 'grain': 1, 'lumber': 1, 'wool': 1},
-            'BUY_DEVELOPMENT_CARD': {'grain': 1, 'ore': 1, 'wool': 1}
+            'BUY_DEVELOPMENT_CARD': {'grain': 1, 'ore': 1, 'wool': 1},
+            'UPGRADE_SETTLEMENT': {'grain': 2, 'ore': 3}
         }
         return d[action]
     

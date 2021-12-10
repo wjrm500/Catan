@@ -164,6 +164,14 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def upgrade_settlement(self, node):
+        data = {
+            'action': ActionFactory.UPGRADE_SETTLEMENT,
+            'game_code': self.game_code,
+            'node': node
+        }
+        self.client.interface.send_data(self.client.socket, data)
+    
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()

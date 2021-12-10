@@ -146,11 +146,14 @@ class HexagonRendering:
     def handle_motion(self, event):
         event_x, event_y = event.x, event.y
         if self.canvas_mode == self.CANVAS_MODE_BUILD_ROAD:
+            # self.handle_city_upgrade_motion(event_x, event_y) ### TODO: Delete and replace with commented line below
             self.handle_build_road_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_BUILD_SETTLEMENT:
             self.handle_build_settlement_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_PLACE_ROBBER:
             self.handle_place_robber_motion(event_x, event_y)
+        elif self.canvas_mode == self.CANVAS_MODE_CITY_UPGRADE:
+            self.handle_city_upgrade_motion(event_x, event_y)
         elif self.canvas_mode in (self.CANVAS_MODE_DISABLED, self.CANVAS_MODE_DEFAULT):
             pass
     
@@ -364,6 +367,35 @@ class HexagonRendering:
         play_frame_handler = current_phase.notebook_frame_handlers['play']
         from_development_card = play_frame_handler.action_tree_handler.development_card_clicked
         self.parent_phase.chaperone.place_robber(hexagon, from_development_card = from_development_card)
+    
+    def handle_city_upgrade_motion(self, event_x, event_y):
+        self.delete_tag(self.CT_OBJ_NODE)
+        get_dist_to_node = lambda node: math.sqrt(pow(self.real_x(node) - event_x, 2) + pow(self.real_y(node) - event_y, 2))
+        node_dists = [(node, get_dist_to_node(node)) for node in self.distributor.nodes]
+        min_node_dist = min(map(lambda x: x[1], node_dists))
+        for node, dist in node_dists:
+            closest_to_cursor = dist == min_node_dist
+            if closest_to_cursor and node.settlement and node.settlement.player is self.parent_phase.chaperone.player:
+                r = (self.scale * 3 / 4) / 5
+                width = r / 2
+                tags = [
+                    self.CT_OBJ_NODE,
+                    self.ct_node_tag(node),
+                    self.CV_OBJ_RECT
+                ]
+                x, y = self.real_x(node), self.real_y(node)
+                rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = self.parent_phase.chaperone.player.color, width = width)
+                self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_city_upgrade_click)
+                self.rectangle_node_dict[rectangle_id] = node
+    
+                ### Change cursor pointer to hand icon if cursor near node
+                cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
+                self.canvas.config(cursor = cursor)
+        
+    def handle_city_upgrade_click(self, event):
+        rectangle_id = event.widget.find_withtag('current')[0]
+        node = self.rectangle_node_dict[rectangle_id]
+        self.parent_phase.chaperone.upgrade_settlement(node)
 
     def unfocus_focused_hexagons(self):
         for hexagon in self.focused_hexagons:
@@ -469,6 +501,8 @@ class HexagonRendering:
                 ]
                 r = (self.scale * 3 / 4) / 5 ### Circle radius
                 fill = node.settlement.player.color
+                if node.settlement.city:
+                    fill = 'pink'
                 width = (self.scale * 3 / 4) / 10
                 x, y = self.real_x(node), self.real_y(node)
                 self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)

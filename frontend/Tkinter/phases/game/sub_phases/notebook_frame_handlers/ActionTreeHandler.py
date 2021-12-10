@@ -119,6 +119,8 @@ class ActionTreeHandler:
             self.handle_buy_development_card()
         elif action == 'TRADE_WITH_BANK':
             self.handle_trade_with_bank()
+        elif action == 'UPGRADE_SETTLEMENT':
+            self.handle_upgrade_settlement()
         elif action == 'USE_DEVELOPMENT_CARD':
             self.handle_use_development_card()
     
@@ -149,6 +151,11 @@ class ActionTreeHandler:
     def handle_trade_with_bank(self):
         self.trade_with_bank_setup()
         self.set_instruction('Trade with the bank!')
+        self.set_cancel_button()
+    
+    def handle_upgrade_settlement(self):
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_CITY_UPGRADE
+        self.set_instruction('Click a settlement!')
         self.set_cancel_button()
     
     def handle_use_development_card(self):
@@ -296,11 +303,11 @@ class ActionTreeHandler:
         port_types = player.port_types()
         give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(resource_type, port_types))]
         give_iterable = {
-                'name': 'give',
-                'title': 'What do you want to give?',
-                'card_click_event_handler': self.give_card_click,
-                'iterable': give_iterable
-            }
+            'name': 'give',
+            'title': 'What do you want to give?',
+            'card_click_event_handler': self.give_card_click,
+            'iterable': give_iterable
+        }
         handle_iterable(0, give_iterable)
 
         ### Make clickable

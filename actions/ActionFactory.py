@@ -14,10 +14,9 @@ from actions.RollDice import RollDice
 from actions.StartGame import StartGame
 from actions.StartGameProper import StartGameProper
 from actions.TradeWithBank import TradeWithBank
+from actions.UpgradeSettlement import UpgradeSettlement
 from actions.main_game.MoveRobberToDesert import MoveRobberToDesert
 from actions.main_game.SwapCards import SwapCards
-from actions.main_game.UpgradeSettlement import UpgradeSettlement
-from actions.main_game.UseDevelopmentCard import UseDevelopmentCard
 
 class ActionFactory:
     ADD_PLAYER = 'ADD_PLAYER'
@@ -37,7 +36,6 @@ class ActionFactory:
 
     UPGRADE_SETTLEMENT = 'UPGRADE_SETTLEMENT'
     BUY_DEVELOPMENT_CARD = 'BUY_DEVELOPMENT_CARD'
-    USE_DEVELOPMENT_CARD = 'USE_DEVELOPMENT_CARD'
     TRADE_WITH_BANK = 'TRADE_WITH_BANK'
     SWAP_CARDS = 'SWAP_CARDS'
     MOVE_ROBBER_TO_DESERT = 'MOVE_ROBBER_TO_DESERT'
@@ -75,8 +73,6 @@ class ActionFactory:
             return UpgradeSettlement()
         elif action == cls.BUY_DEVELOPMENT_CARD:
             return BuyDevelopmentCard()
-        elif action == cls.USE_DEVELOPMENT_CARD:
-            return UseDevelopmentCard()
         elif action == cls.TRADE_WITH_BANK:
             return TradeWithBank()
         elif action == cls.SWAP_CARDS:

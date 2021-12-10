@@ -2,6 +2,7 @@ import socket
 import threading
 
 from ClientServerInterface import ClientServerInterface
+from actions.Action import Action
 from actions.ActionFactory import ActionFactory
 from backend.mechanics.Distributor import Distributor
 from backend.mechanics.Player import Player
@@ -176,6 +177,16 @@ class Server:
                     resource_card = game.resource_cards[input_data['receive_type']].pop()
                     player.hand['resource'].append(resource_card)
                     output_data = {'action': action, 'player': player}
+                    self.broadcast_to_game(game_code, output_data)
+                elif action == ActionFactory.UPGRADE_SETTLEMENT:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
+                    player.transfer_resources_to_bank(player.get_resource_card_dict(action))
+                    city = player.cities.pop()
+                    node.settlement.add_city(city)
+                    output_data = {'action': action, 'city': city, 'node': node, 'player': player}
                     self.broadcast_to_game(game_code, output_data)
             except Exception as e:
                 print(str(e))

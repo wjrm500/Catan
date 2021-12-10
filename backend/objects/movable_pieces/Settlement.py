@@ -6,3 +6,7 @@ class Settlement(Incrementable):
         self.player = player
         self.node = None
         self.city = None
+    
+    def add_city(self, city):
+        self.city = city
+        city.settlement = self
