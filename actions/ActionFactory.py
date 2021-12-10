@@ -8,6 +8,7 @@ from actions.EndTurn import EndTurn
 from actions.JoinExistingGame import JoinExistingGame
 from actions.PlaceRobber import PlaceRobber
 from actions.PlayMonopolyCard import PlayMonopolyCard
+from actions.PlayYearOfPlentyCard import PlayYearOfPlentyCard
 from actions.RemovePlayer import RemovePlayer
 from actions.RollDice import RollDice
 from actions.StartGame import StartGame
@@ -42,6 +43,7 @@ class ActionFactory:
     MOVE_ROBBER_TO_DESERT = 'MOVE_ROBBER_TO_DESERT'
 
     PLAY_MONOPOLY_CARD = 'PLAY_MONOPOLY_CARD'
+    PLAY_YEAR_OF_PLENTY_CARD = 'PLAY_YEAR_OF_PLENTY_CARD'
 
     @classmethod
     def get_action(cls, action):
@@ -83,3 +85,5 @@ class ActionFactory:
             return MoveRobberToDesert()
         elif action == cls.PLAY_MONOPOLY_CARD:
             return PlayMonopolyCard()
+        elif action == cls.PLAY_YEAR_OF_PLENTY_CARD:
+            return PlayYearOfPlentyCard()

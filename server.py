@@ -2,12 +2,9 @@ import socket
 import threading
 
 from ClientServerInterface import ClientServerInterface
-from actions.Action import Action
 from actions.ActionFactory import ActionFactory
 from backend.mechanics.Distributor import Distributor
 from backend.mechanics.Player import Player
-from backend.objects.cards.development.Monopoly import Monopoly
-from backend.objects.cards.development.RoadBuilding import RoadBuilding
 from config import config
 from backend.mechanics.Game import Game
 from frontend.GeneralUtils import GeneralUtils as gutils
@@ -130,6 +127,23 @@ class Server:
                     card_to_remove = next(card for card in player.hand['development'] if card.type == 'monopoly')
                     player.hand['development'].remove(card_to_remove)
                     output_data = {'action': action, 'num_received': num_received, 'player': player, 'players': game.players, 'resource_type': resource_type}
+                    self.broadcast_to_game(game_code, output_data)
+                elif action == ActionFactory.PLAY_YEAR_OF_PLENTY_CARD:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    year_of_plenty_turn_index = input_data['year_of_plenty_turn_index']
+                    cards_of_type = game.resource_cards[input_data['resource_type']]
+                    bank_unable_to_pay = False
+                    if len(cards_of_type) > 0:
+                        resource_card = cards_of_type.pop()
+                        player.hand['resource'].append(resource_card)
+                        if year_of_plenty_turn_index == 0:
+                            card_to_remove = next(card for card in player.hand['development'] if card.type == 'year_of_plenty')
+                            player.hand['development'].remove(card_to_remove)
+                    else:
+                        bank_unable_to_pay = True
+                    output_data = {'action': action, 'bank_unable_to_pay': bank_unable_to_pay, 'player': player, 'players': game.players, 'resource_type': input_data['resource_type'], 'year_of_plenty_turn_index': input_data['year_of_plenty_turn_index']}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.ROLL_DICE:
                     game_code = input_data['game_code']

@@ -155,6 +155,15 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def play_year_of_plenty_card(self, resource_type, year_of_plenty_turn_index):
+        data = {
+            'action': ActionFactory.PLAY_YEAR_OF_PLENTY_CARD,
+            'game_code': self.game_code,
+            'resource_type': resource_type,
+            'year_of_plenty_turn_index': year_of_plenty_turn_index
+        }
+        self.client.interface.send_data(self.client.socket, data)
+    
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()

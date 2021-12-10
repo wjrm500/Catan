@@ -17,6 +17,8 @@ class ActionTreeHandler:
         self.phase = self.play_frame_handler.phase
         self.hexagon_rendering = self.phase.hexagon_rendering
         self.development_card_clicked = False
+        self.road_building_turn_index = None
+        self.year_of_plenty_turn_index = None
 
     def create_action_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
@@ -187,7 +189,12 @@ class ActionTreeHandler:
 
     def year_of_plenty_card_click(self, event):
         self.development_card_clicked = True
+        self.year_of_plenty_turn_index = 0
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+        self.set_instruction('Select a resource card!')
+        for card_frame in self.play_frame_handler.card_frames['resource'].values():
+            func = lambda evt, card_frame = card_frame: self.phase.chaperone.play_year_of_plenty_card(card_frame.get_type(), self.year_of_plenty_turn_index) ### Using default argument for closure https://stackoverflow.com/questions/7546285/creating-lambda-inside-a-loop
+            card_frame.make_labels_clickable(event_handler = func)
     
     def cancel(self, event):
         phase = self.play_frame_handler.phase
@@ -213,8 +220,9 @@ class ActionTreeHandler:
             self.trade_with_bank_confirm_button.unbind('<Motion>')
             self.trade_with_bank_confirm_button.unbind('<Leave>')
             self.trade_with_bank_overlay.place_forget()
-        for card_frame in self.play_frame_handler.card_frames['development'].values():
-            card_frame.make_labels_unclickable()
+        for card_frames in self.play_frame_handler.card_frames.values():
+            for card_frame in card_frames.values():
+                card_frame.make_labels_unclickable()
         if self.development_card_clicked:
             self.play_frame_handler.update_resource_cards()
             self.play_frame_handler.update_development_cards()
