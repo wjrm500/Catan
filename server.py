@@ -1,8 +1,8 @@
+import random
 import socket
 import threading
 
 from ClientServerInterface import ClientServerInterface
-from actions.Action import Action
 from actions.ActionFactory import ActionFactory
 from backend.mechanics.Distributor import Distributor
 from backend.mechanics.Player import Player
@@ -100,6 +100,16 @@ class Server:
                     else:
                         output_data['error'] = f'"{game_code}" is not a valid game code'
                         self.broadcast_to_client(client, output_data)
+                elif action == ActionFactory.MOVE_ROBBER_TO_DESERT:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    hexagon = next(iter(sorted([hexagon for hexagon in game.distributor.hexagons if hexagon.resource_type == 'desert'], key = lambda x: random.random())))
+                    robber = game.distributor.robber
+                    robber.place_on_hexagon(hexagon)
+                    player = game.get_player_from_client_address(client_address)
+                    player.num_game_tokens -= 1
+                    output_data.update({'action': action, 'hexagon': hexagon, 'player': player, 'players': game.players})
+                    self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.PLACE_ROBBER:
                     game_code = input_data['game_code']
                     game = self.games[game_code]

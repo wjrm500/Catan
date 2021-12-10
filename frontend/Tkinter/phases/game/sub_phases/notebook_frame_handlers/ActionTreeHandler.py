@@ -117,6 +117,8 @@ class ActionTreeHandler:
             self.handle_build_settlement()
         elif action == 'BUY_DEVELOPMENT_CARD':
             self.handle_buy_development_card()
+        elif action == 'MOVE_ROBBER_TO_DESERT':
+            self.handle_move_robber_to_desert()
         elif action == 'TRADE_WITH_BANK':
             self.handle_trade_with_bank()
         elif action == 'UPGRADE_SETTLEMENT':
@@ -147,6 +149,9 @@ class ActionTreeHandler:
     
     def handle_buy_development_card(self):
         self.phase.chaperone.buy_development_card()
+    
+    def handle_move_robber_to_desert(self):
+        self.phase.chaperone.move_robber_to_desert()
     
     def handle_trade_with_bank(self):
         self.trade_with_bank_setup()

@@ -172,6 +172,13 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def move_robber_to_desert(self):
+        data = {
+            'action': ActionFactory.MOVE_ROBBER_TO_DESERT,
+            'game_code': self.game_code
+        }
+        self.client.interface.send_data(self.client.socket, data)
+    
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()

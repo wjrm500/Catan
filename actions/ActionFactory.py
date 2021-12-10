@@ -6,6 +6,7 @@ from actions.CreateNewGame import CreateNewGame
 from actions.EndGame import EndGame
 from actions.EndTurn import EndTurn
 from actions.JoinExistingGame import JoinExistingGame
+from actions.MoveRobberToDesert import MoveRobberToDesert
 from actions.PlaceRobber import PlaceRobber
 from actions.PlayMonopolyCard import PlayMonopolyCard
 from actions.PlayYearOfPlentyCard import PlayYearOfPlentyCard
@@ -15,7 +16,6 @@ from actions.StartGame import StartGame
 from actions.StartGameProper import StartGameProper
 from actions.TradeWithBank import TradeWithBank
 from actions.UpgradeSettlement import UpgradeSettlement
-from actions.main_game.MoveRobberToDesert import MoveRobberToDesert
 from actions.main_game.SwapCards import SwapCards
 
 class ActionFactory:
