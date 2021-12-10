@@ -17,9 +17,14 @@ class GeneralUtils:
         else:
             p = inflect.engine()
             return p.number_to_words(p.ordinal(n))
-            
     
     @staticmethod
     def safe_isinstance(obj: object, type: str) -> bool:
         ### Probably not fully valid but helps to prevent circular imports
         return obj.__class__.__name__ == type
+    
+    @staticmethod
+    def filter_list(list, filter_cond):
+        filtered_out = [x for x in list if not filter_cond(x)]
+        filtered_in = [x for x in list if filter_cond(x)]
+        return (filtered_in, filtered_out)

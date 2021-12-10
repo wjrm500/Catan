@@ -1,0 +1,22 @@
+from actions.Action import Action
+
+class PlayMonopolyCard(Action):
+    def __init__(self):
+        pass
+
+    def callback(self, chaperone, data):
+        self.chaperone = chaperone
+        self.game_phase = self.chaperone.current_phase
+        self.data = data
+        self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
+        self.reload_all_players()
+        self.update_gui()
+
+    def update_gui(self):
+        self.refresh_play_frame_handler()
+        text_area = self.get_text_area(in_settling_phase = False)
+        text = f'\n\n{self.data["player"].name} played the Monopoly card and asked for everybody\'s {self.data["resource_type"]}... and received {self.data["num_received"]}!'
+        self.history_insert(text_area, text)
+        if self.data['num_received'] == 0:
+            history_tab_id = self.game_phase.notebook_tab_ids['history']
+            self.game_phase.notebook.select(history_tab_id)

@@ -145,6 +145,14 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def play_monopoly_card(self, resource_type):
+        data = {
+            'action': ActionFactory.PLAY_MONOPOLY_CARD,
+            'game_code': self.game_code,
+            'resource_type': resource_type
+        }
+        self.client.interface.send_data(self.client.socket, data)
+    
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()

@@ -1,4 +1,3 @@
-import random
 import socket
 import threading
 
@@ -7,8 +6,10 @@ from actions.Action import Action
 from actions.ActionFactory import ActionFactory
 from backend.mechanics.Distributor import Distributor
 from backend.mechanics.Player import Player
+from backend.objects.cards.development.Monopoly import Monopoly
 from config import config
 from backend.mechanics.Game import Game
+from frontend.GeneralUtils import GeneralUtils as gutils
 
 class Server:
     LOCAL_HOST = '127.0.0.1'
@@ -61,7 +62,7 @@ class Server:
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     node.add_settlement(settlement := player.get_free_settlement())
-                    output_data = {'action': action, 'node': node, 'player': player, 'settlement': settlement} ### TODO: Player has spent a settlement
+                    output_data = {'action': action, 'node': node, 'player': player, 'settlement': settlement}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
                     game_code = input_data['game_code']
@@ -109,6 +110,20 @@ class Server:
                         player.hand['development'].remove(card_to_remove)
                         player.army_size += 1
                     output_data = {'action': action, 'from_development_card': from_development_card, 'hexagon': hexagon, 'player': player, 'players': game.players, 'text_events': text_events}
+                    self.broadcast_to_game(game_code, output_data)
+                elif action == ActionFactory.PLAY_MONOPOLY_CARD:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    resource_type = input_data['resource_type']
+                    num_received = 0
+                    for other_player in game.players:
+                        other_player.hand['resource'], cards_to_give = gutils.filter_list(other_player.hand['resource'], lambda card: card.type != resource_type)
+                        player.hand['resource'].extend(cards_to_give)
+                        num_received += len(cards_to_give)
+                    card_to_remove = next(card for card in player.hand['development'] if card.type == 'monopoly')
+                    player.hand['development'].remove(card_to_remove)
+                    output_data = {'action': action, 'num_received': num_received, 'player': player, 'players': game.players, 'resource_type': resource_type}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.ROLL_DICE:
                     game_code = input_data['game_code']

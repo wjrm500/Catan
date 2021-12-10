@@ -7,6 +7,7 @@ from actions.EndGame import EndGame
 from actions.EndTurn import EndTurn
 from actions.JoinExistingGame import JoinExistingGame
 from actions.PlaceRobber import PlaceRobber
+from actions.PlayMonopolyCard import PlayMonopolyCard
 from actions.RemovePlayer import RemovePlayer
 from actions.RollDice import RollDice
 from actions.StartGame import StartGame
@@ -39,6 +40,8 @@ class ActionFactory:
     TRADE_WITH_BANK = 'TRADE_WITH_BANK'
     SWAP_CARDS = 'SWAP_CARDS'
     MOVE_ROBBER_TO_DESERT = 'MOVE_ROBBER_TO_DESERT'
+
+    PLAY_MONOPOLY_CARD = 'PLAY_MONOPOLY_CARD'
 
     @classmethod
     def get_action(cls, action):
@@ -78,3 +81,5 @@ class ActionFactory:
             return SwapCards()
         elif action == cls.MOVE_ROBBER_TO_DESERT:
             return MoveRobberToDesert()
+        elif action == cls.PLAY_MONOPOLY_CARD:
+            return PlayMonopolyCard()
