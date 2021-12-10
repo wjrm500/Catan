@@ -12,8 +12,17 @@ class Robber:
         self.hexagon = hexagon
         hexagon.robber = True
 
-    def do_the_robbing(self, robber_mover):
-        ### Rob all players with 8 or more resources
+    def do_the_robbing(self, robber_mover, from_development_card):
+        text_events = []
+        if not from_development_card:
+            rtr_text_events = self.rob_the_rich()
+            text_events.extend(rtr_text_events)
+        rap_text_events = self.rob_adjacent_player(robber_mover)
+        text_events.extend(rap_text_events)
+        return text_events
+    
+    def rob_the_rich(self):
+        ### Bank robs all players with 8 or more resources
         game = self.distributor.game
         for_text_gen = {}
         text_events = []
@@ -33,9 +42,13 @@ class Robber:
                     resources_lost_text = '{} and {}'.format(', '.join(resources_lost_list[:-1]), resources_lost_list[-1])
                 else:
                     resources_lost_text = f'{resources_lost_list[0]}'
-                text_event = f'The robber stole {resources_lost_text} from {player.name}!'
+                text_event = f'The bank stole {resources_lost_text} from {player.name}!'
                 text_events.append(text_event)
-        ### Rob player with settlement on robbed hexagon
+        return text_events
+    
+    def rob_adjacent_player(self, robber_mover):
+         ### Active player robs random player with settlement on robbed hexagon
+        text_events = []
         settled_nodes = [node for node in self.hexagon.nodes if node.settlement and node.settlement.player is not robber_mover]
         if settled_nodes:
             random_settled_node = random.choice(settled_nodes)

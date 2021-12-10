@@ -102,8 +102,9 @@ class Server:
                     hexagon = game.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, input_data['hexagon'].id)
                     robber = game.distributor.robber
                     robber.place_on_hexagon(hexagon)
-                    text_events = robber.do_the_robbing(robber_mover = player)
-                    if (from_development_card := input_data['from_development_card']):
+                    from_development_card = input_data['from_development_card']
+                    text_events = robber.do_the_robbing(robber_mover = player, from_development_card = from_development_card)
+                    if from_development_card:
                         card_to_remove = next(card for card in player.hand['development'] if card.type == 'knight')
                         player.hand['development'].remove(card_to_remove)
                         player.army_size += 1
