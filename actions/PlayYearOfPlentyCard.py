@@ -19,8 +19,9 @@ class PlayYearOfPlentyCard(Action):
         self.history_insert(text_area, text)
         if self.data['bank_unable_to_pay']:
             text = f'\n\n{self.data["player"].name} requested {self.data["resource_type"]} from the bank... but the bank cannot afford to pay!'
-            history_frame_handler = self.game_phase.notebook_frame_handlers['history']
-            self.game_phase.notebook.select(history_frame_handler.get())
+            if self.is_instigating_client():
+                history_frame_handler = self.game_phase.notebook_frame_handlers['history']
+                self.game_phase.notebook.select(history_frame_handler.get())
         else:
             text = f'\n\n{self.data["player"].name} took 1 {self.data["resource_type"]} from the bank!'
             play_frame_handler = self.game_phase.notebook_frame_handlers['play']
