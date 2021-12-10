@@ -78,15 +78,15 @@ class PlayFrameHandler(BaseFrameHandler):
         self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.action_frame = self.action_tree_handler.create_action_frame(self.frame)
         self.action_cost_frame = self.action_tree_handler.create_action_cost_frame(self.frame)
-        self.enable_or_disable_cards()
+        self.highlight_or_unhighlight_cards()
     
     def roll_dice(self, event):
         self.phase.chaperone.roll_dice()
     
-    def enable_or_disable_cards(self):
+    def highlight_or_unhighlight_cards(self):
         for card_frames in self.card_frames.values():
             for card_frame in card_frames.values():
-                card_frame.enable_or_disable_labels()
+                card_frame.highlight_or_unhighlight_labels()
     
     def show_action_frame(self):
         self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
@@ -167,14 +167,14 @@ class PlayFrameHandler(BaseFrameHandler):
         for resource_type, num_label in self.card_num_label_texts['resource'].items():
             num_of_resource = d.get(resource_type, 0)
             num_label.set(str(num_of_resource))
-        self.enable_or_disable_cards()
+        self.highlight_or_unhighlight_cards()
     
     def update_development_cards(self):
         d = dict(Counter([development_card.type for development_card in self.phase.chaperone.player.hand['development']]))
         for development_card_type, num_label in self.card_num_label_texts['development'].items():
             num_of_card = d.get(development_card_type, 0)
             num_label.set(str(num_of_card))
-        self.enable_or_disable_cards()
+        self.highlight_or_unhighlight_cards()
     
     def update_movable_pieces(self):
         for movable_piece, num_label_text in self.movable_piece_label_texts.items():

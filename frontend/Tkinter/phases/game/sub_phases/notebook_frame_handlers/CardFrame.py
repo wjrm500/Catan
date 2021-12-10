@@ -1,24 +1,29 @@
 import tkinter
 
 class CardFrame(tkinter.Frame):
-    def enable_or_disable_labels(self, event = None, clickable = False, event_handler = None):
+    def highlight_or_unhighlight_labels(self, event = None):
         children = self.winfo_children()
         num_label = children[-1]
-        enable = int(num_label.cget('text')) > 0
-        if enable:
-            self.enable_labels(clickable, event_handler)
+        highlight = int(num_label.cget('text')) > 0
+        if highlight:
+            self.highlight_labels()
         else:
-            self.disable_labels()
+            self.unhighlight_labels()
     
-    def enable_labels(self, clickable = False, event_handler = None):
+    def highlight_labels(self):
         children = self.winfo_children()
         for child in children:
-            child.enable(clickable, event_handler)
+            child.highlight()
 
-    def disable_labels(self):
+    def unhighlight_labels(self):
         children = self.winfo_children()
         for child in children:
-            child.disable()
+            child.unhighlight()
+        
+    def make_labels_clickable(self, event_handler):
+        children = self.winfo_children()
+        for child in children:
+            child.make_clickable(event_handler)
         
     def make_labels_unclickable(self):
         children = self.winfo_children()

@@ -151,7 +151,7 @@ class ActionTreeHandler:
     def handle_use_development_card(self):
         for type, card_frame in self.play_frame_handler.card_frames['development'].items():
             func = self.get_development_card_func_from_type(type)
-            card_frame.enable_or_disable_labels(clickable = True, event_handler = func)
+            card_frame.make_labels_clickable(event_handler = func)
         self.set_instruction('Select a development card!')
         self.set_cancel_button()
     
@@ -171,6 +171,10 @@ class ActionTreeHandler:
     
     def monopoly_card_click(self, event):
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+        self.set_instruction('Select a resource card!')
+        for card_frame in self.play_frame_handler.card_frames['resource'].values():
+            func = lambda evt, card_frame = card_frame: self.phase.chaperone.play_monopoly_card(card_frame.get_type()) ### Using default argument for closure https://stackoverflow.com/questions/7546285/creating-lambda-inside-a-loop
+            card_frame.make_labels_clickable(event_handler = func)
 
     def road_building_card_click(self, event):
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
@@ -195,7 +199,7 @@ class ActionTreeHandler:
         if hasattr(self, 'trade_with_bank_overlay'):
             for verb in ['give', 'receive']:
                 for card_frame in self.trade_with_bank_card_frames[verb]:
-                    card_frame.disable_labels()
+                    card_frame.unhighlight_labels()
             self.trade_with_bank_summary_text.set('')
             self.trade_with_bank_confirm_button.configure({'background': '#DCDCDC', 'foreground': '#808080'})
             self.trade_with_bank_confirm_button.unbind('<Button-1>')
@@ -290,18 +294,18 @@ class ActionTreeHandler:
     
     def give_card_click(self, event):
         for card_frame in self.trade_with_bank_card_frames['give']:
-            card_frame.disable_labels()
+            card_frame.unhighlight_labels()
         card_frame = event.widget.master
-        card_frame.enable_labels()
+        card_frame.highlight_labels()
         self.give_type = card_frame.get_type()
         self.update_trade_with_bank_summary_text()
         self.activate_confirm_button_if_give_and_receive()
     
     def receive_card_click(self, event):
         for card_frame in self.trade_with_bank_card_frames['receive']:
-            card_frame.disable_labels()
+            card_frame.unhighlight_labels()
         card_frame = event.widget.master
-        card_frame.enable_labels()
+        card_frame.highlight_labels()
         self.receive_type = card_frame.get_type()
         self.update_trade_with_bank_summary_text()
         self.activate_confirm_button_if_give_and_receive()
