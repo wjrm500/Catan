@@ -146,7 +146,6 @@ class HexagonRendering:
     def handle_motion(self, event):
         event_x, event_y = event.x, event.y
         if self.canvas_mode == self.CANVAS_MODE_BUILD_ROAD:
-            # self.handle_city_upgrade_motion(event_x, event_y) ### TODO: Delete and replace with commented line below
             self.handle_build_road_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_BUILD_SETTLEMENT:
             self.handle_build_settlement_motion(event_x, event_y)
@@ -501,11 +500,18 @@ class HexagonRendering:
                 ]
                 r = (self.scale * 3 / 4) / 5 ### Circle radius
                 fill = node.settlement.player.color
-                if node.settlement.city:
-                    fill = 'pink'
                 width = (self.scale * 3 / 4) / 10
                 x, y = self.real_x(node), self.real_y(node)
-                self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
+                if node.settlement.city:
+                    verts = [10,40,40,40,50,10,60,40,90,40,65,60,75,90,50,70,25,90,35,60] ### Taken from https://www.techwalla.com/articles/how-to-draw-a-five-point-star-using-python-language
+                    average_vert = sum(verts) / len(verts)
+                    verts = [vert - average_vert for vert in verts] ### Centre around zero
+                    verts = [vert * self.scale / 150 for vert in verts] ### Resize
+                    verts = [(vert + x if i % 2 == 0 else vert) for i, vert in enumerate(verts)] ### Translate in x direction
+                    verts = [(vert + y if i % 2 != 0 else vert) for i, vert in enumerate(verts)] ### Translate in y direction
+                    self.create_polygon(verts, fill = fill, outline = 'black', width = width * 0.8)
+                else:
+                    self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
     
     def real_x(self, node):
         pct_canvas_used = 0.95
