@@ -25,11 +25,12 @@ class PlayYearOfPlentyCard(Action):
         else:
             text = f'\n\n{self.data["player"].name} took 1 {self.data["resource_type"]} from the bank!'
             play_frame_handler = self.game_phase.notebook_frame_handlers['play']
-            if self.data['year_of_plenty_turn_index'] == 0:
-                self.game_phase.instruction_text.set('Select another resource!')
-                play_frame_handler.update_resource_cards()
-                play_frame_handler.action_tree_handler.year_of_plenty_turn_index += 1
-            else:
-                play_frame_handler.root.configure(cursor = Phase.CURSOR_DEFAULT)
-                self.refresh_play_frame_handler()
+            if self.is_instigating_client():
+                if self.data['year_of_plenty_turn_index'] == 0:
+                    self.game_phase.instruction_text.set('Select another resource!')
+                    play_frame_handler.update_resource_cards()
+                    play_frame_handler.action_tree_handler.year_of_plenty_turn_index += 1
+                else:
+                    play_frame_handler.root.configure(cursor = Phase.CURSOR_DEFAULT)
+                    self.refresh_play_frame_handler()
         self.history_insert(text_area, text)
