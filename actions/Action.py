@@ -18,12 +18,13 @@ class Action:
 
     def refresh_play_frame_handler(self):
         play_frame_handler = self.game_phase.notebook_frame_handlers['play']
-        action_tree_handler = play_frame_handler.action_tree_handler
-        action_tree_handler.cancel(event = None)
         play_frame_handler.update_resource_cards()
         play_frame_handler.update_development_cards()
         play_frame_handler.update_movable_pieces()
-        action_tree_handler.fill_action_tree()
+        if self.is_instigating_client():
+            action_tree_handler = play_frame_handler.action_tree_handler
+            action_tree_handler.cancel(event = None)
+            action_tree_handler.fill_action_tree()
     
     def refresh_game_board(self, full_refresh = False):
         if self.is_instigating_client():
