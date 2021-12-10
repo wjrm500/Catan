@@ -249,7 +249,13 @@ class HexagonRendering:
     def handle_build_road_click(self, event):
         line_id = event.widget.find_withtag('current')[0]
         line = self.line_dict[line_id]
-        self.parent_phase.chaperone.build_road(line)
+        current_phase = self.parent_phase.chaperone.current_phase
+        from_development_card, road_building_turn_index = False, None
+        if GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase'):
+            play_frame_handler = current_phase.notebook_frame_handlers['play']
+            from_development_card = play_frame_handler.action_tree_handler.development_card_clicked
+            road_building_turn_index = play_frame_handler.action_tree_handler.road_building_turn_index
+        self.parent_phase.chaperone.build_road(line, from_development_card = from_development_card, road_building_turn_index = road_building_turn_index)
 
     def handle_build_settlement_motion(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
@@ -356,7 +362,7 @@ class HexagonRendering:
         hexagon = self.polygon_hexagon_dict[polygon_id]
         current_phase = self.parent_phase.chaperone.current_phase
         play_frame_handler = current_phase.notebook_frame_handlers['play']
-        from_development_card = not play_frame_handler.in_dice_roll_stage
+        from_development_card = play_frame_handler.action_tree_handler.development_card_clicked
         self.parent_phase.chaperone.place_robber(hexagon, from_development_card = from_development_card)
 
     def unfocus_focused_hexagons(self):

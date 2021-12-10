@@ -33,6 +33,9 @@ class BuildRoad(Action):
         text_area = self.get_text_area(in_settling_phase)
         self.enable_text_area(text_area)
 
+        if self.data['from_development_card'] and self.data['road_building_turn_index'] == 0:
+            text_area.insert('end', f'\n\n{self.data["player"].name} played the Road Building card...')
+
         ### X built a road
         text_to_insert = f'{self.data["player"].name} built a road.'
         text_area.insert('end', f'\n\n{text_to_insert}', 'green_font')
@@ -74,6 +77,14 @@ class BuildRoad(Action):
                 text_to_insert = f"It's {self.game_phase.active_player().name}'s turn to settle..."
                 text_area.insert('end', f'\n\n{text_to_insert}')
         else: ### In main game phase
-            self.refresh_play_frame_handler()
+            if self.data['from_development_card']:
+                if self.data['road_building_turn_index'] == 0:
+                    self.game_phase.instruction_text.set('Build another road!')
+                    play_frame_handler = self.game_phase.notebook_frame_handlers['play']
+                    play_frame_handler.action_tree_handler.road_building_turn_index += 1
+                else:
+                    self.refresh_play_frame_handler()
+            else:
+                self.refresh_play_frame_handler()
 
         self.disable_text_area(text_area)

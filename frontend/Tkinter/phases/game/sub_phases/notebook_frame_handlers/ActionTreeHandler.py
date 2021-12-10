@@ -16,6 +16,7 @@ class ActionTreeHandler:
         self.frame = self.play_frame_handler.frame
         self.phase = self.play_frame_handler.phase
         self.hexagon_rendering = self.phase.hexagon_rendering
+        self.development_card_clicked = False
 
     def create_action_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
@@ -151,7 +152,7 @@ class ActionTreeHandler:
     def handle_use_development_card(self):
         for type, card_frame in self.play_frame_handler.card_frames['development'].items():
             func = self.get_development_card_func_from_type(type)
-            card_frame.make_labels_clickable(event_handler = func)
+            card_frame.make_labels_clickable_or_unclickable(event_handler = func)
         self.set_instruction('Select a development card!')
         self.set_cancel_button()
     
@@ -166,10 +167,12 @@ class ActionTreeHandler:
             return self.year_of_plenty_card_click
     
     def knight_card_click(self, event):
+        self.development_card_clicked = True
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_PLACE_ROBBER
         self.set_instruction('Place the robber!')
     
     def monopoly_card_click(self, event):
+        self.development_card_clicked = True
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
         self.set_instruction('Select a resource card!')
         for card_frame in self.play_frame_handler.card_frames['resource'].values():
@@ -177,9 +180,13 @@ class ActionTreeHandler:
             card_frame.make_labels_clickable(event_handler = func)
 
     def road_building_card_click(self, event):
+        self.development_card_clicked = True
+        self.road_building_turn_index = 0
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
+        self.set_instruction('Build a road!')
 
     def year_of_plenty_card_click(self, event):
+        self.development_card_clicked = True
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
     
     def cancel(self, event):
@@ -208,6 +215,12 @@ class ActionTreeHandler:
             self.trade_with_bank_overlay.place_forget()
         for card_frame in self.play_frame_handler.card_frames['development'].values():
             card_frame.make_labels_unclickable()
+        if self.development_card_clicked:
+            self.play_frame_handler.update_resource_cards()
+            self.play_frame_handler.update_development_cards()
+            self.play_frame_handler.update_movable_pieces()
+            self.fill_action_tree()
+        self.development_card_clicked = False
 
     def trade_with_bank_setup(self):
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)

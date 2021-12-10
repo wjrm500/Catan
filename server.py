@@ -7,6 +7,7 @@ from actions.ActionFactory import ActionFactory
 from backend.mechanics.Distributor import Distributor
 from backend.mechanics.Player import Player
 from backend.objects.cards.development.Monopoly import Monopoly
+from backend.objects.cards.development.RoadBuilding import RoadBuilding
 from config import config
 from backend.mechanics.Game import Game
 from frontend.GeneralUtils import GeneralUtils as gutils
@@ -51,9 +52,14 @@ class Server:
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
                     line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line'].id)
-                    player.transfer_resources_to_bank(player.get_resource_card_dict(action))
+                    if not input_data['from_development_card']:
+                        player.transfer_resources_to_bank(player.get_resource_card_dict(action))
+                    else:
+                        if input_data['road_building_turn_index'] == 0:
+                            card_to_remove = next(card for card in player.hand['development'] if card.type == 'road_building')
+                            player.hand['development'].remove(card_to_remove)
                     line.add_road(road := player.get_free_road())
-                    output_data = {'action': action, 'line': line, 'player': player, 'players': game.players, 'road': road}
+                    output_data = {'action': action, 'from_development_card': input_data['from_development_card'], 'line': line, 'player': player, 'players': game.players, 'road': road, 'road_building_turn_index': input_data['road_building_turn_index']}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']

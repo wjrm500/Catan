@@ -10,6 +10,15 @@ class CardFrame(tkinter.Frame):
         else:
             self.unhighlight_labels()
     
+    def make_labels_clickable_or_unclickable(self, event_handler):
+        children = self.winfo_children()
+        num_label = children[-1]
+        clickable = int(num_label.cget('text')) > 0
+        if clickable:
+            self.make_labels_clickable(event_handler)
+        else:
+            self.make_labels_unclickable()
+    
     def highlight_labels(self):
         children = self.winfo_children()
         for child in children:

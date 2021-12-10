@@ -91,11 +91,13 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
 
-    def build_road(self, line):
+    def build_road(self, line, from_development_card = False, road_building_turn_index = None):
         data = {
             'action': ActionFactory.BUILD_ROAD,
+            'from_development_card': from_development_card,
             'game_code': self.game_code,
-            'line': line
+            'line': line,
+            'road_building_turn_index': road_building_turn_index
         }
         self.client.interface.send_data(self.client.socket, data)
 
