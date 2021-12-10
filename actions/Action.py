@@ -43,3 +43,8 @@ class Action:
     def disable_text_area(self, text_area):
         text_area.yview('end')
         text_area.config(state = 'disabled')
+    
+    def history_insert(self, text_area, text, style = None):
+        self.enable_text_area(text_area)
+        text_area.insert('end', text, style)
+        self.disable_text_area(text_area)

@@ -22,6 +22,5 @@ class EndTurn(Action):
             game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral
         self.game_phase = game_phase
         text_area = self.get_text_area(in_settling_phase = False)
-        self.enable_text_area(text_area)
-        text_area.insert('end', f'\n\n{self.data["player"].name} ended their turn.', 'red_font')
-        self.disable_text_area(text_area)
+        text = f'\n\n{self.data["player"].name} ended their turn.'
+        self.history_insert(text_area, text, style = 'red_font')

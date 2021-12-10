@@ -40,10 +40,9 @@ class RollDice(Action):
             play_frame_handler.update_resource_cards()
             play_frame_handler.action_tree_handler.fill_action_tree()
         text_area = self.get_text_area(in_settling_phase = False)
-        self.enable_text_area(text_area)
         event_text = ' '.join(DiceRoll.text_events)
-        text_area.insert('end', f'\n\n{self.data["player"].name} rolled a {DiceRoll.total}. {event_text}')
-        self.disable_text_area(text_area)
+        text = f'\n\n{self.data["player"].name} rolled a {DiceRoll.total}. {event_text}'
+        self.history_insert(text_area, text)
     
     def prepare_for_robber_moving(self, play_frame_handler):
         self.game_phase.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_PLACE_ROBBER
