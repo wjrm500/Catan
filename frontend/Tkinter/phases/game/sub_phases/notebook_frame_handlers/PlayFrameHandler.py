@@ -36,6 +36,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.hide_action_frame()
 
     def dice_roll_setup(self):
+        self.dice_rolled = 0
         darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         self.dice_roll_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
         self.dice_roll_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
@@ -79,6 +80,9 @@ class PlayFrameHandler(BaseFrameHandler):
         self.highlight_or_unhighlight_cards()
     
     def roll_dice(self, event):
+        self.dice_rolled += 1
+        if self.dice_rolled > 2:
+            return
         self.phase.chaperone.roll_dice()
     
     def highlight_or_unhighlight_cards(self):
