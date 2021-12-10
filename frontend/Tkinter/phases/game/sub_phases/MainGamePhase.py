@@ -23,15 +23,13 @@ class MainGamePhase(GamePhase):
     
     def setup_inner_frame_middle_right(self):
         self.notebook = ttk.Notebook(self.inner_frame_middle_right)
-        self.notebook_tab_ids = {}
         self.notebook_frame_handlers = {}
         for frame_name in ['play', 'status', 'history', 'chat']:
             frame_handler = self.frame_handler_by_name(self.notebook, frame_name)
             frame_handler.setup()
             frame = frame_handler.get()
             frame.pack(expand = True, fill = 'both')
-            tab_id = self.notebook.add(frame, text = frame_name.title())
-            self.notebook_tab_ids[frame_name] = tab_id
+            self.notebook.add(frame, text = frame_name.title())
             self.notebook_frame_handlers[frame_name] = frame_handler
         self.notebook.pack(fill = 'both', padx = 10, pady = 10)
     

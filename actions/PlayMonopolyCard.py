@@ -18,5 +18,5 @@ class PlayMonopolyCard(Action):
         text = f'\n\n{self.data["player"].name} played the Monopoly card and asked for everybody\'s {self.data["resource_type"]}... and received {self.data["num_received"]}!'
         self.history_insert(text_area, text)
         if self.data['num_received'] == 0:
-            history_tab_id = self.game_phase.notebook_tab_ids['history']
-            self.game_phase.notebook.select(history_tab_id)
+            history_frame_handler = self.game_phase.notebook_frame_handlers['history']
+            self.game_phase.notebook.select(history_frame_handler.get())
