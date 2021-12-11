@@ -16,9 +16,9 @@ class BuildSettlement(Action):
         self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
 
         ### Following two lines necessary to work with client-side versions of objects
-        node = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, data['node'].id)
-        settlement = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement'].id)
-        node.add_settlement(settlement)
+        self.node = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, data['node_id'])
+        settlement = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement_id'])
+        self.node.add_settlement(settlement)
 
         in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')
         if not in_settling_phase:
@@ -38,14 +38,13 @@ class BuildSettlement(Action):
         text_area = self.get_text_area(in_settling_phase)
         self.enable_text_area(text_area)
 
-        node = self.data['settlement'].node
         port_text = ''
-        if (port := node.port):
+        if (port := self.node.port):
             a_an = 'an' if port.type.startswith(tuple('aeiou')) else 'a'
             port_text = f' on {a_an} {port.type} port'
-        nominal_value = node.nominal_value()
+        nominal_value = self.node.nominal_value()
         def fun(d, x): d[x[0]] = d.get(x[0], 0) + x[1]; return d
-        d = functools.reduce(fun, [(hexagon.resource_type, hexagon.num_pips) for hexagon in node.hexagons], {})
+        d = functools.reduce(fun, [(hexagon.resource_type, hexagon.num_pips) for hexagon in self.node.hexagons], {})
         nominal_values = ' + '.join(f'{v} {k}' for k, v in d.items() if k != 'desert')
         text_to_insert = f'{self.data["player"].name} built a settlement{port_text}! This settlement has a nominal value of {nominal_value} ({nominal_values}).'
         text_area.insert('end', f'\n\n{text_to_insert}', 'green_font')

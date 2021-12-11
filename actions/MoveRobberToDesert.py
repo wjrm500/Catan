@@ -13,7 +13,7 @@ class MoveRobberToDesert(Action):
         self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
 
         ### Following three lines necessary to work with client-side versions of objects
-        hexagon = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, data['hexagon'].id)
+        hexagon = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, data['hexagon_id'])
         robber = self.hexagon_rendering.distributor.robber
         robber.place_on_hexagon(hexagon)
 

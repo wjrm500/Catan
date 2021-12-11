@@ -14,8 +14,8 @@ class BuildRoad(Action):
         self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
 
         ### Following two lines necessary to work with client-side versions of objects
-        line = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_LINE, data['line'].id)
-        road = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_ROAD, data['road'].id)
+        line = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_LINE, data['line_id'])
+        road = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_ROAD, data['road_id'])
         line.add_road(road)
 
         in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')

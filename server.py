@@ -49,7 +49,7 @@ class Server:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
-                    line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line'].id)
+                    line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line_id'])
                     if not input_data['from_development_card']:
                         player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     else:
@@ -57,16 +57,16 @@ class Server:
                             card_to_remove = next(card for card in player.hand['development'] if card.type == 'road_building')
                             player.hand['development'].remove(card_to_remove)
                     line.add_road(road := player.get_free_road())
-                    output_data = {'action': action, 'from_development_card': input_data['from_development_card'], 'line': line, 'player': player, 'players': game.players, 'road': road, 'road_building_turn_index': input_data['road_building_turn_index']}
+                    output_data = {'action': action, 'from_development_card': input_data['from_development_card'], 'line_id': line.id, 'player': player, 'players': game.players, 'road_id': road.id, 'road_building_turn_index': input_data['road_building_turn_index']}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
-                    node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
+                    node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node_id'])
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     node.add_settlement(settlement := player.get_free_settlement())
-                    output_data = {'action': action, 'node': node, 'player': player, 'settlement': settlement}
+                    output_data = {'action': action, 'node_id': node.id, 'player': player, 'settlement_id': settlement.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
                     game_code = input_data['game_code']
@@ -108,13 +108,13 @@ class Server:
                     robber.place_on_hexagon(hexagon)
                     player = game.get_player_from_client_address(client_address)
                     player.num_game_tokens -= 1
-                    output_data.update({'action': action, 'hexagon': hexagon, 'player': player, 'players': game.players})
+                    output_data.update({'action': action, 'hexagon_id': hexagon.id, 'player': player, 'players': game.players})
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.PLACE_ROBBER:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
-                    hexagon = game.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, input_data['hexagon'].id)
+                    hexagon = game.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, input_data['hexagon_id'])
                     robber = game.distributor.robber
                     robber.place_on_hexagon(hexagon)
                     from_development_card = input_data['from_development_card']
@@ -123,7 +123,7 @@ class Server:
                         card_to_remove = next(card for card in player.hand['development'] if card.type == 'knight')
                         player.hand['development'].remove(card_to_remove)
                         player.army_size += 1
-                    output_data = {'action': action, 'from_development_card': from_development_card, 'hexagon': hexagon, 'player': player, 'players': game.players, 'text_events': text_events}
+                    output_data = {'action': action, 'from_development_card': from_development_card, 'hexagon_id': hexagon.id, 'player': player, 'players': game.players, 'text_events': text_events}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.PLAY_MONOPOLY_CARD:
                     game_code = input_data['game_code']
@@ -192,11 +192,11 @@ class Server:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
-                    node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node'].id)
+                    node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node_id'])
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     city = player.cities.pop()
                     node.settlement.add_city(city)
-                    output_data = {'action': action, 'city': city, 'node': node, 'player': player}
+                    output_data = {'action': action, 'city_id': city.id, 'node_id': node.id, 'player': player}
                     self.broadcast_to_game(game_code, output_data)
             except Exception as e:
                 print(str(e))

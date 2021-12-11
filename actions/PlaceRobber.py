@@ -16,9 +16,9 @@ class PlaceRobber(Action):
         self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
 
         ### Following three lines necessary to work with client-side versions of objects
-        hexagon = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, data['hexagon'].id)
+        self.hexagon = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_HEXAGON, data['hexagon_id'])
         robber = self.hexagon_rendering.distributor.robber
-        robber.place_on_hexagon(hexagon)
+        robber.place_on_hexagon(self.hexagon)
 
         self.reload_all_players()
 
@@ -42,7 +42,6 @@ class PlaceRobber(Action):
             self.refresh_play_frame_handler()
         self.refresh_game_board(full_refresh = True)
         text_area = self.get_text_area(in_settling_phase = False)
-        hexagon = self.data['hexagon']
-        self.data['text_events'].insert(0, f'{self.data["player"].name} placed the robber on a {hexagon.num_pips}-pip {hexagon.resource_type} hexagon.')
+        self.data['text_events'].insert(0, f'{self.data["player"].name} placed the robber on a {self.hexagon.num_pips}-pip {self.hexagon.resource_type} hexagon.')
         text = f'\n\n{" ".join(self.data["text_events"])}'
         self.history_insert(text_area, text)

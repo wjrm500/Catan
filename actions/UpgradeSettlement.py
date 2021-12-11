@@ -12,8 +12,8 @@ class UpgradeSettlement(Action):
         self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
 
         ### Following two lines necessary to work with client-side versions of objects
-        node = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, data['node'].id)
-        city = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_CITY, data['city'].id)
+        node = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, data['node_id'])
+        city = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_CITY, data['city_id'])
         node.settlement.add_city(city)
 
         ### Update active player client side (to reflect paid for action)

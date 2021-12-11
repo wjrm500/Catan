@@ -87,7 +87,7 @@ class Chaperone:
         data = {
             'action': ActionFactory.BUILD_SETTLEMENT,
             'game_code': self.game_code,
-            'node': node
+            'node_id': node.id
         }
         self.client.interface.send_data(self.client.socket, data)
 
@@ -96,7 +96,7 @@ class Chaperone:
             'action': ActionFactory.BUILD_ROAD,
             'from_development_card': from_development_card,
             'game_code': self.game_code,
-            'line': line,
+            'line_id': line.id,
             'road_building_turn_index': road_building_turn_index
         }
         self.client.interface.send_data(self.client.socket, data)
@@ -127,7 +127,7 @@ class Chaperone:
             'action': ActionFactory.PLACE_ROBBER,
             'from_development_card': from_development_card,
             'game_code': self.game_code,
-            'hexagon': hexagon
+            'hexagon_id': hexagon.id
         }
         self.client.interface.send_data(self.client.socket, data)
     
@@ -168,7 +168,7 @@ class Chaperone:
         data = {
             'action': ActionFactory.UPGRADE_SETTLEMENT,
             'game_code': self.game_code,
-            'node': node
+            'node_id': node.id
         }
         self.client.interface.send_data(self.client.socket, data)
     
