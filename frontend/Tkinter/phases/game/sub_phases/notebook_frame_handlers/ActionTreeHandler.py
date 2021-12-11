@@ -17,7 +17,9 @@ class ActionTreeHandler:
         self.phase = self.play_frame_handler.phase
         self.hexagon_rendering = self.phase.hexagon_rendering
         self.development_card_clicked = False
+        self.swap_cards_clicked = False
         self.road_building_turn_index = None
+        self.swap_cards_turn_index = None
         self.year_of_plenty_turn_index = None
 
     def create_action_frame(self, where):
@@ -119,6 +121,8 @@ class ActionTreeHandler:
             self.handle_buy_development_card()
         elif action == 'MOVE_ROBBER_TO_DESERT':
             self.handle_move_robber_to_desert()
+        elif action == 'SWAP_CARDS':
+            self.handle_swap_cards()
         elif action == 'TRADE_WITH_BANK':
             self.handle_trade_with_bank()
         elif action == 'UPGRADE_SETTLEMENT':
@@ -152,6 +156,27 @@ class ActionTreeHandler:
     
     def handle_move_robber_to_desert(self):
         self.phase.chaperone.move_robber_to_desert()
+    
+    def handle_swap_cards(self):
+        self.swap_cards_clicked = True
+        self.swap_cards_turn_index = 0
+        self.swap_card_resource_types = []
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+        self.set_instruction('Select a resource card!')
+        self.set_cancel_button()
+        for card_frame in self.play_frame_handler.card_frames['resource'].values():
+            def func(evt, card_frame = card_frame): ### Using default argument for closure https://stackoverflow.com/questions/7546285/creating-lambda-inside-a-loop
+                resource_type = card_frame.get_type()
+                self.swap_card_resource_types.append(resource_type)
+                text_var = self.play_frame_handler.card_num_label_texts['resource'][resource_type]
+                text_var.set(str(int(text_var.get()) - 1))
+                card_frame.highlight_or_unhighlight_labels()
+                self.swap_cards_turn_index += 1
+                if self.swap_cards_turn_index == 1:
+                    self.set_instruction('Select another resource card!')
+                if self.swap_cards_turn_index == 2:
+                    self.phase.chaperone.swap_cards(self.swap_card_resource_types)
+            card_frame.make_labels_clickable_or_unclickable(event_handler = func)
     
     def handle_trade_with_bank(self):
         self.trade_with_bank_setup()
@@ -235,11 +260,12 @@ class ActionTreeHandler:
         for card_frames in self.play_frame_handler.card_frames.values():
             for card_frame in card_frames.values():
                 card_frame.make_labels_unclickable()
-        if self.development_card_clicked:
+        if self.development_card_clicked or self.swap_cards_clicked:
             self.play_frame_handler.update_resource_cards()
             self.play_frame_handler.update_development_cards()
             self.play_frame_handler.update_movable_pieces()
             self.fill_action_tree()
+        self.swap_cards_clicked = False
         self.development_card_clicked = False
 
     def trade_with_bank_setup(self):

@@ -23,16 +23,18 @@ class Player(Incrementable):
             return self.can_build_road()
         elif action == 'BUILD_SETTLEMENT':
             return self.can_build_settlement()
-        elif action == 'TRADE_WITH_BANK':
-            return self.can_trade_with_bank()
         elif action == 'BUY_DEVELOPMENT_CARD':
             return self.can_buy_development_card()
+        elif action == 'MOVE_ROBBER_TO_DESERT':
+            return self.can_move_robber_to_desert()
+        elif action == 'SWAP_CARDS':
+            return self.can_swap_cards()
+        elif action == 'TRADE_WITH_BANK':
+            return self.can_trade_with_bank()
         elif action == 'UPGRADE_SETTLEMENT':
             return self.can_upgrade_settlement()
         elif action == 'USE_DEVELOPMENT_CARD':
             return self.can_use_development_card()
-        elif action == 'MOVE_ROBBER_TO_DESERT':
-            return self.can_move_robber_to_desert()
     
     def can_build_road(self):
         resource_card_dict = self.get_resource_card_dict('BUILD_ROAD')
@@ -96,6 +98,12 @@ class Player(Incrementable):
     def can_move_robber_to_desert(self):
         return self.num_tokens_available('game') > 0
     
+    def can_swap_cards(self):
+        has_two_cards_in_hand = len(self.hand['resource']) > 1
+        at_least_one_opponent_has_two_cards_in_hand = len([player for player in self.game.players if player.id != self.id and len(player.hand['resource']) > 1]) > 0
+        has_token_available = self.num_tokens_available('game') > 0
+        return has_two_cards_in_hand and at_least_one_opponent_has_two_cards_in_hand and has_token_available
+    
     def has_resource_cards_in_hand(self, resource_card_dict):
         resource_card_counter = Counter(resource_card_dict)
         hand_counter = Counter([resource_card.type for resource_card in self.hand['resource']])
@@ -116,17 +124,26 @@ class Player(Incrementable):
         }
         return d[action]
     
-    def transfer_resources_to_bank(self, resource_card_dict):
+    def subtract_and_return_resources_from_hand(self, resource_card_dict):
+        marked_for_removal = []
         if self.game.started_proper: ### No need to pay for road in settle phase
-            marked_for_removal = []
             for resource_card in self.hand['resource']:
                 if resource_card.type in resource_card_dict:
                     marked_for_removal.append(resource_card)
                     resource_card_dict[resource_card.type] -= 1
                     if resource_card_dict[resource_card.type] == 0:
                         del resource_card_dict[resource_card.type]
-                    self.game.resource_cards[resource_card.type].append(resource_card)
             self.hand['resource'] = [resource_card for resource_card in self.hand['resource'] if resource_card not in marked_for_removal]
+        return marked_for_removal
+    
+    def transfer_resources_to_player(self, resource_card_dict, player):
+        resource_cards = self.subtract_and_return_resources_from_hand(resource_card_dict)
+        player.hand['resource'].extend(resource_cards)
+    
+    def transfer_resources_to_bank(self, resource_card_dict):
+        resource_cards = self.subtract_and_return_resources_from_hand(resource_card_dict)
+        for resource_card in resource_cards:
+            self.game.resource_cards[resource_card.type].append(resource_card)
     
     def get_free_road(self):
         return next(road for road in self.roads if not road.line)

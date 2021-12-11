@@ -179,6 +179,14 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
+    def swap_cards(self, swap_card_resource_types):
+        data = {
+            'action': ActionFactory.SWAP_CARDS,
+            'game_code': self.game_code,
+            'swap_card_resource_types': swap_card_resource_types
+        }
+        self.client.interface.send_data(self.client.socket, data)
+    
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()

@@ -14,9 +14,9 @@ from actions.RemovePlayer import RemovePlayer
 from actions.RollDice import RollDice
 from actions.StartGame import StartGame
 from actions.StartGameProper import StartGameProper
+from actions.SwapCards import SwapCards
 from actions.TradeWithBank import TradeWithBank
 from actions.UpgradeSettlement import UpgradeSettlement
-from actions.main_game.SwapCards import SwapCards
 
 class ActionFactory:
     ADD_PLAYER = 'ADD_PLAYER'

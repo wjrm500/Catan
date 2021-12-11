@@ -1,3 +1,4 @@
+from collections import Counter
 import random
 import socket
 import threading
@@ -177,6 +178,20 @@ class Server:
                     game = self.games[game_code]
                     game.started_proper = True
                     self.broadcast_to_game(input_data['game_code'], {'action': action})
+                elif action == ActionFactory.SWAP_CARDS:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    active_player = game.get_player_from_client_address(client_address)
+                    random_opponent = random.choice([player for player in game.players if player is not active_player and len(player.hand['resource']) > 1]) ### With at least two cards in hand
+                    reverse_swap_resource_types = sorted([resource_card.type for resource_card in random_opponent.hand['resource']], key = lambda x: random.random())[:2]
+                    receive_resource_card_dict = dict(Counter(reverse_swap_resource_types))
+                    random_opponent.transfer_resources_to_player(receive_resource_card_dict.copy(), active_player) ### Random opponent must transfer before active player to prevent possibility of sending same cards back
+                    swap_card_resource_types = input_data['swap_card_resource_types']
+                    give_resource_card_dict = dict(Counter(swap_card_resource_types))
+                    active_player.transfer_resources_to_player(give_resource_card_dict.copy(), random_opponent)
+                    active_player.num_game_tokens -= 1
+                    output_data = {'action': action, 'give_resource_card_dict': give_resource_card_dict, 'player': active_player, 'players': game.players, 'random_opponent': random_opponent, 'receive_resource_card_dict': receive_resource_card_dict}
+                    self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.TRADE_WITH_BANK:
                     game_code = input_data['game_code']
                     game = self.games[game_code]

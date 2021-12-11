@@ -200,4 +200,4 @@ class Game(Unserializable):
         return DiceRoll(dice_roll_1, dice_roll_2, total, text_events, proceed_to_action_selection)
     
     def unserializable_properties(self):
-        return ['clients', 'main_client', 'players']
+        return ['clients', 'main_client']
