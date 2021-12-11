@@ -1,6 +1,6 @@
 from actions.Action import Action
 from backend.mechanics.Distributor import Distributor
-from frontend.GeneralUtils import GeneralUtils
+from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class BuildRoad(Action):
@@ -18,7 +18,7 @@ class BuildRoad(Action):
         road = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_ROAD, data['road_id'])
         line.add_road(road)
 
-        in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')
+        in_settling_phase = gutils.safe_isinstance(self.game_phase, 'SettlingPhase')
         if in_settling_phase:
             chaperone.current_phase.update_active_player_index()
         move_on_to_next_phase = sum([bool(settlement.node) for player in self.chaperone.players for settlement in player.settlements]) == len(self.chaperone.players) * 2

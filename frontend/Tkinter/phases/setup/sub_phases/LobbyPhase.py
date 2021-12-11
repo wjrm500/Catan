@@ -2,7 +2,7 @@ import re
 import tkinter
 
 from frontend.ColorUtils import ColorUtils
-from frontend.GeneralUtils import GeneralUtils
+from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.phases.setup.SetupPhase import SetupPhase
 
 ### Lobby game code needs to be visible
@@ -69,7 +69,7 @@ class LobbyPhase(SetupPhase):
         new_player_panel = self.render_frame(where = where, size = 1.0, config = config)
         self.new_player_label_text = tkinter.StringVar()
         self.new_player_label_text.set('Please enter your name:')
-        self.new_player_label = self.render_label(where = new_player_panel, text = self.new_player_label_text, config = GeneralUtils.filter_dict(config, ['background']))
+        self.new_player_label = self.render_label(where = new_player_panel, text = self.new_player_label_text, config = gutils.filter_dict(config, ['background']))
         self.new_player_input = self.render_input(where = new_player_panel)
         self.add_new_player_button = self.render_button(where = new_player_panel, text = 'Submit')
         panel_components = [self.new_player_label, self.new_player_input, self.add_new_player_button]
@@ -79,8 +79,8 @@ class LobbyPhase(SetupPhase):
         
     def render_existing_players_panel(self, where, config):
         existing_players_panel = self.render_frame(where = where, size = 1.0, config = config)
-        existing_players_label = self.render_label(where = existing_players_panel, text = 'Players in lobby:', config = GeneralUtils.filter_dict(config, ['background']))
-        self.existing_players_list = self.render_existing_players_list(where = existing_players_panel, config = GeneralUtils.filter_dict(config, ['background']))
+        existing_players_label = self.render_label(where = existing_players_panel, text = 'Players in lobby:', config = gutils.filter_dict(config, ['background']))
+        self.existing_players_list = self.render_existing_players_list(where = existing_players_panel, config = gutils.filter_dict(config, ['background']))
         existing_players_label.pack(side = tkinter.TOP, pady = 20)
         for i, list_item in enumerate(self.existing_players_list):
             list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))

@@ -3,7 +3,7 @@ import numpy as np
 
 from config import config
 from frontend.ColorUtils import ColorUtils
-from frontend.GeneralUtils import GeneralUtils
+from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.rendering.HexagonRender import HexagonRender
 
 def set_colors(darken): ### TODO: Factor out - duplicate on HexagonBodyRender
@@ -207,10 +207,10 @@ class HexagonRendering:
             current_phase = self.parent_phase.chaperone.current_phase
             node_settled = node.settlement and self.parent_phase.client_active()
             node_on_road = [line for line in node.lines if line.road and line.road.player is self.parent_phase.active_player()]
-            if GeneralUtils.safe_isinstance(current_phase, 'SettlingPhase'):
+            if gutils.safe_isinstance(current_phase, 'SettlingPhase'):
                 if node_settled and not node_on_road:
                     roadworthy = True; break
-            elif GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase'):
+            elif gutils.safe_isinstance(current_phase, 'MainGamePhase'):
                 if node_settled or node_on_road:
                     roadworthy = True; break
         else:
@@ -253,7 +253,7 @@ class HexagonRendering:
         line = self.line_dict[line_id]
         current_phase = self.parent_phase.chaperone.current_phase
         from_development_card, road_building_turn_index = False, None
-        if GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase'):
+        if gutils.safe_isinstance(current_phase, 'MainGamePhase'):
             play_frame_handler = current_phase.notebook_frame_handlers['play']
             from_development_card = play_frame_handler.action_tree_handler.development_card_clicked
             road_building_turn_index = play_frame_handler.action_tree_handler.road_building_turn_index
@@ -296,10 +296,10 @@ class HexagonRendering:
 
         node = draw_node_args['node']
         current_phase = self.parent_phase.chaperone.current_phase
-        if GeneralUtils.safe_isinstance(current_phase, 'SettlingPhase'):
+        if gutils.safe_isinstance(current_phase, 'SettlingPhase'):
             if node.settlement or node.adjacent_to_settled_node():
                 return
-        elif GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase'):
+        elif gutils.safe_isinstance(current_phase, 'MainGamePhase'):
             node_on_road = [line for line in node.lines if line.road and line.road.player is self.parent_phase.active_player()]
             if node.settlement or node.adjacent_to_settled_node() or not node_on_road:
                 return
@@ -475,7 +475,7 @@ class HexagonRendering:
             r = line_width * 2 ### Circle radius
             
             current_phase = self.parent_phase.chaperone.current_phase
-            in_main_game = GeneralUtils.safe_isinstance(current_phase, 'MainGamePhase')
+            in_main_game = gutils.safe_isinstance(current_phase, 'MainGamePhase')
             node_on_road = [line for line in port_node.lines if line.road and line.road.player is self.parent_phase.active_player()]
             if hovered_node is not None and port_node is hovered_node and not port_node.adjacent_to_settled_node() and not (in_main_game and not node_on_road):
                 r = max(r, draw_node_args['circle_radius'] * 2)

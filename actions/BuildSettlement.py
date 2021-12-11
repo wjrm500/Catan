@@ -2,7 +2,7 @@ import functools
 
 from actions.Action import Action
 from backend.mechanics.Distributor import Distributor
-from frontend.GeneralUtils import GeneralUtils
+from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
 class BuildSettlement(Action):
@@ -20,7 +20,7 @@ class BuildSettlement(Action):
         settlement = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement_id'])
         self.node.add_settlement(settlement)
 
-        in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')
+        in_settling_phase = gutils.safe_isinstance(self.game_phase, 'SettlingPhase')
         if not in_settling_phase:
             ### Update active player client side (to reflect paid for action)
             if self.chaperone.player.id == data['player'].id:
@@ -29,7 +29,7 @@ class BuildSettlement(Action):
         self.update_gui()
     
     def update_gui(self):
-        in_settling_phase = GeneralUtils.safe_isinstance(self.game_phase, 'SettlingPhase')
+        in_settling_phase = gutils.safe_isinstance(self.game_phase, 'SettlingPhase')
         if self.is_instigating_client():
             self.hexagon_rendering.handle_leave(event = None)
         else:
