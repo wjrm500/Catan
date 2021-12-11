@@ -34,7 +34,7 @@ class BuildRoad(Action):
         self.enable_text_area(text_area)
 
         if self.data['from_development_card'] and self.data['road_building_turn_index'] == 0:
-            text_area.insert('end', f'\n\n{self.data["player"].name} played the Road Building card...')
+            text_area.insert('end', f'\n\n{self.data["player"].name} played a Road Building card...', 'purple_font')
 
         ### X built a road
         text_to_insert = f'{self.data["player"].name} built a road.'

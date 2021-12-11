@@ -26,6 +26,7 @@ class PlaceRobber(Action):
     
     def update_gui(self):
         self.game_phase.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED
+        
         if self.is_instigating_client() and not self.data['from_development_card']:
             play_frame_handler = self.game_phase.notebook_frame_handlers['play']
             event_text = '\n'.join(self.data['text_events'])
@@ -42,6 +43,8 @@ class PlaceRobber(Action):
             self.refresh_play_frame_handler()
         self.refresh_game_board(full_refresh = True)
         text_area = self.get_text_area(in_settling_phase = False)
-        self.data['text_events'].insert(0, f'{self.data["player"].name} placed the robber on a {self.hexagon.num_pips}-pip {self.hexagon.resource_type} hexagon.')
+        knight_text = ' played a Knight card and ' if self.data['from_development_card'] else ' '
+        self.data['text_events'].insert(0, f'{self.data["player"].name}{knight_text}placed the robber on a {self.hexagon.num_pips}-pip {self.hexagon.resource_type} hexagon.')
         text = f'\n\n{" ".join(self.data["text_events"])}'
-        self.history_insert(text_area, text)
+        style = 'purple_font' if self.data['from_development_card'] else None
+        self.history_insert(text_area, text, style = style)

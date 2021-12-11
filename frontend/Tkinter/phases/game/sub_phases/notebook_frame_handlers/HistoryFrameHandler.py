@@ -14,3 +14,4 @@ class HistoryFrameHandler(BaseFrameHandler):
         self.text_area.pack(expand = True, fill = 'both', padx = 5, pady = 5)
         self.text_area.tag_config('red_font', foreground = 'red')
         self.text_area.tag_config('green_font', foreground = 'green')
+        self.text_area.tag_config('purple_font', foreground = 'purple')
