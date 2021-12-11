@@ -41,10 +41,12 @@ class Player(Incrementable):
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
 
         ### Check for roadworthy line
-        roads_on_board = [x for x in self.roads if x.line]
-        nodes_on_roads = [node for road in roads_on_board for node in road.line.nodes if not (node.settlement and node.settlement.player is not self)]
-        lines_from_nodes = [line for node in nodes_on_roads for line in node.lines]
-        roadworthy_lines = [line for line in lines_from_nodes if not line.road]
+        roads_on_board = [x for x in self.roads if x.line] ### Roads that have been placed on board
+        nodes_on_roads = [node for road in roads_on_board for node in road.line.nodes if not (node.settlement and node.settlement.player is not self)] ### Lineworthy nodes
+        lines_from_roads = [line for node in nodes_on_roads for line in node.lines if not line.road] ### Roadworthy lines extending from roads
+        settlements_on_board = [x for x in self.settlements if x.node] ### Settlements that have been placed on board
+        lines_from_settlements = [line for settlement in settlements_on_board for line in settlement.node.lines if not line.road] ### Roadworthy lines extending from settlements
+        roadworthy_lines = lines_from_roads + lines_from_settlements 
         
         return has_resource_cards_in_hand and self.num_tokens_available('road') > 0 and len(roadworthy_lines) > 0
     
