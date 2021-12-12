@@ -373,9 +373,10 @@ class ActionTreeHandler:
         summary_text_components = ['You will']
         give_and_receive_text_components = []
         if self.give_type != '':
-            give_and_receive_text_components.append(f'give {self.give_type}')
+            how_many = self.phase.chaperone.player.bank_trade_cost(self.give_type)
+            give_and_receive_text_components.append(f'give {how_many} {self.give_type}')
         if self.receive_type != '':
-            give_and_receive_text_components.append(f'receive {self.receive_type}')
+            give_and_receive_text_components.append(f'receive 1 {self.receive_type}')
         summary_text_components.append(' and '.join(give_and_receive_text_components))
         self.trade_with_bank_summary_text.set('{}.'.format(' '.join(summary_text_components)))
     
