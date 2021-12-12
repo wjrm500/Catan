@@ -53,3 +53,4 @@ class HexagonRender:
                 self.rendering.CV_OBJ_POLYGON
             ]
             self.rendering.create_polygon(points, fill = 'black', outline = 'black', tags = tags, width = 2) ### TODO: Make transparent?
+            self.rendering.canvas.tag_bind(self.rendering.CT_OBJ_ROBBER, '<Button-1>', self.rendering.handle_place_robber_click)

@@ -360,12 +360,16 @@ class HexagonRendering:
         self.canvas.config(cursor = cursor)
     
     def handle_place_robber_click(self, event):
-        polygon_id = event.widget.find_withtag('current')[0]
-        hexagon = self.polygon_hexagon_dict[polygon_id]
         current_phase = self.parent_phase.chaperone.current_phase
         play_frame_handler = current_phase.notebook_frame_handlers['play']
         from_development_card = play_frame_handler.action_tree_handler.development_card_clicked
-        self.parent_phase.chaperone.place_robber(hexagon, from_development_card = from_development_card)
+        polygon_id = event.widget.find_withtag('current')[0]
+        if polygon_id in self.polygon_hexagon_dict: ### Hexagon clicked
+            hexagon = self.polygon_hexagon_dict[polygon_id]
+            self.parent_phase.chaperone.place_robber(hexagon, from_development_card)
+        else: ### Robber clicked
+            hexagon = self.distributor.robber.hexagon
+            self.parent_phase.chaperone.place_robber(hexagon, from_development_card)
     
     def handle_city_upgrade_motion(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
