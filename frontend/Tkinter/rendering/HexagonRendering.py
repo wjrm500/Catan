@@ -380,7 +380,7 @@ class HexagonRendering:
         min_node_dist = min(map(lambda x: x[1], node_dists))
         for node, dist in node_dists:
             closest_to_cursor = dist == min_node_dist
-            if closest_to_cursor and node.settlement and node.settlement.player is self.parent_phase.chaperone.player:
+            if closest_to_cursor and node.settlement and node.settlement.player is self.parent_phase.chaperone.player and not node.settlement.city:
                 r = (self.scale * 3 / 4) / 5
                 width = r / 2
                 tags = [
