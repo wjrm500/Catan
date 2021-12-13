@@ -205,13 +205,15 @@ class HexagonRendering:
         line = draw_road_args['line']
         for node in line.nodes:
             current_phase = self.parent_phase.chaperone.current_phase
-            node_settled = node.settlement and self.parent_phase.client_active()
-            node_on_road = [line for line in node.lines if line.road and line.road.player is self.parent_phase.active_player()]
+            active_player = self.parent_phase.active_player()
+            node_settled = node.settlement
+            node_settled_by_active_player = node.settlement.player is active_player if node_settled else False
+            node_on_road = len([line for line in node.lines if line.road and line.road.player is active_player]) > 0
             if gutils.safe_isinstance(current_phase, 'SettlingPhase'):
-                if node_settled and not node_on_road:
+                if (node_settled and node_settled_by_active_player) and not node_on_road:
                     roadworthy = True; break
             elif gutils.safe_isinstance(current_phase, 'MainGamePhase'):
-                if node_settled or node_on_road:
+                if (node_settled and node_settled_by_active_player) or (node_on_road and not (node_settled and not node_settled_by_active_player)):
                     roadworthy = True; break
         else:
             roadworthy = False
