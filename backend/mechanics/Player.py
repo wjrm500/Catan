@@ -90,7 +90,7 @@ class Player(Incrementable):
     def can_upgrade_settlement(self):
         resource_card_dict = self.get_resource_card_dict('UPGRADE_SETTLEMENT')
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
-        has_settlement_on_board = len([settlement for settlement in self.settlements if settlement.node]) > 0
+        has_settlement_on_board = len([settlement for settlement in self.settlements if settlement.node and not settlement.city]) > 0
         has_token_available = self.num_tokens_available('city') > 0
         return has_resource_cards_in_hand and has_settlement_on_board and has_token_available
 
