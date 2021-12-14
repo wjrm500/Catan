@@ -98,7 +98,9 @@ class Player(Incrementable):
         return len([card for card in self.hand['development'] if not card.type == 'victory_point']) > 0
     
     def can_move_robber_to_desert(self):
-        return self.num_tokens_available('game') > 0
+        board_has_desert = len([hexagon for hexagon in self.game.hexagons if hexagon.resource_type == 'desert']) > 0
+        has_token_available = self.num_tokens_available('game') > 0
+        return board_has_desert and has_token_available
     
     def can_swap_cards(self):
         has_two_cards_in_hand = len(self.hand['resource']) > 1
