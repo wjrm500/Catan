@@ -22,10 +22,8 @@ class BuildRoad(Action):
         if in_settling_phase:
             chaperone.current_phase.update_active_player_index()
         move_on_to_next_phase = sum([bool(settlement.node) for player in self.chaperone.players for settlement in player.settlements]) == len(self.chaperone.players) * 2
-        if move_on_to_next_phase:
+        if move_on_to_next_phase or not in_settling_phase:
             self.reload_all_players()
-        if not in_settling_phase:
-            self.reload_active_player()
         self.update_gui(in_settling_phase, move_on_to_next_phase)
     
     def update_gui(self, in_settling_phase, move_on_to_next_phase):

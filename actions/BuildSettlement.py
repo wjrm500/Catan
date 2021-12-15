@@ -22,9 +22,7 @@ class BuildSettlement(Action):
 
         in_settling_phase = gutils.safe_isinstance(self.game_phase, 'SettlingPhase')
         if not in_settling_phase:
-            ### Update active player client side (to reflect paid for action)
-            if self.chaperone.player.id == data['player'].id:
-                self.chaperone.player.__dict__ = data['player'].__dict__
+            self.reload_all_players() ### Not just active player because victory points etc. change
 
         self.update_gui()
     

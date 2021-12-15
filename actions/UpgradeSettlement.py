@@ -16,10 +16,7 @@ class UpgradeSettlement(Action):
         city = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_CITY, data['city_id'])
         node.settlement.add_city(city)
 
-        ### Update active player client side (to reflect paid for action)
-        if self.chaperone.player.id == data['player'].id:
-            self.chaperone.player.__dict__ = data['player'].__dict__
-
+        self.reload_all_players() ### Not just active player because victory points etc. change
         self.update_gui()
     
     def update_gui(self):

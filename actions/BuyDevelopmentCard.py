@@ -9,7 +9,7 @@ class BuyDevelopmentCard(Action):
         self.game_phase = self.chaperone.current_phase
         self.data = data
         self.hexagon_rendering = chaperone.current_phase.hexagon_rendering
-        self.reload_active_player()
+        self.reload_all_players() ### Not just active player because victory points etc. change
         self.update_gui()
 
     def update_gui(self):
@@ -18,3 +18,4 @@ class BuyDevelopmentCard(Action):
         self.history_insert(text_area, text, 'purple_font')
         if self.is_instigating_client():
             self.refresh_play_frame_handler()
+        self.refresh_status_frame_handler()
