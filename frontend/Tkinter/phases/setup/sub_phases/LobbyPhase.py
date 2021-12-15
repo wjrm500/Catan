@@ -16,8 +16,8 @@ class LobbyPhase(SetupPhase):
         self.split_panel = self.render_frame(where = self.inner_frame, size = 1.0)
         player_panel_config = {
             'background': ColorUtils.lighten_hex(self.BG_COLOR, 0.1),
-            'highlightbackground': ColorUtils.darken_hex(self.BG_COLOR, 0.2),
-            'highlightcolor': ColorUtils.darken_hex(self.BG_COLOR, 0.2), 
+            'highlightbackground': self.DARKER_BG_COLOR,
+            'highlightcolor': self.DARKER_BG_COLOR, 
             'highlightthickness': 1
         }
         self.game_code_text = tkinter.StringVar()

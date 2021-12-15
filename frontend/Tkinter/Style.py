@@ -1,13 +1,12 @@
 from tkinter import ttk
 
-from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
 
 class Style:
     def setup(self):
         style = ttk.Style()
         blue = Phase.BG_COLOR
-        darker_blue = ColorUtils.darken_hex(blue, 0.2)
+        darker_blue = Phase.DARKER_BG_COLOR
 
         style.theme_create('catan', parent = 'classic', settings = { ### Need classic to avoid dashed lines on selected notebook tab
             'TNotebook': {

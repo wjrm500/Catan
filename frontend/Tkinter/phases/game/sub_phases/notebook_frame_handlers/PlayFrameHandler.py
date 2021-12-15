@@ -3,14 +3,11 @@ from functools import partial
 import tkinter
 
 from config import config
-from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.ActionTreeHandler import ActionTreeHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHandler import BaseFrameHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrame import CardFrame
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLabel import CardFrameLabel
-
-### TODO: factor out "darker_blue" stuff (and any instance of ColourUtils.darken_hex being used elsewhere)
 
 class PlayFrameHandler(BaseFrameHandler):
     def __init__(self, phase, notebook):
@@ -37,21 +34,20 @@ class PlayFrameHandler(BaseFrameHandler):
 
     def dice_roll_setup(self):
         self.dice_rolled = 0
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         self.dice_roll_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
         self.dice_roll_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
 
-        self.dice_roll_box = tkinter.Frame(self.dice_roll_overlay, background = darker_blue, height = 200, width = 300)
+        self.dice_roll_box = tkinter.Frame(self.dice_roll_overlay, background = Phase.DARKER_BG_COLOR, height = 200, width = 300)
         self.dice_roll_box.place(in_ = self.dice_roll_overlay, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
 
         self.dice_roll_text = tkinter.StringVar()
         self.dice_roll_text.set('')
-        dice_roll_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_text, background = darker_blue, font = ('Arial', 24))
+        dice_roll_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_text, background = Phase.DARKER_BG_COLOR, font = ('Arial', 24))
         dice_roll_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.05)
 
         self.dice_roll_event_text = tkinter.StringVar()
         self.dice_roll_event_text.set('')
-        dice_roll_event_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_event_text, background = darker_blue, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 275)
+        dice_roll_event_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_event_text, background = Phase.DARKER_BG_COLOR, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 275)
         dice_roll_event_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.25)
 
         self.instruct_label_text = tkinter.StringVar()
@@ -104,10 +100,9 @@ class PlayFrameHandler(BaseFrameHandler):
     def create_cards_frame(self, where, type, iterable):
         self.root.update_idletasks()
         frame_width = where.master.master.winfo_width() ### Get width of inner frame middle right
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        outer_frame_top = tkinter.Label(outer_frame, text = f'{type.title()} cards', anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
-        outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
+        outer_frame_top = tkinter.Label(outer_frame, text = f'{type.title()} cards', anchor = tkinter.W, background = Phase.DARKER_BG_COLOR, font = ('Arial', 10, 'bold'))
+        outer_frame_bottom = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR, pady = 5)
         outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
         outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
         outer_frame.grid_rowconfigure(0, weight = 1)
@@ -148,19 +143,18 @@ class PlayFrameHandler(BaseFrameHandler):
     
     def create_movable_piece_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        top_label = tkinter.Label(outer_frame, text = 'Tokens remaining', background = darker_blue, anchor = tkinter.W, font = ('Arial', 10, 'bold'))
+        top_label = tkinter.Label(outer_frame, text = 'Tokens remaining', background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10, 'bold'))
         top_label.pack(fill = 'x', side = tkinter.TOP)
-        bottom_frame = tkinter.Frame(outer_frame, background = darker_blue)
+        bottom_frame = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR)
         bottom_frame.pack(fill = 'x', side = tkinter.TOP)
         self.movable_piece_label_texts = {}
         for i, movable_piece in enumerate(['road', 'settlement', 'city', 'game']): ### Only add tokens if two players
-            piece_label = tkinter.Label(bottom_frame, text = f'{movable_piece.title().replace("_", " ")}:', background = darker_blue)
+            piece_label = tkinter.Label(bottom_frame, text = f'{movable_piece.title().replace("_", " ")}:', background = Phase.DARKER_BG_COLOR)
             piece_label.grid(row = 0, column = i * 2)
-            num_label_text = tkinter.StringVar() ### Needs to be accessible later
+            num_label_text = tkinter.StringVar()
             num_label_text.set(str(self.player.num_tokens_available(movable_piece)))
             self.movable_piece_label_texts[movable_piece] = num_label_text
-            num_label = tkinter.Label(bottom_frame, textvariable = num_label_text, background = darker_blue)
+            num_label = tkinter.Label(bottom_frame, textvariable = num_label_text, background = Phase.DARKER_BG_COLOR)
             num_label.grid(row = 0, column = i * 2 + 1)
         return outer_frame
     

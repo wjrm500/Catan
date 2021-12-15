@@ -24,8 +24,7 @@ class ActionTreeHandler:
 
     def create_action_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
+        inner_frame = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR, padx = 5, pady = 5)
         inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
         self.action_tree = ttk.Treeview(inner_frame, columns = ['action'], show = 'headings', height = 5)
         self.action_tree.tag_configure('odd', background = Phase.BG_COLOR)
@@ -43,13 +42,11 @@ class ActionTreeHandler:
     
     def create_action_cost_frame(self, where):
         outer_frame = tkinter.Frame(where, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        inner_frame = tkinter.Frame(outer_frame, background = darker_blue, padx = 5, pady = 5)
+        inner_frame = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR, padx = 5, pady = 5)
         inner_frame.pack(side = tkinter.TOP, expand = True, fill = 'both')
         self.action_cost = tkinter.StringVar()
         self.action_cost.set(self.default_action_cost_text())
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
-        cost_label = tkinter.Label(inner_frame, textvariable = self.action_cost, background = darker_blue)
+        cost_label = tkinter.Label(inner_frame, textvariable = self.action_cost, background = Phase.DARKER_BG_COLOR)
         cost_label.pack()
         return outer_frame
     
@@ -269,13 +266,12 @@ class ActionTreeHandler:
         self.development_card_clicked = False
 
     def trade_with_bank_setup(self):
-        darker_blue = ColorUtils.darken_hex(Phase.BG_COLOR, 0.2)
         Card = namedtuple('Card', ['resource_type', 'cost'])
         def handle_iterable(enumerator, iterable):
             self.trade_with_bank_card_frames[iterable['name']] = []
             outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
-            outer_frame_top = tkinter.Label(outer_frame, text = iterable['title'], anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
-            outer_frame_bottom = tkinter.Frame(outer_frame, background = darker_blue, pady = 5)
+            outer_frame_top = tkinter.Label(outer_frame, text = iterable['title'], anchor = tkinter.W, background = Phase.DARKER_BG_COLOR, font = ('Arial', 10, 'bold'))
+            outer_frame_bottom = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR, pady = 5)
             outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
             outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
             outer_frame.grid_rowconfigure(0, weight = 1)
@@ -314,10 +310,10 @@ class ActionTreeHandler:
         
             ### Summary section
             outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
-            outer_frame_top = tkinter.Label(outer_frame, text = 'Summary', anchor = tkinter.W, background = darker_blue, font = ('Arial', 10, 'bold'))
+            outer_frame_top = tkinter.Label(outer_frame, text = 'Summary', anchor = tkinter.W, background = Phase.DARKER_BG_COLOR, font = ('Arial', 10, 'bold'))
             self.trade_with_bank_summary_text = tkinter.StringVar()
             self.trade_with_bank_summary_text.set('')
-            outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_summary_text, background = darker_blue, anchor = tkinter.W, font = ('Arial', 10))
+            outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_summary_text, background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10))
             outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
             outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
             outer_frame.grid(row = 2, column = 0, sticky = 'ew')
