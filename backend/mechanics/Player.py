@@ -41,6 +41,8 @@ class Player(Incrementable):
             self.check_path_length(road_inverted, road_arr, road_count, vertex_list)
             road_lengths.append(max(self.road_i_lengths))
         self.longest_road = max(road_lengths) if road_lengths else 0
+        if self.longest_road >= 5 and self.longest_road > self.game.longest_road['road_length']:
+            self.game.longest_road = {'player': self, 'road_length': self.longest_road}
 
     def check_path_length(self, edge, edge_list, road_length, vertex_list):
         edge_list.append(edge)

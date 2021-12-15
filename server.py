@@ -59,8 +59,6 @@ class Server:
                             active_player.hand['development'].remove(card_to_remove)
                     line.add_road(road := active_player.get_free_road())
                     active_player.set_longest_road()
-                    if active_player.longest_road >= 5 and active_player.longest_road > game.longest_road['road_length']:
-                        game.longest_road = {'player': active_player, 'road_length': active_player.longest_road}
                     output_data = {'action': action, 'from_development_card': input_data['from_development_card'], 'line_id': line.id, 'player': active_player, 'players': game.players, 'road_id': road.id, 'road_building_turn_index': input_data['road_building_turn_index']}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
@@ -74,6 +72,8 @@ class Server:
                         for player in game.players:
                             player.set_longest_road() ### Settlement might have broken road
                     output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'settlement_id': settlement.id}
+                        if game.longest_road['road_length'] < 5:
+                            game.longest_road = {'player': None, 'road_length': 0} ### Previous longest road holder may no longer own that title
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
                     game_code = input_data['game_code']
