@@ -54,40 +54,4 @@ class Action:
     
     def refresh_status_frame_handler(self):
         status_frame_handler = self.game_phase.notebook_frame_handlers['status']
-        game = self.chaperone.player.game
-        
-        victory_points = [{
-            'name': player.name,
-            'value': (victory_points := player.victory_points()),
-            'ranked_first': victory_points >= game.victory_point_limit
-            } for player in game.players]
-        sorted_victory_points = sorted(victory_points, key = lambda x: x['value'], reverse = True)
-
-        army_size = [{
-            'name': player.name,
-            'value': player.army_size,
-            'has_largest_army': (has_largest_army := player.has_largest_army()),
-            'ranked_first': has_largest_army
-            } for player in game.players]
-        sorted_army_size = sorted(army_size, key = lambda x: (x['has_largest_army'], x['value']), reverse = True)
-
-        longest_road = [{
-            'name': player.name,
-            'value': player.longest_road,
-            'has_longest_road': (has_longest_road := player.has_longest_road()),
-            'ranked_first': has_longest_road
-            } for player in game.players]
-        sorted_longest_road = sorted(longest_road, key = lambda x: (x['has_longest_road'], x['value']), reverse = True)
-
-        iterable = [
-            {'text_variables_index': 'Victory points', 'local_list': sorted_victory_points},
-            {'text_variables_index': 'Largest army', 'local_list': sorted_army_size},
-            {'text_variables_index': 'Longest road', 'local_list': sorted_longest_road},
-        ]
-        for item in iterable:
-            for i, text_variable in enumerate(status_frame_handler.text_variables[item['text_variables_index']]):
-                player_data = item["local_list"][i]
-                text = f'{player_data["name"]} - {player_data["value"]}'
-                text_variable['text'].set(text)
-                bg_color = 'gold' if player_data['ranked_first'] else Phase.DARKER_BG_COLOR
-                text_variable['label'].configure(background = bg_color)
+        status_frame_handler.load_text_variables()
