@@ -66,13 +66,13 @@ class Server:
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
-                    player = game.get_player_from_client_address(client_address)
+                    active_player = game.get_player_from_client_address(client_address)
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node_id'])
-                    player.transfer_resources_to_bank(player.get_resource_card_dict(action))
-                    node.add_settlement(settlement := player.get_free_settlement())
+                    active_player.transfer_resources_to_bank(active_player.get_resource_card_dict(action))
+                    node.add_settlement(settlement := active_player.get_free_settlement())
                     for player in game.players:
                         player.set_longest_road() ### Settlement might have broken road
-                    output_data = {'action': action, 'node_id': node.id, 'player': player, 'settlement_id': settlement.id}
+                    output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'settlement_id': settlement.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
                     game_code = input_data['game_code']
