@@ -52,9 +52,23 @@ class Action:
     def refresh_status_frame_handler(self):
         status_frame_handler = self.game_phase.notebook_frame_handlers['status']
         game = self.chaperone.player.game
-        text = '\n'.join([f'{player.name} has a longest road of {player.longest_road}' for player in game.players])
-        text_2 = '\n'.join([f'{player.name} has a largest army of {player.army_size}' for player in game.players])
-        text_3 = f'{army_player.name} has the largest army' if (army_player := game.largest_army["player"]) else ''
-        text_4 = f'{road_player.name} has the longest road' if (road_player := game.longest_road["player"]) else ''
-        text = '\n\n'.join([text, text_2, text_3, text_4])
-        status_frame_handler.text_variable.set(text)
+        
+        victory_points = sorted([{'name': player.name, 'value': player.victory_points()} for player in game.players], key = lambda x: x['value'], reverse = True)
+        army_size = sorted([{'name': player.name, 'value': player.army_size} for player in game.players], key = lambda x: x['value'], reverse = True) ### How will this differentiate between players with same army size value?
+        longest_road = sorted([{'name': player.name, 'value': player.longest_road} for player in game.players], key = lambda x: x['value'], reverse = True)
+        iterable = [
+            {'text_variables_index': 'Victory points', 'local_list': victory_points},
+            {'text_variables_index': 'Largest army', 'local_list': army_size},
+            {'text_variables_index': 'Longest road', 'local_list': longest_road},
+        ]
+        for item in iterable:
+            for i, text_variable in enumerate(status_frame_handler.text_variables[item['text_variables_index']]):
+                text = f'{item["local_list"][i]["name"]} - {item["local_list"][i]["value"]}'
+                text_variable.set(text)
+
+        # text = '\n'.join([f'{player.name} has a longest road of {player.longest_road}' for player in game.players])
+        # text_2 = '\n'.join([f'{player.name} has a largest army of {player.army_size}' for player in game.players])
+        # text_3 = f'{army_player.name} has the largest army' if (army_player := game.largest_army["player"]) else ''
+        # text_4 = f'{road_player.name} has the longest road' if (road_player := game.longest_road["player"]) else ''
+        # text = '\n\n'.join([text, text_2, text_3, text_4])
+        # status_frame_handler.text_variable.set(text)

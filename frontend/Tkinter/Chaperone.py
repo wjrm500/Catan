@@ -21,6 +21,7 @@ class Chaperone:
         self.player = None
         self.main = False ### User is main client i.e. created game
         self.game_code = ''
+        self.settling_phase_text = ''
     
     def get_player_from_id(self, id):
         return next(player for player in self.players if player.id == id)

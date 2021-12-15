@@ -1,0 +1,31 @@
+- Add text event for trading with bank
+
+- Don't allow player to start game if they are not playing, even if other players take it over the limit
+
+add token if build by desert.
+change token price.
+add up victory points.
+include longest road and largest army.
+"Kate placed the robber on a 5-pip lumber hexagon. Kate stole 1 ore from Mell!Kate upgraded a settlement to a city!".
+using a knight card to history. prevented from building road (from settlement|)
+
+When hovering over canvas objects, show brief description of what they are in top right corner e.g.
+"General port"
+"Wool port belonging to Kate"
+"Lumber hexagon"
+"City"
+"Settlement belonging to Will"
+"Road"
+
+Prevent development card picked up on that go from being played?
+
+- Only allow game tokens, swap cards with opponent and move robber to desert hex on two player game
+- "If two player game, discard a face-up knight card to gain two trade tokens"
+
+- Make ports around settlements slightly bigger
+- Prevent building a road through another player's settlement
+
+- Prevent city upgrade click handler on existing city icon
+
+roll dice - too many events overflows - make box bigger
+upgrade to city showing when not settlements

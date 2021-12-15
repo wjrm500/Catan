@@ -85,9 +85,8 @@ class BuildRoad(Action):
                         play_frame_handler.action_tree_handler.road_building_turn_index += 1
                     else:
                         self.refresh_play_frame_handler()
-                        self.refresh_status_frame_handler()
                 else:
                     self.refresh_play_frame_handler()
-                    self.refresh_status_frame_handler()
+            self.refresh_status_frame_handler()
 
         self.disable_text_area(text_area)
