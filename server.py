@@ -70,8 +70,9 @@ class Server:
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node_id'])
                     active_player.transfer_resources_to_bank(active_player.get_resource_card_dict(action))
                     node.add_settlement(settlement := active_player.get_free_settlement())
-                    for player in game.players:
-                        player.set_longest_road() ### Settlement might have broken road
+                    if len([line for line in node.lines if line.road]) >= 2: ### Settlement has at least two roads extending from it
+                        for player in game.players:
+                            player.set_longest_road() ### Settlement might have broken road
                     output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'settlement_id': settlement.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
@@ -129,7 +130,7 @@ class Server:
                         card_to_remove = next(card for card in player.hand['development'] if card.type == 'knight')
                         player.hand['development'].remove(card_to_remove)
                         player.army_size += 1
-                        if player.army_size > game.largest_army['army_size']:
+                        if player.army_size >= 3 and player.army_size > game.largest_army['army_size']:
                             game.largest_army = {'player': player, 'army_size': player.army_size}
                     output_data = {'action': action, 'from_development_card': from_development_card, 'hexagon_id': hexagon.id, 'player': player, 'players': game.players, 'text_events': text_events}
                     self.broadcast_to_game(game_code, output_data)

@@ -12,14 +12,19 @@ class Player(Incrementable):
         self.army_size = 0
         self.road_length = []
         self.longest_road = 0
-        self.has_longest_road = False
-        self.has_largest_army = False
         self.hand = {
             'development': [],
             'resource': []
         }
+    
+    def has_longest_road(self):
+        return (road_player := self.game.longest_road['player']) and road_player.id == self.id
+    
+    def has_largest_army(self):
+        return (army_player := self.game.largest_army['player']) and army_player.id == self.id
 
     def set_longest_road(self):
+        ### Credit for the solution goes to kvombatkere @ https://github.com/kvombatkere
         road_lengths = []
         self.build_graph = {}
         self.build_graph['ROADS'] = [(road.line.start_node, road.line.end_node) for road in self.roads if road.line]
@@ -71,7 +76,7 @@ class Player(Incrementable):
 
     def victory_points(self):
         from_settlements = sum([(2 if settlement.city else 1) for settlement in self.settlements if settlement.node])
-        from_achievements = (2 if self.has_longest_road else 0) + (2 if self.has_largest_army else 0)
+        from_achievements = (2 if self.has_longest_road() else 0) + (2 if self.has_largest_army() else 0)
         from_development_cards = len([card for card in self.hand['development'] if card.type == 'victory_point'])
         return from_settlements + from_achievements + from_development_cards
     

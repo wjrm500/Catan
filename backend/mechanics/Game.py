@@ -24,6 +24,7 @@ class Game(Unserializable):
         self.dice_rolls = []
         self.longest_road = {'player': None, 'road_length': 0}
         self.largest_army = {'player': None, 'army_size': 0}
+        self.victory_point_limit = round(self.num_hexagons * 10 / 19)
     
     def add_client(self, client):
         if len(self.clients) == 0:

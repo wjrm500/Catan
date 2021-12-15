@@ -31,3 +31,4 @@ class UpgradeSettlement(Action):
         text = f'\n\n{self.data["player"].name} upgraded a settlement to a city!'
         self.history_insert(text_area, text, style = 'green_font')
         self.refresh_play_frame_handler()
+        self.refresh_status_frame_handler()

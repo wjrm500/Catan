@@ -8,11 +8,11 @@ class StatusFrameHandler(BaseFrameHandler):
         super().__init__(phase, notebook)
         self.num_players = len(self.phase.chaperone.player.game.players)
         self.text_variables = {
-            'Victory points': [tkinter.StringVar() for _ in range(self.num_players)],
-            'Largest army': [tkinter.StringVar() for _ in range(self.num_players)],
-            'Longest road': [tkinter.StringVar() for _ in range(self.num_players)]
+            'Victory points': [{'text': tkinter.StringVar(), 'label': None} for _ in range(self.num_players)],
+            'Largest army': [{'text': tkinter.StringVar(), 'label': None} for _ in range(self.num_players)],
+            'Longest road': [{'text': tkinter.StringVar(), 'label': None} for _ in range(self.num_players)]
         }
-
+    
     def setup(self):
         self.frame.grid_columnconfigure(0, weight = 1)
         frame_width = self.frame.master.master.winfo_width() ### Get width of inner frame middle right
@@ -30,8 +30,9 @@ class StatusFrameHandler(BaseFrameHandler):
             sub_frame = tkinter.Frame(top_frame, background = darker_blue, highlightbackground = 'black', highlightthickness = item['highlightthickness'], width = round(frame_width / 10))
             sub_frame.grid(row = 0, column = i, padx = 2.5, pady = 2.5)
             title_label = tkinter.Label(sub_frame, text = item['title'], background = darker_blue, width = round(frame_width / 20), font = ('Arial', 10, 'bold'))
-            title_label.pack()
+            title_label.pack(pady = 5)
             for i in range(self.num_players):
                 text_variable = self.text_variables[item['title']][i]
-                player_label = tkinter.Label(sub_frame, textvariable = text_variable, background = darker_blue)
-                player_label.pack(expand = True, fill = 'both', side = tkinter.TOP)
+                player_label = tkinter.Label(sub_frame, textvariable = text_variable['text'], background = darker_blue)
+                player_label.pack(anchor = tkinter.CENTER, side = tkinter.TOP)
+                text_variable['label'] = player_label
