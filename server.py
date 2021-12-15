@@ -49,16 +49,19 @@ class Server:
                 elif action == ActionFactory.BUILD_ROAD:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
-                    player = game.get_player_from_client_address(client_address)
+                    active_player = game.get_player_from_client_address(client_address)
                     line = game.distributor.get_object_by_id(Distributor.OBJ_LINE, input_data['line_id'])
                     if not input_data['from_development_card']:
-                        player.transfer_resources_to_bank(player.get_resource_card_dict(action))
+                        active_player.transfer_resources_to_bank(active_player.get_resource_card_dict(action))
                     else:
                         if input_data['road_building_turn_index'] == 0:
-                            card_to_remove = next(card for card in player.hand['development'] if card.type == 'road_building')
-                            player.hand['development'].remove(card_to_remove)
-                    line.add_road(road := player.get_free_road())
-                    output_data = {'action': action, 'from_development_card': input_data['from_development_card'], 'line_id': line.id, 'player': player, 'players': game.players, 'road_id': road.id, 'road_building_turn_index': input_data['road_building_turn_index']}
+                            card_to_remove = next(card for card in active_player.hand['development'] if card.type == 'road_building')
+                            active_player.hand['development'].remove(card_to_remove)
+                    line.add_road(road := active_player.get_free_road())
+                    active_player.set_longest_road()
+                    if active_player.longest_road >= 5 and active_player.longest_road > game.longest_road['road_length']:
+                        game.longest_road = {'player': active_player, 'road_length': active_player.longest_road}
+                    output_data = {'action': action, 'from_development_card': input_data['from_development_card'], 'line_id': line.id, 'player': active_player, 'players': game.players, 'road_id': road.id, 'road_building_turn_index': input_data['road_building_turn_index']}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUILD_SETTLEMENT:
                     game_code = input_data['game_code']
@@ -67,6 +70,8 @@ class Server:
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node_id'])
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     node.add_settlement(settlement := player.get_free_settlement())
+                    for player in game.players:
+                        player.set_longest_road() ### Settlement might have broken road
                     output_data = {'action': action, 'node_id': node.id, 'player': player, 'settlement_id': settlement.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
@@ -124,6 +129,8 @@ class Server:
                         card_to_remove = next(card for card in player.hand['development'] if card.type == 'knight')
                         player.hand['development'].remove(card_to_remove)
                         player.army_size += 1
+                        if player.army_size > game.largest_army['army_size']:
+                            game.largest_army = {'player': player, 'army_size': player.army_size}
                     output_data = {'action': action, 'from_development_card': from_development_card, 'hexagon_id': hexagon.id, 'player': player, 'players': game.players, 'text_events': text_events}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.PLAY_MONOPOLY_CARD:

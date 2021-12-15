@@ -48,3 +48,13 @@ class Action:
         self.enable_text_area(text_area)
         text_area.insert('end', text, style)
         self.disable_text_area(text_area)
+    
+    def refresh_status_frame_handler(self):
+        status_frame_handler = self.game_phase.notebook_frame_handlers['status']
+        game = self.chaperone.player.game
+        text = '\n'.join([f'{player.name} has a longest road of {player.longest_road}' for player in game.players])
+        text_2 = '\n'.join([f'{player.name} has a largest army of {player.army_size}' for player in game.players])
+        text_3 = f'{army_player.name} has the largest army' if (army_player := game.largest_army["player"]) else ''
+        text_4 = f'{road_player.name} has the longest road' if (road_player := game.longest_road["player"]) else ''
+        text = '\n\n'.join([text, text_2, text_3, text_4])
+        status_frame_handler.text_variable.set(text)

@@ -19,7 +19,7 @@ class Player(Incrementable):
             'resource': []
         }
 
-    def get_longest_road(self):
+    def set_longest_road(self):
         road_lengths = []
         self.build_graph = {}
         self.build_graph['ROADS'] = [(road.line.start_node, road.line.end_node) for road in self.roads if road.line]
@@ -35,9 +35,7 @@ class Player(Incrementable):
             vertex_list = []
             self.check_path_length(road_inverted, road_arr, road_count, vertex_list)
             road_lengths.append(max(self.road_i_lengths))
-        longest_road = max(road_lengths) if road_lengths else 0
-        print(longest_road)
-        return longest_road
+        self.longest_road = max(road_lengths) if road_lengths else 0
 
     def check_path_length(self, edge, edge_list, road_length, vertex_list):
         edge_list.append(edge)

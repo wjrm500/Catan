@@ -22,6 +22,8 @@ class Game(Unserializable):
         self.started_proper = False
         self.code = ''.join(random.choices(string.ascii_lowercase, k = 5))
         self.dice_rolls = []
+        self.longest_road = {'player': None, 'road_length': 0}
+        self.largest_army = {'player': None, 'army_size': 0}
     
     def add_client(self, client):
         if len(self.clients) == 0:

@@ -41,6 +41,7 @@ class PlaceRobber(Action):
             self.game_phase.instruction.configure({'background': instruction_bg_color, 'foreground': ColorUtils.get_fg_from_bg(instruction_bg_color)})
         else:
             self.refresh_play_frame_handler()
+            self.refresh_status_frame_handler()
         self.refresh_game_board(full_refresh = True)
         text_area = self.get_text_area(in_settling_phase = False)
         knight_text = ' played a Knight card and ' if self.data['from_development_card'] else ' '

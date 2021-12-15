@@ -56,3 +56,4 @@ class BuildSettlement(Action):
             self.game_phase.instruction_text.set('Build a road!')
         else: ### In main game phase
             self.refresh_play_frame_handler()
+            self.refresh_status_frame_handler()
