@@ -71,9 +71,9 @@ class Server:
                     if len([line for line in node.lines if line.road]) >= 2: ### Settlement has at least two roads extending from it
                         for player in game.players:
                             player.set_longest_road() ### Settlement might have broken road
-                    output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'settlement_id': settlement.id}
                         if game.longest_road['road_length'] < 5:
                             game.longest_road = {'player': None, 'road_length': 0} ### Previous longest road holder may no longer own that title
+                    output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'players': game.players, 'settlement_id': settlement.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
                     game_code = input_data['game_code']
@@ -82,7 +82,7 @@ class Server:
                     development_card = game.development_cards.pop()
                     player.hand['development'].append(development_card)
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
-                    output_data = {'action': action, 'player': player}
+                    output_data = {'action': action, 'player': player, 'players': game.players}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.CREATE_NEW_GAME:
                     num_hexagons = input_data['num_hexagons']
@@ -219,7 +219,7 @@ class Server:
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
                     city = player.cities.pop()
                     node.settlement.add_city(city)
-                    output_data = {'action': action, 'city_id': city.id, 'node_id': node.id, 'player': player}
+                    output_data = {'action': action, 'city_id': city.id, 'node_id': node.id, 'player': player, 'players': game.players}
                     self.broadcast_to_game(game_code, output_data)
             except Exception as e:
                 print(str(e))
