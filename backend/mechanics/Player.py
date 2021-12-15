@@ -1,4 +1,6 @@
 from collections import Counter
+import networkx as nx
+
 from backend.Incrementable import Incrementable
 
 class Player(Incrementable):
@@ -8,12 +10,72 @@ class Player(Incrementable):
         self.name = name
         self.client_address = client_address
         self.army_size = 0
-        self.longest_road = False
-        self.largest_army = False
+        self.road_length = []
+        self.longest_road = 0
+        self.has_longest_road = False
+        self.has_largest_army = False
         self.hand = {
             'development': [],
             'resource': []
         }
+
+    def get_longest_road(self):
+        road_lengths = []
+        self.build_graph = {}
+        self.build_graph['ROADS'] = [(road.line.start_node, road.line.end_node) for road in self.roads if road.line]
+        for road in self.build_graph['ROADS']:
+            self.road_i_lengths = []
+            road_count = 0
+            road_arr = []
+            vertex_list = []
+            self.check_path_length(road, road_arr, road_count, vertex_list)
+            road_inverted = (road[1], road[0])
+            road_count = 0
+            road_arr = []
+            vertex_list = []
+            self.check_path_length(road_inverted, road_arr, road_count, vertex_list)
+            road_lengths.append(max(self.road_i_lengths))
+        longest_road = max(road_lengths) if road_lengths else 0
+        print(longest_road)
+        return longest_road
+
+    def check_path_length(self, edge, edge_list, road_length, vertex_list):
+        edge_list.append(edge)
+        road_length += 1
+        vertex_list.append(edge[0])
+        road_neighbors_list = self.get_neighbouring_roads(edge, edge_list, vertex_list)
+        if road_neighbors_list == []:
+            self.road_i_lengths.append(road_length)
+            return
+        else:
+            for neighbor_road in road_neighbors_list:
+                self.check_path_length(neighbor_road, edge_list, road_length, vertex_list)
+
+    def get_neighbouring_roads(self, road_i, visited_roads, visited_vertices):
+        new_neighbours = []
+        v1 = road_i[0]
+        v2 = road_i[1] 
+        for edge in self.build_graph['ROADS']:
+            if edge[1] in visited_vertices:
+                edge = (edge[1], edge[0])
+            if edge not in visited_roads:
+                if v2.settlement and v2.settlement.player.id != self.id:
+                    continue
+                if edge[0] == v2 and edge[0] not in visited_vertices:
+                    new_neighbours.append(edge)
+                if edge[0] == v1 and edge[0] not in visited_vertices:
+                    new_neighbours.append(edge)
+                if edge[1] == v2 and edge[1] not in visited_vertices:
+                    new_neighbours.append((edge[1], edge[0]))
+                if edge[1] == v1 and edge[1] not in visited_vertices:
+                    new_neighbours.append((edge[1], edge[0]))
+        return new_neighbours
+
+    def victory_points(self):
+        from_settlements = sum([(2 if settlement.city else 1) for settlement in self.settlements if settlement.node])
+        from_achievements = (2 if self.has_longest_road else 0) + (2 if self.has_largest_army else 0)
+        from_development_cards = len([card for card in self.hand['development'] if card.type == 'victory_point'])
+        return from_settlements + from_achievements + from_development_cards
     
     def set_color(self, color):
         self.color = color
@@ -98,7 +160,7 @@ class Player(Incrementable):
         return len([card for card in self.hand['development'] if not card.type == 'victory_point']) > 0
     
     def can_move_robber_to_desert(self):
-        board_has_desert = len([hexagon for hexagon in self.game.hexagons if hexagon.resource_type == 'desert']) > 0
+        board_has_desert = len([hexagon for hexagon in self.game.distributor.hexagons if hexagon.resource_type == 'desert']) > 0
         has_token_available = self.num_tokens_available('game') > 0
         return board_has_desert and has_token_available
     
