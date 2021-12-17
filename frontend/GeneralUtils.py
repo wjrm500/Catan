@@ -1,4 +1,5 @@
 import inflect
+from itertools import chain, repeat, islice
 
 class GeneralUtils:
     @staticmethod
@@ -28,3 +29,7 @@ class GeneralUtils:
         filtered_out = [x for x in list if not filter_cond(x)]
         filtered_in = [x for x in list if filter_cond(x)]
         return (filtered_in, filtered_out)
+    
+    @staticmethod
+    def intersperse(delimiter, seq):
+        return islice(chain.from_iterable(zip(repeat(delimiter), seq)), 1, None)

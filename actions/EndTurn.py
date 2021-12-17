@@ -24,3 +24,6 @@ class EndTurn(Action):
         text_area = self.get_text_area(in_settling_phase = False)
         text = f'\n\n{self.data["player"].name} ended their turn.'
         self.history_insert(text_area, text, style = 'red_font')
+
+        status_frame_handler = self.game_phase.notebook_frame_handlers['status']
+        status_frame_handler.rounds_completed_text.set(f'Rounds completed: {self.data["rounds_completed"]}')

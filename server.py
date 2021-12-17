@@ -95,7 +95,9 @@ class Server:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     player = game.get_player_from_client_address(client_address)
-                    self.broadcast_to_game(game.code, {'action': action, 'player': player})
+                    if player == game.players[-1]:
+                        game.rounds_completed += 1
+                    self.broadcast_to_game(game.code, {'action': action, 'player': player, 'rounds_completed': game.rounds_completed})
                 elif action == ActionFactory.JOIN_EXISTING_GAME:
                     game_code = input_data['game_code']
                     output_data = {'action': action}

@@ -1,4 +1,5 @@
 import tkinter
+from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHandler import BaseFrameHandler
 
@@ -54,8 +55,21 @@ class StatusFrameHandler(BaseFrameHandler):
     def setup(self):
         self.frame.grid_columnconfigure(0, weight = 1)
         frame_width = self.frame.master.master.winfo_width() ### Get width of inner frame middle right
+
+        top_top_frame = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
+        top_top_frame.grid(row = 0, column = 0, sticky = 'ew')
+        self.rounds_completed_text = tkinter.StringVar()
+        self.rounds_completed_text.set('Rounds completed: 0')
+        interpunct_label = tkinter.Label(top_top_frame, text = '·', background = Phase.BG_COLOR, foreground = 'gray', font = ('Calibri', 12, 'bold'))
+        rounds_completed_label = tkinter.Label(top_top_frame, textvariable = self.rounds_completed_text, background = Phase.BG_COLOR)
+        victory_points_required_label = tkinter.Label(top_top_frame, text = f'Victory points required: {self.player.game.victory_point_limit}', background = Phase.BG_COLOR)
+        ordinary_wizarding_labels = [rounds_completed_label, victory_points_required_label]
+        label_arr = gutils.intersperse(interpunct_label, ordinary_wizarding_labels)
+        for label in label_arr:
+            label.pack(side = tkinter.LEFT)
+
         top_frame = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
-        top_frame.grid(row = 0, column = 0, sticky = 'ew')
+        top_frame.grid(row = 1, column = 0, sticky = 'ew')
         top_frame.grid_rowconfigure(0, weight = 1)
         iterable = [
             {'title': 'Victory points', 'highlightthickness': 2},

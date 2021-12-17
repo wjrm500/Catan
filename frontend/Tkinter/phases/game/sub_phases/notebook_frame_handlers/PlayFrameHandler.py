@@ -37,7 +37,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.dice_roll_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
         self.dice_roll_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
 
-        self.dice_roll_box = tkinter.Frame(self.dice_roll_overlay, background = Phase.DARKER_BG_COLOR, height = 200, width = 300)
+        self.dice_roll_box = tkinter.Frame(self.dice_roll_overlay, background = Phase.DARKER_BG_COLOR, height = 250, width = 300)
         self.dice_roll_box.place(in_ = self.dice_roll_overlay, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
 
         self.dice_roll_text = tkinter.StringVar()
@@ -47,13 +47,13 @@ class PlayFrameHandler(BaseFrameHandler):
 
         self.dice_roll_event_text = tkinter.StringVar()
         self.dice_roll_event_text.set('')
-        dice_roll_event_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_event_text, background = Phase.DARKER_BG_COLOR, font = ('Arial', 12), justify = tkinter.LEFT, wraplength = 275)
+        dice_roll_event_label = tkinter.Label(self.dice_roll_box, textvariable = self.dice_roll_event_text, background = Phase.DARKER_BG_COLOR, font = ('Arial', 11), justify = tkinter.LEFT, wraplength = 275)
         dice_roll_event_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.25)
 
         self.instruct_label_text = tkinter.StringVar()
         self.instruct_label_text.set('Roll dice')
         self.instruct_label = tkinter.Label(self.dice_roll_box, textvariable = self.instruct_label_text, background = Phase.BG_COLOR, padx = 10, pady = 10, font = ('Arial', 16, 'bold'))
-        self.instruct_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.685)
+        self.instruct_label.place(in_ = self.dice_roll_box, relx = 0.05, rely = 0.75)
         self.instruct_label.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
         self.instruct_label.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
         self.instruct_label.bind('<Button-1>', self.roll_dice)
