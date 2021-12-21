@@ -327,6 +327,7 @@ class ActionTreeHandler:
         ### "What do you want to give?" section
         player = self.play_frame_handler.player
         hand_dict = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
+        hand_dict = dict(sorted(hand_dict.items())) ### So that resources to give appear from left to right in alphabetical order
         port_types = player.port_types()
         give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(resource_type, port_types))]
         give_iterable = {
