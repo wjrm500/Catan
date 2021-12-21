@@ -1,7 +1,7 @@
 from collections import Counter
-import networkx as nx
 
 from backend.Incrementable import Incrementable
+from config import config
 
 class Player(Incrementable):
     def __init__(self, game, name, client_address):
@@ -231,3 +231,11 @@ class Player(Incrementable):
             return len([city for city in self.cities if not city.settlement])
         elif type == 'game':
             return self.num_game_tokens
+        
+    def pip_dict(self):
+        settlements_on_board = [settlement for settlement in self.settlements if settlement.node]
+        accessed_hexagons = [hexagon for settlement in settlements_on_board for hexagon in settlement.node.hexagons if hexagon.resource_type != 'desert']
+        pip_dict = {resource_type: 0 for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert'}
+        for hexagon in accessed_hexagons:
+            pip_dict[hexagon.resource_type] = pip_dict.get(hexagon.resource_type) + hexagon.num_pips
+        return pip_dict

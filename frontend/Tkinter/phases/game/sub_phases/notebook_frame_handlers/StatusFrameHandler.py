@@ -3,7 +3,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter, MaxNLocator
 import tkinter
+from tkinter import ttk
 
+from config import config
 from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHandler import BaseFrameHandler
@@ -84,7 +86,7 @@ class StatusFrameHandler(BaseFrameHandler):
         for i, item in enumerate(iterable):
             top_frame.grid_columnconfigure(i, weight = 1, uniform = 'catan')
             sub_frame = tkinter.Frame(top_frame, background = Phase.DARKER_BG_COLOR, highlightbackground = 'black', highlightthickness = item['highlightthickness'], width = round(frame_width / 10))
-            sub_frame.grid(row = 0, column = i, padx = 2.5, pady = 2.5)
+            sub_frame.grid(row = 0, column = i, padx = 5, pady = 2.5)
             title_label = tkinter.Label(sub_frame, text = item['title'], background = Phase.DARKER_BG_COLOR, width = round(frame_width / 20), font = ('Arial', 10, 'bold'))
             title_label.pack(pady = 5)
             for i in range(self.num_players):
@@ -95,6 +97,7 @@ class StatusFrameHandler(BaseFrameHandler):
         self.load_text_variables()
 
         self.load_dice_roll_num_distro_frame()
+        self.load_resource_potential_frame()
 
     def load_dice_roll_num_distro_frame(self):
         game = self.player.game
@@ -111,7 +114,7 @@ class StatusFrameHandler(BaseFrameHandler):
         figure = plt.Figure(figsize = (2, 2), dpi = 100, facecolor = Phase.BG_COLOR)
         ax = figure.add_subplot(111)
         chart_type = FigureCanvasTkAgg(figure, self.roll_num_distro_frame)
-        chart_type.get_tk_widget().pack(expand = True, fill = 'both', padx = 2.5, pady = (10, 0))
+        chart_type.get_tk_widget().pack(expand = True, fill = 'both', padx = 2.5, pady = 10)
         ax.set_title('Dice roll number distribution', fontdict = {'fontname': 'Arial', 'fontsize': 10, 'fontweight': 'bold'})
         ax.set_ylim(bottom = 0, top = max(roll_num_freqs.values()) + 1)
         ax.set_facecolor(Phase.BG_COLOR)
@@ -122,3 +125,32 @@ class StatusFrameHandler(BaseFrameHandler):
         ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
         ax.yaxis.set_major_locator(MaxNLocator(integer = True))
         ax.bar(x, y, color = Phase.DARKER_BG_COLOR)
+    
+    def load_resource_potential_frame(self):
+        outer_frame = tkinter.Frame(self.frame, background = Phase.BG_COLOR, padx = 5, pady = 5)
+        outer_frame.grid(row = 3, column = 0, sticky = 'ew')
+        top_label = tkinter.Label(outer_frame, text = 'Resource potential (total num. pips)', background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10, 'bold'))
+        top_label.pack(fill = 'x', side = tkinter.TOP)
+        bottom_frame = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR)
+        bottom_frame.pack(fill = 'x', side = tkinter.TOP)
+        game = self.player.game
+        resource_types = [resource_type for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert']
+        columns = ['player'] + resource_types + ['total']
+        self.resource_potential_table = ttk.Treeview(bottom_frame, columns = columns, show = 'headings', style = 'StatusFrame.Treeview')
+        for column in columns:
+            self.resource_potential_table.heading(column, text = column.title(), anchor = tkinter.W)
+            self.resource_potential_table.column(column, width = 5)
+        for player in game.players:
+            pip_dict = player.pip_dict()
+            tree_values = [player.name] + [str(x) for x in pip_dict.values()] + [str(sum(pip_dict.values()))]
+            self.resource_potential_table.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)
+            
+        self.resource_potential_table.pack(expand = True, fill = 'x', side = tkinter.LEFT)
+    
+    def update_resource_potential_frame(self):
+        self.resource_potential_table.delete(*self.resource_potential_table.get_children())
+        game = self.player.game
+        for player in game.players:
+            pip_dict = player.pip_dict()
+            tree_values = [player.name] + [str(x) for x in pip_dict.values()] + [str(sum(pip_dict.values()))]
+            self.resource_potential_table.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)

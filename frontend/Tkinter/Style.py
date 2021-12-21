@@ -30,3 +30,6 @@ class Style:
         style.element_create('My.Vertical.TScrollbar.thumb', 'from', 'clam')
         style.element_create('My.Vertical.TScrollbar.grip', 'from', 'clam')
         style.layout('My.Vertical.TScrollbar', [('My.Vertical.TScrollbar.trough', {'children': [('My.Vertical.TScrollbar.thumb', {'unit': '1', 'children': [('My.Vertical.TScrollbar.grip', {'sticky': ''})], 'sticky': 'nswe'})], 'sticky': 'ns'})])
+
+        style.configure('StatusFrame.Treeview.Heading', background = Phase.DARKER_BG_COLOR)
+        style.configure('StatusFrame.Treeview', background = Phase.DARKER_BG_COLOR, borderwidth = 0)

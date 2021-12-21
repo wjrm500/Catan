@@ -55,3 +55,4 @@ class Action:
     def refresh_status_frame_handler(self):
         status_frame_handler = self.game_phase.notebook_frame_handlers['status']
         status_frame_handler.load_text_variables()
+        status_frame_handler.update_resource_potential_frame()
