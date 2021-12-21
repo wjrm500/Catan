@@ -1,4 +1,9 @@
+from collections import Counter
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter, MaxNLocator
 import tkinter
+
 from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHandler import BaseFrameHandler
@@ -88,3 +93,32 @@ class StatusFrameHandler(BaseFrameHandler):
                 player_label.pack(anchor = tkinter.CENTER, side = tkinter.TOP)
                 text_variable['label'] = player_label
         self.load_text_variables()
+
+        self.load_dice_roll_num_distro_frame()
+
+    def load_dice_roll_num_distro_frame(self):
+        game = self.player.game
+        roll_num_dict = dict(Counter(game.dice_rolls))
+        roll_num_freqs = {i: roll_num_dict.get(i, 0) for i in range(2, 13)}
+        x = list(roll_num_freqs.keys())
+        y = list(roll_num_freqs.values())
+        if not roll_num_dict:
+            return
+        if hasattr(self, 'roll_num_distro_frame'):
+            self.roll_num_distro_frame.destroy()
+        self.roll_num_distro_frame = tkinter.Frame(self.frame, background = Phase.BG_COLOR, height = 1)
+        self.roll_num_distro_frame.grid(row = 2, column = 0, sticky = 'ew')
+        figure = plt.Figure(figsize = (2, 2), dpi = 100, facecolor = Phase.BG_COLOR)
+        ax = figure.add_subplot(111)
+        chart_type = FigureCanvasTkAgg(figure, self.roll_num_distro_frame)
+        chart_type.get_tk_widget().pack(expand = True, fill = 'both', padx = 2.5, pady = (10, 0))
+        ax.set_title('Dice roll number distribution', fontdict = {'fontname': 'Arial', 'fontsize': 10, 'fontweight': 'bold'})
+        ax.set_ylim(bottom = 0, top = max(roll_num_freqs.values()) + 1)
+        ax.set_facecolor(Phase.BG_COLOR)
+        ax.tick_params(axis = 'both', labelsize = 8)
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontname('Arial')
+        ax.set_xticks(x)
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
+        ax.yaxis.set_major_locator(MaxNLocator(integer = True))
+        ax.bar(x, y, color = Phase.DARKER_BG_COLOR)

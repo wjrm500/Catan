@@ -43,6 +43,10 @@ class RollDice(Action):
         event_text = ' '.join(DiceRoll.text_events)
         text = f'\n\n{self.data["player"].name} rolled a {DiceRoll.total}. {event_text}'
         self.history_insert(text_area, text)
+
+        if DiceRoll.proceed_to_action_selection:
+            status_frame_handler = self.game_phase.notebook_frame_handlers['status']
+            status_frame_handler.load_dice_roll_num_distro_frame()
     
     def prepare_for_robber_moving(self, play_frame_handler):
         self.game_phase.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_PLACE_ROBBER
