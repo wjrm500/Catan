@@ -23,6 +23,7 @@ class PlayFrameHandler(BaseFrameHandler):
         self.dice_roll_setup()
     
     def transition_to_action_selection(self, event):
+        self.root.configure(cursor = Phase.CURSOR_DEFAULT)
         self.dice_roll_overlay.destroy()
         self.update_resource_cards()
         self.update_movable_pieces()
