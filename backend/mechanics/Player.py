@@ -234,8 +234,8 @@ class Player(Incrementable):
         
     def pip_dict(self):
         settlements_on_board = [settlement for settlement in self.settlements if settlement.node]
-        accessed_hexagons = {hexagon: (2 if settlement.city else 1) for settlement in settlements_on_board for hexagon in settlement.node.hexagons if hexagon.resource_type != 'desert'}
+        accessed_hexagons = [(hexagon, 2 if settlement.city else 1) for settlement in settlements_on_board for hexagon in settlement.node.hexagons if hexagon.resource_type != 'desert']
         pip_dict = {resource_type: 0 for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert'}
-        for hexagon, multiplier in accessed_hexagons.items():
+        for hexagon, multiplier in accessed_hexagons:
             pip_dict[hexagon.resource_type] = pip_dict.get(hexagon.resource_type) + (hexagon.num_pips * multiplier)
         return pip_dict
