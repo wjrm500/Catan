@@ -115,6 +115,7 @@ class StatusFrameHandler(BaseFrameHandler):
         self.load_dice_roll_num_distro_frame()
         self.create_resource_potential_table_frame()
         self.create_resources_won_table_frame()
+        self.create_resources_lost_to_robber_table_frame()
 
     def load_dice_roll_num_distro_frame(self):
         game = self.player.game
@@ -194,6 +195,15 @@ class StatusFrameHandler(BaseFrameHandler):
             'player_data_attr': 'resources_won'
         }
         self.create_table_frame(data)
+
+    def create_resources_lost_to_robber_table_frame(self):
+        data = {
+            'grid_row_index': 5,
+            'title': 'Resources lost to robber',
+            'table_reference': 'resources_lost_to_robber_table',
+            'player_data_attr': 'resources_lost_to_robber'
+        }
+        self.create_table_frame(data)
     
     def update_resource_potential_table_frame(self):
         data = {
@@ -206,5 +216,12 @@ class StatusFrameHandler(BaseFrameHandler):
         data = {
             'table_reference': 'resources_won_table',
             'player_data_attr': 'resources_won'
+        }
+        self.update_table_frame(data)
+    
+    def update_resources_lost_to_robber_table_frame(self):
+        data = {
+            'table_reference': 'resources_lost_to_robber_table',
+            'player_data_attr': 'resources_lost_to_robber'
         }
         self.update_table_frame(data)

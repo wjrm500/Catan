@@ -181,7 +181,7 @@ class Game(Unserializable):
                                 player.hand['resource'].append(resource_card)
                         else:
                             bounties_gained[player][hexagon.resource_type]['robbed'] += bounty
-                            player.resources_lost_to_robber[hexagon.resource_type] -= bounty
+                            player.resources_lost_to_robber[hexagon.resource_type] += bounty
                             
         for player, v1 in bounties_gained.items():
             for resource_type, v2 in v1.items():

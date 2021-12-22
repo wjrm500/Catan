@@ -49,3 +49,6 @@ class PlaceRobber(Action):
         text = f'\n\n{" ".join(self.data["text_events"])}'
         style = 'purple_font' if self.data['from_development_card'] else None
         self.history_insert(text_area, text, style = style)
+
+        status_frame_handler = self.game_phase.notebook_frame_handlers['status']
+        status_frame_handler.update_resources_lost_to_robber_table_frame()

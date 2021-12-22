@@ -31,6 +31,7 @@ class Robber:
             if (num_resources_in_hand := len(player.hand['resource'])) >= 8:
                 for _ in range(num_resources_in_hand // 2):
                     random_resource_card = player.hand['resource'].pop(random.randrange(len(player.hand['resource'])))
+                    player.resources_lost_to_robber[random_resource_card.type] += 1
                     game.resource_cards[random_resource_card.type].append(random_resource_card)
                     for_text_gen[player].append(random_resource_card.type)
             for_text_gen[player] = dict(Counter(for_text_gen[player]))
