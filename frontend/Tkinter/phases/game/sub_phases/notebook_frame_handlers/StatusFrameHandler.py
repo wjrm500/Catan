@@ -113,8 +113,8 @@ class StatusFrameHandler(BaseFrameHandler):
         self.load_text_variables()
 
         self.load_dice_roll_num_distro_frame()
-        self.load_resource_potential_frame()
-        self.load_resources_won_frame()
+        self.create_resource_potential_table_frame()
+        self.create_resources_won_table_frame()
 
     def load_dice_roll_num_distro_frame(self):
         game = self.player.game
@@ -145,60 +145,66 @@ class StatusFrameHandler(BaseFrameHandler):
         ax.yaxis.set_major_locator(MaxNLocator(integer = True))
         ax.bar(x, y, color = Phase.BG_COLOR)
     
-    def load_resource_potential_frame(self):
+    def create_table_frame(self, data):
         outer_frame = tkinter.Frame(self.scrollable_frame, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        outer_frame.grid(row = 3, column = 0, sticky = 'ew')
-        top_label = tkinter.Label(outer_frame, text = 'Resource potential (total num. pips)', background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10, 'bold'))
+        outer_frame.grid(row = data['grid_row_index'], column = 0, sticky = 'ew')
+        top_label = tkinter.Label(outer_frame, text = data['title'], background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10, 'bold'))
         top_label.pack(fill = 'x', side = tkinter.TOP)
         bottom_frame = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR)
         bottom_frame.pack(fill = 'x', side = tkinter.TOP)
         game = self.player.game
         resource_types = [resource_type for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert']
         columns = ['player'] + resource_types + ['total']
-        self.resource_potential_table = ttk.Treeview(bottom_frame, columns = columns, show = 'headings', style = 'StatusFrame.Treeview', height = len(game.players))
+        treeview = ttk.Treeview(bottom_frame, columns = columns, show = 'headings', style = 'StatusFrame.Treeview', height = len(game.players))
+        setattr(self, data['table_reference'], treeview)
         for column in columns:
-            self.resource_potential_table.heading(column, text = column.title(), anchor = tkinter.W)
-            self.resource_potential_table.column(column, width = 5)
+            treeview.heading(column, text = column.title(), anchor = tkinter.W)
+            treeview.column(column, width = 5)
         for player in game.players:
-            pip_dict = player.pip_dict()
-            tree_values = [player.name] + [str(x) for x in pip_dict.values()] + [str(sum(pip_dict.values()))]
-            self.resource_potential_table.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)
-            
-        self.resource_potential_table.pack(expand = True, fill = 'x', side = tkinter.TOP)
+            attr = getattr(player, data['player_data_attr'])
+            d = attr() if callable(attr) else attr
+            tree_values = [player.name] + [str(x) for x in d.values()] + [str(sum(d.values()))]
+            treeview.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)
+        treeview.pack(expand = True, fill = 'x', side = tkinter.TOP)
     
-    def update_resource_potential_frame(self):
-        self.resource_potential_table.delete(*self.resource_potential_table.get_children())
+    def update_table_frame(self, data):
+        table = getattr(self, data['table_reference'])
+        table.delete(*table.get_children())
         game = self.player.game
         for player in game.players:
-            pip_dict = player.pip_dict()
-            tree_values = [player.name] + [str(x) for x in pip_dict.values()] + [str(sum(pip_dict.values()))]
-            self.resource_potential_table.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)
+            attr = getattr(player, data['player_data_attr'])
+            d = attr() if callable(attr) else attr
+            tree_values = [player.name] + [str(x) for x in d.values()] + [str(sum(d.values()))]
+            table.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)
     
-    def load_resources_won_frame(self):
-        outer_frame = tkinter.Frame(self.scrollable_frame, background = Phase.BG_COLOR, padx = 5, pady = 5)
-        outer_frame.grid(row = 4, column = 0, sticky = 'ew')
-        top_label = tkinter.Label(outer_frame, text = 'Resources won', background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10, 'bold'))
-        top_label.pack(fill = 'x', side = tkinter.TOP)
-        bottom_frame = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR)
-        bottom_frame.pack(fill = 'x', side = tkinter.TOP)
-        game = self.player.game
-        resource_types = [resource_type for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert']
-        columns = ['player'] + resource_types + ['total']
-        self.resources_won_table = ttk.Treeview(bottom_frame, columns = columns, show = 'headings', style = 'StatusFrame.Treeview', height = len(game.players))
-        for column in columns:
-            self.resources_won_table.heading(column, text = column.title(), anchor = tkinter.W)
-            self.resources_won_table.column(column, width = 5)
-        for player in game.players:
-            resources_won_dict = player.resources_won
-            tree_values = [player.name] + [str(x) for x in resources_won_dict.values()] + [str(sum(resources_won_dict.values()))]
-            self.resources_won_table.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)
-            
-        self.resources_won_table.pack(expand = True, fill = 'x', side = tkinter.TOP)
+    def create_resource_potential_table_frame(self):
+        data = {
+            'grid_row_index': 3,
+            'title': 'Resource potential (total num. pips)',
+            'table_reference': 'resource_potential_table',
+            'player_data_attr': 'pip_dict'
+        }
+        self.create_table_frame(data)
     
-    def update_resources_won_frame(self):
-        self.resources_won_table.delete(*self.resources_won_table.get_children())
-        game = self.player.game
-        for player in game.players:
-            resources_won_dict = player.resources_won
-            tree_values = [player.name] + [str(x) for x in resources_won_dict.values()] + [str(sum(resources_won_dict.values()))]
-            self.resources_won_table.insert('', tkinter.END, iid = player.name, text = player.name, values = tree_values)
+    def create_resources_won_table_frame(self):
+        data = {
+            'grid_row_index': 4,
+            'title': 'Resources won',
+            'table_reference': 'resources_won_table',
+            'player_data_attr': 'resources_won'
+        }
+        self.create_table_frame(data)
+    
+    def update_resource_potential_table_frame(self):
+        data = {
+            'table_reference': 'resource_potential_table',
+            'player_data_attr': 'pip_dict'
+        }
+        self.update_table_frame(data)
+    
+    def update_resources_won_table_frame(self):
+        data = {
+            'table_reference': 'resources_won_table',
+            'player_data_attr': 'resources_won'
+        }
+        self.update_table_frame(data)
