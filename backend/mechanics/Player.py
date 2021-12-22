@@ -16,6 +16,8 @@ class Player(Incrementable):
             'development': [],
             'resource': []
         }
+        self.resources_won = {resource_type: 0 for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert'}
+        self.resources_lost_to_robber = {resource_type: 0 for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert'}
     
     def has_longest_road(self):
         return (road_player := self.game.longest_road['player']) and road_player.id == self.id

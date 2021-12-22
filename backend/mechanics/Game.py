@@ -174,12 +174,14 @@ class Game(Unserializable):
                         player = settlement.player
                         bounty = 2 if settlement.city else 1
                         bounties_gained[player][hexagon.resource_type]['won'] += bounty
+                        player.resources_won[hexagon.resource_type] += bounty
                         if not hexagon.robber:
                             for _ in range(bounty):
                                 resource_card = resource_cards.pop()
-                                node.settlement.player.hand['resource'].append(resource_card)
+                                player.hand['resource'].append(resource_card)
                         else:
                             bounties_gained[player][hexagon.resource_type]['robbed'] += bounty
+                            player.resources_lost_to_robber[hexagon.resource_type] -= bounty
                             
         for player, v1 in bounties_gained.items():
             for resource_type, v2 in v1.items():
