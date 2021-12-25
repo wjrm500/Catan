@@ -19,7 +19,7 @@ class StatusFrameHandler(BaseFrameHandler):
             'Largest army': [{'text': tkinter.StringVar(), 'label': None} for _ in range(self.num_players)],
             'Longest road': [{'text': tkinter.StringVar(), 'label': None} for _ in range(self.num_players)]
         }
-        self.canvas = tkinter.Canvas(self.frame, bd = 0, highlightthickness = 0, background = 'red')
+        self.canvas = tkinter.Canvas(self.frame, bd = 0, highlightthickness = 0, background = Phase.BG_COLOR)
         scrollbar = ttk.Scrollbar(self.frame, orient = 'vertical', command = self.canvas.yview, style = 'My.Vertical.TScrollbar')
         self.canvas.pack(side = tkinter.LEFT, expand = True, fill = 'both')
         self.canvas.bind('<Configure>', self.FrameWidth)
