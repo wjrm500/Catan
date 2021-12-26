@@ -51,10 +51,11 @@ class Chaperone:
     
     def display_winner(self):
         if not self.winner_announced:
+            game = self.player.game
             try:
-                winner = next(player for player in self.players if player.victory_points() >= player.game.victory_point_limit)
+                winner = next(player for player in self.players if player.victory_points() >= game.victory_point_limit)
                 popup = tkinter.Toplevel(self.root, background = Phase.BG_COLOR)
-                popup.geometry('250x200')
+                popup.geometry('250x250')
                 popup.wm_title('Catan')
                 popup.tkraise(self.root)
                 frame = tkinter.Frame(popup, background = Phase.BG_COLOR)
@@ -73,6 +74,12 @@ class Chaperone:
                 button.pack(pady = 10)
                 button.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
                 button.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
+
+                tkinter.Label(frame, text = 'Scores', background = Phase.BG_COLOR, font = ('Courier New', 12, 'bold')).pack()
+
+                max_player_name_len = max(len(player.name) for player in game.players)
+                for player in sorted(game.players, key = lambda player: player.victory_points(), reverse = True):
+                    tkinter.Label(frame, text = f'{player.name.ljust(max_player_name_len)}   {player.victory_points()}', background = Phase.BG_COLOR, font = ('Courier New', 10)).pack()
 
                 self.winner_announced = True
             except StopIteration:
