@@ -61,19 +61,19 @@ class Server:
                     active_player.set_longest_road()
                     output_data = {'action': action, 'from_development_card': input_data['from_development_card'], 'line_id': line.id, 'player': active_player, 'players': game.players, 'road_id': road.id, 'road_building_turn_index': input_data['road_building_turn_index']}
                     self.broadcast_to_game(game.code, output_data)
-                elif action == ActionFactory.BUILD_SETTLEMENT:
+                elif action == ActionFactory.BUILD_VILLAGE:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
                     active_player = game.get_player_from_client_address(client_address)
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node_id'])
                     active_player.transfer_resources_to_bank(active_player.get_resource_card_dict(action))
-                    node.add_settlement(settlement := active_player.get_free_settlement())
+                    node.add_village(village := active_player.get_free_village())
                     if len([line for line in node.lines if line.road]) >= 2: ### Settlement has at least two roads extending from it
                         for player in game.players:
                             player.set_longest_road() ### Settlement might have broken road
                         if game.longest_road['road_length'] < 5:
                             game.longest_road = {'player': None, 'road_length': 0} ### Previous longest road holder may no longer own that title
-                    output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'players': game.players, 'settlement_id': settlement.id}
+                    output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'players': game.players, 'village_id': village.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
                     game_code = input_data['game_code']
@@ -219,8 +219,7 @@ class Server:
                     player = game.get_player_from_client_address(client_address)
                     node = game.distributor.get_object_by_id(Distributor.OBJ_NODE, input_data['node_id'])
                     player.transfer_resources_to_bank(player.get_resource_card_dict(action))
-                    city = player.cities.pop()
-                    node.settlement.add_city(city)
+                    node.add_city(city := active_player.get_free_city())
                     output_data = {'action': action, 'city_id': city.id, 'node_id': node.id, 'player': player, 'players': game.players}
                     self.broadcast_to_game(game_code, output_data)
             except Exception as e:

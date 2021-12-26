@@ -79,7 +79,7 @@ class Player(Incrementable):
         return new_neighbours
 
     def victory_points(self):
-        from_settlements = sum([(2 if settlement.city else 1) for settlement in self.settlements if settlement.node])
+        from_settlements = sum([settlement.victory_points for settlement in self.settlements if settlement.node])
         from_achievements = (2 if self.has_longest_road() else 0) + (2 if self.has_largest_army() else 0)
         from_development_cards = len([card for card in self.hand['development'] if card.type == 'victory_point'])
         return from_settlements + from_achievements + from_development_cards
@@ -90,8 +90,8 @@ class Player(Incrementable):
     def can_do(self, action):
         if action == 'BUILD_ROAD':
             return self.can_build_road()
-        elif action == 'BUILD_SETTLEMENT':
-            return self.can_build_settlement()
+        elif action == 'BUILD_VILLAGE':
+            return self.can_build_village()
         elif action == 'BUY_DEVELOPMENT_CARD':
             return self.can_buy_development_card()
         elif action == 'MOVE_ROBBER_TO_DESERT':
@@ -119,8 +119,8 @@ class Player(Incrementable):
         
         return has_resource_cards_in_hand and self.num_tokens_available('road') > 0 and len(roadworthy_lines) > 0
     
-    def can_build_settlement(self):
-        resource_card_dict = self.get_resource_card_dict('BUILD_SETTLEMENT')
+    def can_build_village(self):
+        resource_card_dict = self.get_resource_card_dict('BUILD_VILLAGE')
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
 
         ### Check for settleworthy node
@@ -128,7 +128,7 @@ class Player(Incrementable):
         nodes_on_roads = [node for road in roads_on_board for node in road.line.nodes]
         settleworthy_nodes = [node for node in nodes_on_roads if not node.settlement and not node.adjacent_to_settled_node()]
 
-        return has_resource_cards_in_hand and self.num_tokens_available('settlement') > 0 and len(settleworthy_nodes) > 0
+        return has_resource_cards_in_hand and self.num_tokens_available('village') > 0 and len(settleworthy_nodes) > 0
     
     def bank_trade_cost(self, resource_type, port_types = None):
         port_types = port_types or self.port_types()
@@ -159,9 +159,9 @@ class Player(Incrementable):
     def can_upgrade_settlement(self):
         resource_card_dict = self.get_resource_card_dict('UPGRADE_SETTLEMENT')
         has_resource_cards_in_hand = self.has_resource_cards_in_hand(resource_card_dict)
-        has_settlement_on_board = len([settlement for settlement in self.settlements if settlement.node and not settlement.city]) > 0
+        has_village_on_board = len([village for village in self.villages if village.node]) > 0
         has_token_available = self.num_tokens_available('city') > 0
-        return has_resource_cards_in_hand and has_settlement_on_board and has_token_available
+        return has_resource_cards_in_hand and has_village_on_board and has_token_available
 
     def can_use_development_card(self):
         return len([card for card in self.hand['development'] if not card.type == 'victory_point']) > 0
@@ -191,7 +191,7 @@ class Player(Incrementable):
     def get_resource_card_dict(self, action):
         d = {
             'BUILD_ROAD': {'brick': 1, 'lumber': 1},
-            'BUILD_SETTLEMENT': {'brick': 1, 'grain': 1, 'lumber': 1, 'wool': 1},
+            'BUILD_VILLAGE': {'brick': 1, 'grain': 1, 'lumber': 1, 'wool': 1},
             'BUY_DEVELOPMENT_CARD': {'grain': 1, 'ore': 1, 'wool': 1},
             'UPGRADE_SETTLEMENT': {'grain': 2, 'ore': 3}
         }
@@ -221,22 +221,25 @@ class Player(Incrementable):
     def get_free_road(self):
         return next(road for road in self.roads if not road.line)
     
-    def get_free_settlement(self):
-        return next(settlement for settlement in self.settlements if not settlement.node)
+    def get_free_village(self):
+        return next(village for village in self.villages if not village.node)
+    
+    def get_free_city(self):
+        return next(city for city in self.cities if not city.node)
     
     def num_tokens_available(self, type):
         if type == 'road':
             return len([road for road in self.roads if not road.line])
-        elif type == 'settlement':
-            return len([settlement for settlement in self.settlements if not settlement.node or settlement.city])
+        elif type == 'village':
+            return len([village for village in self.villages if not village.node])
         elif type == 'city':
-            return len([city for city in self.cities if not city.settlement])
+            return len([city for city in self.cities if not city.node])
         elif type == 'game':
             return self.num_game_tokens
         
     def pip_dict(self):
         settlements_on_board = [settlement for settlement in self.settlements if settlement.node]
-        accessed_hexagons = [(hexagon, 2 if settlement.city else 1) for settlement in settlements_on_board for hexagon in settlement.node.hexagons if hexagon.resource_type != 'desert']
+        accessed_hexagons = [(hexagon, settlement.victory_points) for settlement in settlements_on_board for hexagon in settlement.node.hexagons if hexagon.resource_type != 'desert']
         pip_dict = {resource_type: 0 for resource_type in list(config['resource_types'].keys()) if resource_type != 'desert'}
         for hexagon, multiplier in accessed_hexagons:
             pip_dict[hexagon.resource_type] = pip_dict.get(hexagon.resource_type) + (hexagon.num_pips * multiplier)

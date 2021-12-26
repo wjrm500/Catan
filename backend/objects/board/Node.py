@@ -34,9 +34,15 @@ class Node(Incrementable):
                 return True
         return False
     
-    def add_settlement(self, settlement):
-        self.settlement = settlement
-        settlement.node = self
+    def add_village(self, village):
+        self.settlement = village
+        village.node = self
+    
+    def add_city(self, city):
+        village = self.settlement
+        self.settlement = city
+        city.node = self
+        village.node = None
     
     def nominal_value(self):
         return sum(hexagon.num_pips for hexagon in self.hexagons)

@@ -76,8 +76,9 @@ class Game(Unserializable):
         for player in self.players:
             player.cities = [self.distributor.get_city(player) for _ in range(round(self.num_hexagons * 4 / 19))]
             player.roads = [self.distributor.get_road(player) for _ in range(round(max(2, self.num_hexagons * 15 / 19)))]
-            player.settlements = [self.distributor.get_settlement(player) for _ in range(max(2, round(self.num_hexagons * 5 / 19)))]
+            player.villages = [self.distributor.get_village(player) for _ in range(max(2, round(self.num_hexagons * 5 / 19)))]
             player.num_game_tokens = round(self.num_hexagons * 5 / 19)
+            player.settlements = player.villages + player.cities
 
     def assign_resource_types_to_hexagons(self):
         resource_types = copy.deepcopy(self.config['resource_types'])
@@ -157,12 +158,7 @@ class Game(Unserializable):
         for hexagon in self.distributor.hexagons:
             if total == hexagon.roll_num:
                 ### Look ahead to make sure the bank has enough resource cards to pay out full bounty to all players
-                def bounty_from_node(node):
-                    if node.settlement:
-                        if node.settlement.city:
-                            return 2
-                        return 1
-                    return 0
+                bounty_from_node = lambda node: node.settlement.victory_points if node.settlement else 0
                 total_bounty = sum(bounty_from_node(node) for node in hexagon.nodes)
                 if total_bounty > len(resource_cards := self.resource_cards[hexagon.resource_type]):
                     text_event = f"The bank doesn't have enough {hexagon.resource_type} cards to pay out a bounty!"
@@ -172,7 +168,7 @@ class Game(Unserializable):
                 for node in hexagon.nodes:
                     if (settlement := node.settlement):
                         player = settlement.player
-                        bounty = 2 if settlement.city else 1
+                        bounty = settlement.victory_points
                         bounties_gained[player][hexagon.resource_type]['won'] += bounty
                         player.resources_won[hexagon.resource_type] += bounty
                         if not hexagon.robber:

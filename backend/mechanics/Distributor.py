@@ -2,7 +2,7 @@ from backend.objects.board.Port import Port
 from backend.objects.movable_pieces.City import City
 from backend.objects.movable_pieces.Road import Road
 from backend.objects.movable_pieces.Robber import Robber
-from backend.objects.movable_pieces.Settlement import Settlement
+from backend.objects.movable_pieces.Village import Village
 from ..objects.board.Hexagon import Hexagon
 from ..objects.board.Line import Line
 from ..objects.board.Node import Node
@@ -19,7 +19,7 @@ class Distributor:
     OBJ_NODE = 'node'
     OBJ_PORT = 'port'
     OBJ_ROAD = 'road'
-    OBJ_SETTLEMENT = 'settlement'
+    OBJ_VILLAGE = 'village'
 
     def __init__(self, game):
         self.game = game
@@ -29,7 +29,7 @@ class Distributor:
         self.nodes = []
         self.ports = []
         self.roads = []
-        self.settlements = []
+        self.villages = []
         self.robber = Robber(self)
     
     def get_city(self, player):
@@ -68,10 +68,10 @@ class Distributor:
         self.roads.append(road)
         return road
     
-    def get_settlement(self, player):
-        settlement = Settlement(player)
-        self.settlements.append(settlement)
-        return settlement
+    def get_village(self, player):
+        village = Village(player)
+        self.villages.append(village)
+        return village
     
     def get_development_card(self, type):
         type_class_mapping = {
@@ -96,5 +96,5 @@ class Distributor:
             return next(port for port in self.ports if port.id == id)
         elif obj == self.OBJ_ROAD:
             return next(road for road in self.roads if road.id == id)
-        elif obj == self.OBJ_SETTLEMENT:
-            return next(settlement for settlement in self.settlements if settlement.id == id)
+        elif obj == self.OBJ_VILLAGE:
+            return next(village for village in self.villages if village.id == id)

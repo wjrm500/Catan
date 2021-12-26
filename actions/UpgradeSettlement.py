@@ -14,7 +14,7 @@ class UpgradeSettlement(Action):
         ### Following two lines necessary to work with client-side versions of objects
         node = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, data['node_id'])
         city = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_CITY, data['city_id'])
-        node.settlement.add_city(city)
+        node.add_city(city)
 
         self.reload_all_players() ### Not just active player because victory points etc. change
         self.update_gui()
@@ -25,7 +25,7 @@ class UpgradeSettlement(Action):
         else:
             self.hexagon_rendering.draw_board_items()
         text_area = self.get_text_area(in_settling_phase = False)
-        text = f'\n\n{self.data["player"].name} upgraded a settlement to a city!'
+        text = f'\n\n{self.data["player"].name} upgraded a village to a city!'
         self.history_insert(text_area, text, style = 'green_font')
         self.refresh_play_frame_handler()
         self.refresh_status_frame_handler()

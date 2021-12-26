@@ -41,8 +41,8 @@ class BuildRoad(Action):
         if in_settling_phase:
             is_active = self.game_phase.client_active()
             if is_active:
-                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
-                self.game_phase.instruction_text.set('Build a settlement!')
+                self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_VILLAGE
+                self.game_phase.instruction_text.set('Build a village!')
                 self.game_phase.instruction.configure({'background': '#90EE90'}) ### LightGreen
             else:
                 self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_DISABLED

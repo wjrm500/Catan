@@ -112,8 +112,8 @@ class ActionTreeHandler:
         ### Consts from ActionFactory not used due to circular import error
         if action == 'BUILD_ROAD':
             self.handle_build_road()
-        elif action == 'BUILD_SETTLEMENT':
-            self.handle_build_settlement()
+        elif action == 'BUILD_VILLAGE':
+            self.handle_build_village()
         elif action == 'BUY_DEVELOPMENT_CARD':
             self.handle_buy_development_card()
         elif action == 'MOVE_ROBBER_TO_DESERT':
@@ -143,9 +143,9 @@ class ActionTreeHandler:
         self.set_instruction('Build a road!')
         self.set_cancel_button()
     
-    def handle_build_settlement(self):
-        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_SETTLEMENT
-        self.set_instruction('Build a settlement!')
+    def handle_build_village(self):
+        self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_VILLAGE
+        self.set_instruction('Build a village!')
         self.set_cancel_button()
     
     def handle_buy_development_card(self):
@@ -182,7 +182,7 @@ class ActionTreeHandler:
     
     def handle_upgrade_settlement(self):
         self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_CITY_UPGRADE
-        self.set_instruction('Click a settlement!')
+        self.set_instruction('Click a village!')
         self.set_cancel_button()
     
     def handle_use_development_card(self):

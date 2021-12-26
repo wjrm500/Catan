@@ -5,8 +5,3 @@ class Settlement(Incrementable):
         super().__init__()
         self.player = player
         self.node = None
-        self.city = None
-    
-    def add_city(self, city):
-        self.city = city
-        city.settlement = self

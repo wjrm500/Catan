@@ -94,18 +94,18 @@ config = {
                 'other': ['1 road token', '1 roadworthy line']
             }
         },
-        'BUILD_SETTLEMENT': {
-            'name': 'Build settlement',
+        'BUILD_VILLAGE': {
+            'name': 'Build village',
             'cost': {
                 'resources': ['1 brick', '1 grain', '1 lumber', '1 wool'],
-                'other': ['1 settlement token', '1 settleworthy node']
+                'other': ['1 village token', '1 settleworthy node']
             }
         },
         'UPGRADE_SETTLEMENT': {
-            'name': 'Upgrade settlement to city',
+            'name': 'Upgrade village to city',
             'cost': {
                 'resources': ['2 grain', '3 ore'],
-                'other': ['1 city token', '1 settlement on board']
+                'other': ['1 city token', '1 village on board']
             }
         },
         'BUY_DEVELOPMENT_CARD': {

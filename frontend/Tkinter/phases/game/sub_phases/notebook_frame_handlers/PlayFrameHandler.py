@@ -149,7 +149,7 @@ class PlayFrameHandler(BaseFrameHandler):
         bottom_frame = tkinter.Frame(outer_frame, background = Phase.DARKER_BG_COLOR)
         bottom_frame.pack(fill = 'x', side = tkinter.TOP)
         self.movable_piece_label_texts = {}
-        for i, movable_piece in enumerate(['road', 'settlement', 'city', 'game']): ### Only add tokens if two players
+        for i, movable_piece in enumerate(['road', 'village', 'city', 'game']): ### Only add tokens if two players
             piece_label = tkinter.Label(bottom_frame, text = f'{movable_piece.title().replace("_", " ")}:', background = Phase.DARKER_BG_COLOR)
             piece_label.grid(row = 0, column = i * 2)
             num_label_text = tkinter.StringVar()

@@ -84,9 +84,9 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
     
-    def build_settlement(self, node):
+    def build_village(self, node):
         data = {
-            'action': ActionFactory.BUILD_SETTLEMENT,
+            'action': ActionFactory.BUILD_VILLAGE,
             'game_code': self.game_code,
             'node_id': node.id
         }

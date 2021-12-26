@@ -5,7 +5,7 @@ from backend.mechanics.Distributor import Distributor
 from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
 
-class BuildSettlement(Action):
+class BuildVillage(Action):
     def __init__(self):
         pass
 
@@ -17,8 +17,8 @@ class BuildSettlement(Action):
 
         ### Following two lines necessary to work with client-side versions of objects
         self.node = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_NODE, data['node_id'])
-        settlement = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_SETTLEMENT, data['settlement_id'])
-        self.node.add_settlement(settlement)
+        village = self.hexagon_rendering.distributor.get_object_by_id(Distributor.OBJ_VILLAGE, data['village_id'])
+        self.node.add_village(village)
 
         in_settling_phase = gutils.safe_isinstance(self.game_phase, 'SettlingPhase')
         if not in_settling_phase:
@@ -44,7 +44,7 @@ class BuildSettlement(Action):
         def fun(d, x): d[x[0]] = d.get(x[0], 0) + x[1]; return d
         d = functools.reduce(fun, [(hexagon.resource_type, hexagon.num_pips) for hexagon in self.node.hexagons], {})
         nominal_values = ' + '.join(f'{v} {k}' for k, v in d.items() if k != 'desert')
-        text_to_insert = f'{self.data["player"].name} built a settlement{port_text}! This settlement has a nominal value of {nominal_value} ({nominal_values}).'
+        text_to_insert = f'{self.data["player"].name} built a village{port_text}! This village has a nominal value of {nominal_value} ({nominal_values}).'
         text_area.insert('end', f'\n\n{text_to_insert}', 'green_font')
 
         self.disable_text_area(text_area)

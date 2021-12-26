@@ -37,13 +37,13 @@ class HexagonRendering:
 
     ### Canvas modes
     CANVAS_MODE_BUILD_ROAD = 'build_road'
-    CANVAS_MODE_BUILD_SETTLEMENT = 'build_settlement'
+    CANVAS_MODE_BUILD_VILLAGE = 'build_village'
     CANVAS_MODE_CITY_UPGRADE = 'city_upgrade'
     CANVAS_MODE_DEFAULT = 'default'
     CANVAS_MODE_DISABLED = 'disabled'
     CANVAS_MODE_PLACE_ROBBER = 'place_robber'
     
-    IN_DEVELOPMENT = False
+    IN_DEVELOPMENT = True
 
     def __init__(self, parent_phase):
         self.parent_phase = parent_phase
@@ -147,8 +147,8 @@ class HexagonRendering:
         event_x, event_y = event.x, event.y
         if self.canvas_mode == self.CANVAS_MODE_BUILD_ROAD:
             self.handle_build_road_motion(event_x, event_y)
-        elif self.canvas_mode == self.CANVAS_MODE_BUILD_SETTLEMENT:
-            self.handle_build_settlement_motion(event_x, event_y)
+        elif self.canvas_mode == self.CANVAS_MODE_BUILD_VILLAGE:
+            self.handle_build_village_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_PLACE_ROBBER:
             self.handle_place_robber_motion(event_x, event_y)
         elif self.canvas_mode == self.CANVAS_MODE_CITY_UPGRADE:
@@ -261,7 +261,7 @@ class HexagonRendering:
             road_building_turn_index = play_frame_handler.action_tree_handler.road_building_turn_index
         self.parent_phase.chaperone.build_road(line, from_development_card = from_development_card, road_building_turn_index = road_building_turn_index)
 
-    def handle_build_settlement_motion(self, event_x, event_y):
+    def handle_build_village_motion(self, event_x, event_y):
         self.delete_tag(self.CT_OBJ_NODE)
 
         ### Find closest node to cursor and collect arguments for rendering
@@ -316,17 +316,17 @@ class HexagonRendering:
         ]
         x, y = self.real_x(node), self.real_y(node)
         rectangle_id = self.create_rectangle(x - r, y - r, x + r, y + r, tags = tags, fill = fill, width = width)
-        self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_build_settlement_click)
+        self.canvas.tag_bind(rectangle_id, '<Button-1>', self.handle_build_village_click)
         self.rectangle_node_dict[rectangle_id] = node
     
         ### Change cursor pointer to hand icon if cursor near node
         cursor = self.parent_phase.CURSOR_HAND if min_node_dist / self.scale < 0.2 else ''
         self.canvas.config(cursor = cursor)
     
-    def handle_build_settlement_click(self, event):
+    def handle_build_village_click(self, event):
         rectangle_id = event.widget.find_withtag('current')[0]
         node = self.rectangle_node_dict[rectangle_id]
-        self.parent_phase.chaperone.build_settlement(node)
+        self.parent_phase.chaperone.build_village(node)
     
     def handle_place_robber_motion(self, event_x, event_y):
         get_dist_to_centre_point = lambda centre_point: math.sqrt(pow(self.real_x(centre_point) - event_x, 2) + pow(self.real_y(centre_point) - event_y, 2))
@@ -380,7 +380,7 @@ class HexagonRendering:
         min_node_dist = min(map(lambda x: x[1], node_dists))
         for node, dist in node_dists:
             closest_to_cursor = dist == min_node_dist
-            if closest_to_cursor and node.settlement and node.settlement.player is self.parent_phase.chaperone.player and not node.settlement.city:
+            if closest_to_cursor and node.settlement and node.settlement.player is self.parent_phase.chaperone.player and not gutils.safe_isinstance(node.settlement, 'City'):
                 r = (self.scale * 3 / 4) / 5
                 width = r / 2
                 tags = [
@@ -508,7 +508,7 @@ class HexagonRendering:
                 fill = node.settlement.player.color
                 width = (self.scale * 3 / 4) / 10
                 x, y = self.real_x(node), self.real_y(node)
-                if node.settlement.city:
+                if gutils.safe_isinstance(node.settlement, 'City'):
                     verts = [10,40,40,40,50,10,60,40,90,40,65,60,75,90,50,70,25,90,35,60] ### Taken from https://www.techwalla.com/articles/how-to-draw-a-five-point-star-using-python-language
                     average_vert = sum(verts) / len(verts)
                     verts = [vert - average_vert for vert in verts] ### Centre around zero

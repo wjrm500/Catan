@@ -1,6 +1,6 @@
 from actions.AddPlayer import AddPlayer
 from actions.BuildRoad import BuildRoad
-from actions.BuildSettlement import BuildSettlement
+from actions.BuildVillage import BuildVillage
 from actions.BuyDevelopmentCard import BuyDevelopmentCard
 from actions.CreateNewGame import CreateNewGame
 from actions.EndGame import EndGame
@@ -21,7 +21,7 @@ from actions.UpgradeSettlement import UpgradeSettlement
 class ActionFactory:
     ADD_PLAYER = 'ADD_PLAYER'
     BUILD_ROAD = 'BUILD_ROAD'
-    BUILD_SETTLEMENT = 'BUILD_SETTLEMENT'
+    BUILD_VILLAGE = 'BUILD_VILLAGE'
     CREATE_NEW_GAME = 'CREATE_NEW_GAME'
     END_GAME = 'END_GAME'
     JOIN_EXISTING_GAME = 'JOIN_EXISTING_GAME'
@@ -49,8 +49,8 @@ class ActionFactory:
             return AddPlayer()
         elif action == cls.BUILD_ROAD:
             return BuildRoad()
-        elif action == cls.BUILD_SETTLEMENT:
-            return BuildSettlement()
+        elif action == cls.BUILD_VILLAGE:
+            return BuildVillage()
         elif action == cls.CREATE_NEW_GAME:
             return CreateNewGame()
         elif action == cls.END_GAME:
