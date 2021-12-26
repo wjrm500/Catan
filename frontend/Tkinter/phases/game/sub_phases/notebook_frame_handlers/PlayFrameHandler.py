@@ -3,6 +3,7 @@ from functools import partial
 import tkinter
 
 from config import config
+from frontend.ColorUtils import ColorUtils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.ActionTreeHandler import ActionTreeHandler
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.BaseFrameHandler import BaseFrameHandler
@@ -60,18 +61,37 @@ class PlayFrameHandler(BaseFrameHandler):
         self.instruct_label.bind('<Button-1>', self.roll_dice)
 
         self.phase.deactivate_button()
+    
+    def update_summary_text(self):
+        game = self.player.game
+        vps_to_win = game.victory_point_limit - (player_vps := self.player.victory_points())
+        try:
+            winner = next(player for player in game.players if player.victory_points() >= game.victory_point_limit)
+            if self.player is winner:
+                self.summary_text.set(f'You have {player_vps} victory points! You won!')
+            else:
+                self.summary_text.set(f"You have {player_vps} victory points - but you've already lost!")
+        except StopIteration:
+            self.summary_text.set(f'You have {player_vps} victory points! You need {vps_to_win} more to win.')
         
     def action_selection_setup(self):
         self.labels = []
         self.frame.grid_columnconfigure(0, weight = 1)
+        
+        self.summary_text = tkinter.StringVar()
+        self.update_summary_text()
+        fg_color = ColorUtils.darken_hex(Phase.BG_COLOR, 0.5)
+        summary_label = tkinter.Label(self.frame, textvariable = self.summary_text, background = Phase.BG_COLOR, font = ('Arial', 10, 'bold'), foreground = fg_color)
+        summary_label.grid(row = 0, column = 0, sticky = 'w', padx = (5, 0), pady = (5, 0))
+
         self.card_frames = {}
         self.card_num_label_texts = {}
         self.resource_cards_frame = self.create_resource_cards_frame(self.frame)
-        self.resource_cards_frame.grid(row = 0, column = 0, sticky = 'ew')
+        self.resource_cards_frame.grid(row = 1, column = 0, sticky = 'ew')
         self.development_card_frame = self.create_development_cards_frame(self.frame)
-        self.development_card_frame.grid(row = 1, column = 0, sticky = 'ew')
+        self.development_card_frame.grid(row = 2, column = 0, sticky = 'ew')
         self.movable_piece_frame = self.create_movable_piece_frame(self.frame)
-        self.movable_piece_frame.grid(row = 2, column = 0, sticky = 'ew')
+        self.movable_piece_frame.grid(row = 3, column = 0, sticky = 'ew')
         self.action_frame = self.action_tree_handler.create_action_frame(self.frame)
         self.action_cost_frame = self.action_tree_handler.create_action_cost_frame(self.frame)
         self.highlight_or_unhighlight_cards()
@@ -88,8 +108,8 @@ class PlayFrameHandler(BaseFrameHandler):
                 card_frame.highlight_or_unhighlight_labels()
     
     def show_action_frame(self):
-        self.action_frame.grid(row = 3, column = 0, sticky = 'ew')
-        self.action_cost_frame.grid(row = 4, column = 0, sticky = 'ew')
+        self.action_frame.grid(row = 4, column = 0, sticky = 'ew')
+        self.action_cost_frame.grid(row = 5, column = 0, sticky = 'ew')
         self.action_tree_handler.bind_events()
         self.phase.activate_button()
 

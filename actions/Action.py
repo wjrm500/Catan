@@ -25,6 +25,7 @@ class Action:
         play_frame_handler.update_development_cards()
         play_frame_handler.update_movable_pieces()
         if self.is_instigating_client():
+            play_frame_handler.update_summary_text()
             action_tree_handler = play_frame_handler.action_tree_handler
             action_tree_handler.cancel(event = None)
             action_tree_handler.fill_action_tree()
