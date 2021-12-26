@@ -56,7 +56,7 @@ class Chaperone:
             try:
                 winner = next(player for player in self.players if player.victory_points() >= game.victory_point_limit)
                 popup = tkinter.Toplevel(self.root, background = Phase.BG_COLOR)
-                popup.geometry('250x250')
+                popup.geometry('400x400')
                 popup.wm_title('Catan')
                 popup.tkraise(self.root)
                 frame = tkinter.Frame(popup, background = Phase.BG_COLOR)
@@ -73,10 +73,10 @@ class Chaperone:
                 tkinter.Label(frame, text = f'{winner.name} won!', background = Phase.BG_COLOR, font = ('Arial', 16, 'bold')).pack()
                 button = tkinter.Button(frame, text = 'Acknowledge', command = popup.destroy, background = Phase.DARKER_BG_COLOR)
                 button.pack(pady = 10)
-                button.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
-                button.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
+                button.bind('<Motion>', lambda evt: popup.configure(cursor = Phase.CURSOR_HAND))
+                button.bind('<Leave>', lambda evt: popup.configure(cursor = Phase.CURSOR_DEFAULT))
 
-                tkinter.Label(frame, text = 'Scores', background = Phase.BG_COLOR, font = ('Courier New', 12, 'bold')).pack()
+                tkinter.Label(frame, text = 'Scores', background = Phase.BG_COLOR, font = ('Courier New', 10, 'bold')).pack(pady = (20, 0))
 
                 max_player_name_len = max(len(player.name) for player in game.players)
                 for player in sorted(game.players, key = lambda player: player.victory_points(), reverse = True):
