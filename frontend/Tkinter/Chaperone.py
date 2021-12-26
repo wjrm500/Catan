@@ -80,6 +80,28 @@ class Chaperone:
                 max_player_name_len = max(len(player.name) for player in game.players)
                 for player in sorted(game.players, key = lambda player: player.victory_points(), reverse = True):
                     tkinter.Label(frame, text = f'{player.name.ljust(max_player_name_len)}   {player.victory_points()}', background = Phase.BG_COLOR, font = ('Courier New', 10)).pack()
+                
+                if self.main: ### TODO: Delete next couple of lines in production version?
+                    headings = ['datetime', 'winner', 'player_scores', 'rounds_completed', 'longest_road_holder', 'longest_road', 'largest_army_holder', 'largest_army']
+                    filename = 'scores.txt'
+                    file_existed = os.path.exists(filename)
+                    with open(filename, 'a') as file:
+                        if not file_existed:
+                            file.write(f'{";".join(headings)}\n')
+                        datetime_now = datetime.now().strftime('%Y-%M-%d %H:%M:%S')
+                        player_scores = ','.join([f'{player.name} {player.victory_points()}' for player in game.players])
+                        values = [
+                            datetime_now,
+                            winner.name,
+                            player_scores,
+                            game.rounds_completed,
+                            game.longest_road['player'],
+                            game.longest_road['road_length'],
+                            game.largest_army['player'],
+                            game.largest_army['army_size']
+                        ]
+                        values = list(map(str, values))
+                        file.write(f'{";".join(values)}\n')
 
                 self.winner_announced = True
             except StopIteration:
