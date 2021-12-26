@@ -43,7 +43,7 @@ class HexagonRendering:
     CANVAS_MODE_DISABLED = 'disabled'
     CANVAS_MODE_PLACE_ROBBER = 'place_robber'
     
-    IN_DEVELOPMENT = True
+    IN_DEVELOPMENT = False
 
     def __init__(self, parent_phase):
         self.parent_phase = parent_phase

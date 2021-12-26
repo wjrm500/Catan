@@ -1,8 +1,10 @@
 import os
+from PIL import Image, ImageTk
 import tkinter
 from tkinter import messagebox
 
 from actions.ActionFactory import ActionFactory
+from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.Style import Style
 from frontend.Tkinter.phases.Phase import Phase
 
@@ -22,6 +24,7 @@ class Chaperone:
         self.main = False ### User is main client i.e. created game
         self.game_code = ''
         self.settling_phase_text = ''
+        self.winner_announced = False
     
     def get_player_from_id(self, id):
         return next(player for player in self.players if player.id == id)
@@ -42,7 +45,38 @@ class Chaperone:
             data = self.queue.get(timeout = 0.1)
             action = ActionFactory.get_action(data['action'])
             action.callback(self, data)
+            if gutils.safe_isinstance(self.current_phase, 'MainGamePhase'):
+                self.display_winner()
         self.root.after(100, self.check_queue)
+    
+    def display_winner(self):
+        if not self.winner_announced:
+            try:
+                winner = next(player for player in self.players if player.victory_points() >= player.game.victory_point_limit)
+                popup = tkinter.Toplevel(self.root, background = Phase.BG_COLOR)
+                popup.geometry('250x200')
+                popup.wm_title('Catan')
+                popup.tkraise(self.root)
+                frame = tkinter.Frame(popup, background = Phase.BG_COLOR)
+                frame.place(anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
+
+                canvas = tkinter.Canvas(frame, background = Phase.BG_COLOR, height = 75, width = 75, bd = 0, highlightthickness = 0)
+                canvas.pack()
+                image = Image.open(Phase.CELEBRATION_IMG_FILEPATH)
+                resized_image = image.resize((75, 75), Image.ANTIALIAS)
+                new_image = ImageTk.PhotoImage(resized_image)
+                self.root.celebration_image = new_image ### Prevent garbage collection
+                canvas.create_image(0, 0, image = new_image, anchor = tkinter.NW)
+
+                tkinter.Label(frame, text = f'{winner.name} won!', background = Phase.BG_COLOR, font = ('Arial', 16, 'bold')).pack()
+                button = tkinter.Button(frame, text = 'Acknowledge', command = popup.destroy, background = Phase.DARKER_BG_COLOR)
+                button.pack(pady = 10)
+                button.bind('<Motion>', lambda evt: self.root.configure(cursor = Phase.CURSOR_HAND))
+                button.bind('<Leave>', lambda evt: self.root.configure(cursor = Phase.CURSOR_DEFAULT))
+
+                self.winner_announced = True
+            except StopIteration:
+                pass
     
     def display_error_text(self, error_text):
         self.current_phase.display_error_text(error_text)

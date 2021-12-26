@@ -8,6 +8,7 @@ class Phase(abc.ABC):
     BG_COLOR = '#ADD8E6'
     DARKER_BG_COLOR = ColorUtils.darken_hex(BG_COLOR, 0.2)
     CATAN_LOGO_IMG_FILEPATH = './frontend/assets/images/catan_logo.png'
+    CELEBRATION_IMG_FILEPATH = './frontend/assets/images/celebration.png'
     CURSOR_DEFAULT = 'left_ptr'
     CURSOR_HAND = 'hand2'
     FONT_NAME = 'Arial'
