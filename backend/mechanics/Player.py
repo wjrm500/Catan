@@ -169,7 +169,8 @@ class Player(Incrementable):
     def can_move_robber_to_desert(self):
         board_has_desert = len([hexagon for hexagon in self.game.distributor.hexagons if hexagon.resource_type == 'desert']) > 0
         has_token_available = self.num_tokens_available('game') > 0
-        return board_has_desert and has_token_available
+        robber_not_on_desert = self.game.distributor.robber.hexagon.resource_type != 'desert'
+        return board_has_desert and has_token_available and robber_not_on_desert
     
     def can_swap_cards(self):
         has_two_cards_in_hand = len(self.hand['resource']) > 1
