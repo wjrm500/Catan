@@ -66,8 +66,8 @@ class PlayFrameHandler(BaseFrameHandler):
         game = self.player.game
         vps_to_win = game.victory_point_limit - (player_vps := self.player.victory_points())
         try:
-            winner = next(player for player in game.players if player.victory_points() >= game.victory_point_limit)
-            if self.player is winner:
+            winner = self.phase.chaperone.winner or next(player for player in game.players if player.victory_points() >= game.victory_point_limit)
+            if self.player.id == winner.id:
                 self.summary_text.set(f'You have {player_vps} victory points! You won!')
             else:
                 self.summary_text.set(f"You have {player_vps} victory points - but you've already lost!")
