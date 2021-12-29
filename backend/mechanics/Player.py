@@ -166,16 +166,20 @@ class Player(Incrementable):
     def can_use_development_card(self):
         return len([card for card in self.hand['development'] if not card.type == 'victory_point']) > 0
     
+    def game_token_cost(self):
+        is_winning = self.victory_points() > max([player.victory_points() for player in self.game.players if player.id != self.id])
+        return 2 if is_winning else 1
+    
     def can_move_robber_to_desert(self):
         board_has_desert = len([hexagon for hexagon in self.game.distributor.hexagons if hexagon.resource_type == 'desert']) > 0
-        has_token_available = self.num_tokens_available('game') > 0
+        has_token_available = self.num_tokens_available('game') >= self.game_token_cost()
         robber_not_on_desert = self.game.distributor.robber.hexagon.resource_type != 'desert'
         return board_has_desert and has_token_available and robber_not_on_desert
     
     def can_swap_cards(self):
         has_two_cards_in_hand = len(self.hand['resource']) > 1
         at_least_one_opponent_has_two_cards_in_hand = len([player for player in self.game.players if player.id != self.id and len(player.hand['resource']) > 1]) > 0
-        has_token_available = self.num_tokens_available('game') > 0
+        has_token_available = self.num_tokens_available('game') >= self.game_token_cost()
         return has_two_cards_in_hand and at_least_one_opponent_has_two_cards_in_hand and has_token_available
     
     def has_resource_cards_in_hand(self, resource_card_dict):

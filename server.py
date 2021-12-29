@@ -116,7 +116,7 @@ class Server:
                     robber = game.distributor.robber
                     robber.place_on_hexagon(hexagon)
                     player = game.get_player_from_client_address(client_address)
-                    player.num_game_tokens -= 1
+                    player.num_game_tokens -= player.game_token_cost()
                     output_data.update({'action': action, 'hexagon_id': hexagon.id, 'player': player, 'players': game.players})
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.PLACE_ROBBER:

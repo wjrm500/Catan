@@ -127,13 +127,13 @@ config = {
         'SWAP_CARDS': {
             'name': 'Swap two cards with opponent',
             'cost': {
-                'other': ['2 resource cards in hand', "2 resource cards in opponent's hand", '1 game token'] ### Variable num. of game tokens
+                'other': ['2 resource cards in hand', "2 resource cards in opponent's hand", '$game_token_cost game token'] ### TODO: Variable num. of game tokens
             }
         },
         'MOVE_ROBBER_TO_DESERT': {
             'name': 'Move robber to desert hex',
             'cost': {
-                'other': ['1 game token'] ### Variable num. of game tokens
+                'other': ['$game_token_cost game token'] ### TODO: Variable num. of game tokens
             }
         }
     }

@@ -90,6 +90,8 @@ class ActionTreeHandler:
                     resources_text = f'Resources: {", ".join(resources)}'
                     cost_texts.append(resources_text)
                 if (other := cost.get('other')):
+                    replacer = lambda x: x.replace('$game_token_cost', str(game_token_cost := self.play_frame_handler.player.game_token_cost())) + ('' if game_token_cost == 1 else 's')
+                    other = list(map(replacer, other))
                     other_text = f'Other: {", ".join(other)}'
                     cost_texts.append(other_text)
                 cost_text = ' | '.join(cost_texts)                                                  
