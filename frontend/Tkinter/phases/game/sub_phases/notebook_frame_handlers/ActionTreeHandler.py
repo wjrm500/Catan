@@ -5,6 +5,7 @@ from tkinter import ttk
 
 from config import config
 from frontend.ColorUtils import ColorUtils
+from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrame import CardFrame
 from frontend.Tkinter.phases.game.sub_phases.notebook_frame_handlers.CardFrameLabel import CardFrameLabel
@@ -299,6 +300,18 @@ class ActionTreeHandler:
             self.trade_with_bank_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
             self.trade_with_bank_overlay.grid_columnconfigure(0, weight = 1)
 
+            ### In your hand section
+            outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
+            self.trade_with_bank_current_hand_text = tkinter.StringVar()
+            player = self.play_frame_handler.player
+            resources_text_elements = [f'{num} {type}' for type, num in dict(sorted(dict(Counter([resource_card.type for resource_card in player.hand['resource']])).items())).items()]
+            resources_text = gutils.comma_separate_with_ampersand(resources_text_elements)
+            text = f'You currently have {resources_text} in your hand.'
+            self.trade_with_bank_current_hand_text.set(text)
+            outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_current_hand_text, background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10))
+            outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
+            outer_frame.grid(row = 0, column = 0, sticky = 'ew')
+
             ### "What do you want to receive?" section
             receive_iterable = [Card(resource_type, 1) for resource_type in config['resource_types'].keys() if resource_type != 'desert']
             receive_iterable = {
@@ -308,7 +321,7 @@ class ActionTreeHandler:
                 'iterable': receive_iterable
             }
             self.trade_with_bank_card_frames = {}
-            handle_iterable(1, receive_iterable)
+            handle_iterable(2, receive_iterable)
         
             ### Summary section
             outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
@@ -318,17 +331,17 @@ class ActionTreeHandler:
             outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_summary_text, background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10))
             outer_frame_top.pack(fill = 'x', side = tkinter.TOP)
             outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
-            outer_frame.grid(row = 2, column = 0, sticky = 'ew')
+            outer_frame.grid(row = 3, column = 0, sticky = 'ew')
 
             ### Confirm button
             outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
             self.trade_with_bank_confirm_button = tkinter.Button(outer_frame, text = 'Confirm', background = '#DCDCDC', foreground = '#808080', anchor = tkinter.W) ### Disabled before activated
             self.trade_with_bank_confirm_button.pack(side = tkinter.TOP)
-            outer_frame.grid(row = 3, column = 0, sticky = 'ew')
+            outer_frame.grid(row = 4, column = 0, sticky = 'ew')
 
         ### "What do you want to give?" section
         player = self.play_frame_handler.player
-        hand_dict = dict(Counter([resource_card.type for resource_card in self.phase.chaperone.player.hand['resource']]))
+        hand_dict = dict(Counter([resource_card.type for resource_card in player.hand['resource']]))
         hand_dict = dict(sorted(hand_dict.items())) ### So that resources to give appear from left to right in alphabetical order
         port_types = player.port_types()
         give_iterable = [Card(resource_type, cost) for resource_type, num in hand_dict.items() if num >= (cost := player.bank_trade_cost(resource_type, port_types))]
@@ -338,7 +351,7 @@ class ActionTreeHandler:
             'card_click_event_handler': self.give_card_click,
             'iterable': give_iterable
         }
-        handle_iterable(0, give_iterable)
+        handle_iterable(1, give_iterable)
 
         ### Make clickable
         for verb in ['give', 'receive']:

@@ -1,3 +1,4 @@
+from typing import List
 import inflect
 from itertools import chain, repeat, islice
 
@@ -33,3 +34,9 @@ class GeneralUtils:
     @staticmethod
     def intersperse(delimiter, seq):
         return islice(chain.from_iterable(zip(repeat(delimiter), seq)), 1, None)
+    
+    @staticmethod
+    def comma_separate_with_ampersand(list: List) -> str:
+        if len(list) < 2:
+            return ', '.join(list)
+        return '{} and {}'.format(', '.join(list[:-1]), list[-1])
