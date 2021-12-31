@@ -1,6 +1,8 @@
 from collections import Counter
 import random
 
+from frontend.GeneralUtils import GeneralUtils as gutils
+
 class Robber:
     def __init__(self, distributor):
         self.distributor = distributor
@@ -40,7 +42,7 @@ class Robber:
             resources_lost_list = [f'{num_lost} {resource_type}' for resource_type, num_lost in resource_counter.items()]
             if resources_lost_list:
                 if len(resources_lost_list) > 1:
-                    resources_lost_text = '{} and {}'.format(', '.join(resources_lost_list[:-1]), resources_lost_list[-1])
+                    resources_lost_text = gutils.comma_separate_with_ampersand(resources_lost_list)
                 else:
                     resources_lost_text = f'{resources_lost_list[0]}'
                 text_event = f'The bank stole {resources_lost_text} from {player.name}!'
