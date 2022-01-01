@@ -39,10 +39,10 @@ class RollDice(Action):
         else:
             play_frame_handler.update_resource_cards()
             play_frame_handler.action_tree_handler.fill_action_tree()
-        text_area = self.get_text_area(in_settling_phase = False)
+        text_area = self.get_history_text_area(in_settling_phase = False)
         event_text = ' '.join(DiceRoll.text_events)
         text = f'\n\n{self.data["player"].name} rolled a {DiceRoll.total}. {event_text}'
-        self.history_insert(text_area, text)
+        self.text_insert(text_area, text)
 
         status_frame_handler = self.game_phase.notebook_frame_handlers['status']
         status_frame_handler.load_dice_roll_num_distro_frame()

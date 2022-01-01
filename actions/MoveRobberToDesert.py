@@ -24,6 +24,6 @@ class MoveRobberToDesert(Action):
         if self.is_instigating_client():
             self.refresh_play_frame_handler()
         self.refresh_game_board(full_refresh = True)
-        text_area = self.get_text_area(in_settling_phase = False)
+        text_area = self.get_history_text_area(in_settling_phase = False)
         text = f'\n\n{self.data["player"].name} moved the robber to the desert'
-        self.history_insert(text_area, text)
+        self.text_insert(text_area, text)

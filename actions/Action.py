@@ -37,8 +37,11 @@ class Action:
                 self.game_phase.hexagon_rendering.draw_board()
             self.game_phase.hexagon_rendering.draw_board_items()
         
-    def get_text_area(self, in_settling_phase):
+    def get_history_text_area(self, in_settling_phase):
         return self.game_phase.text_area if in_settling_phase else self.game_phase.notebook_frame_handlers['history'].text_area
+    
+    def get_chat_text_area(self):
+        return self.game_phase.notebook_frame_handlers['chat'].text_area
         
     def enable_text_area(self, text_area):
         text_area.config(state = 'normal')
@@ -47,7 +50,7 @@ class Action:
         text_area.yview('end')
         text_area.config(state = 'disabled')
     
-    def history_insert(self, text_area, text, style = None):
+    def text_insert(self, text_area, text, style = None):
         self.enable_text_area(text_area)
         text_area.insert('end', text, style)
         self.disable_text_area(text_area)

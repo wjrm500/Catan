@@ -43,12 +43,12 @@ class PlaceRobber(Action):
             self.refresh_play_frame_handler()
             self.refresh_status_frame_handler()
         self.refresh_game_board(full_refresh = True)
-        text_area = self.get_text_area(in_settling_phase = False)
+        text_area = self.get_history_text_area(in_settling_phase = False)
         knight_text = ' played a Knight card and ' if self.data['from_development_card'] else ' '
         self.data['text_events'].insert(0, f'{self.data["player"].name}{knight_text}placed the robber on a {self.hexagon.num_pips}-pip {self.hexagon.resource_type} hexagon.')
         text = f'\n\n{" ".join(self.data["text_events"])}'
         style = 'purple_font' if self.data['from_development_card'] else None
-        self.history_insert(text_area, text, style = style)
+        self.text_insert(text_area, text, style = style)
 
         status_frame_handler = self.game_phase.notebook_frame_handlers['status']
         status_frame_handler.update_resources_lost_to_robber_table_frame()

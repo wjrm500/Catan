@@ -14,10 +14,10 @@ class PlayYearOfPlentyCard(Action):
         self.update_gui()
 
     def update_gui(self):
-        text_area = self.get_text_area(in_settling_phase = False)
+        text_area = self.get_history_text_area(in_settling_phase = False)
         if self.data['year_of_plenty_turn_index'] == 0:
             text = f'\n\n{self.data["player"].name} played a Year of Plenty card...'
-            self.history_insert(text_area, text, 'purple_font')
+            self.text_insert(text_area, text, 'purple_font')
         if self.data['bank_unable_to_pay']:
             text = f'\n\n{self.data["player"].name} requested {self.data["resource_type"]} from the bank... but the bank cannot afford to pay!'
             if self.is_instigating_client():
@@ -34,4 +34,4 @@ class PlayYearOfPlentyCard(Action):
                 else:
                     play_frame_handler.root.configure(cursor = Phase.CURSOR_DEFAULT)
                     self.refresh_play_frame_handler()
-        self.history_insert(text_area, text)
+        self.text_insert(text_area, text)

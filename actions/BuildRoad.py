@@ -28,7 +28,7 @@ class BuildRoad(Action):
     
     def update_gui(self, in_settling_phase, move_on_to_next_phase):
         self.refresh_game_board()
-        text_area = self.get_text_area(in_settling_phase)
+        text_area = self.get_history_text_area(in_settling_phase)
         self.enable_text_area(text_area)
 
         if self.data['from_development_card'] and self.data['road_building_turn_index'] == 0:

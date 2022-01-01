@@ -21,9 +21,9 @@ class EndTurn(Action):
             game_phase.instruction_text.set("Please wait for your turn")
             game_phase.instruction.configure({'background': '#F08080'}) ### LightCoral
         self.game_phase = game_phase
-        text_area = self.get_text_area(in_settling_phase = False)
+        text_area = self.get_history_text_area(in_settling_phase = False)
         text = f'\n\n{self.data["player"].name} ended their turn.'
-        self.history_insert(text_area, text, style = 'red_font')
+        self.text_insert(text_area, text, style = 'red_font')
 
         status_frame_handler = self.game_phase.notebook_frame_handlers['status']
         status_frame_handler.rounds_completed_text.set(f'Rounds completed: {self.data["rounds_completed"]}')

@@ -1,3 +1,4 @@
+from better_profanity import profanity
 from collections import Counter
 import random
 import socket
@@ -173,6 +174,13 @@ class Server:
                     player = game.get_player_from_client_address(client_address)
                     dice_roll = game.roll_dice()
                     output_data = {'action': action, 'dice_roll': dice_roll, 'player': player, 'players': game.players}
+                    self.broadcast_to_game(game_code, output_data)
+                elif action == ActionFactory.SEND_CHAT_MESSAGE:
+                    game_code = input_data['game_code']
+                    game = self.games[game_code]
+                    player = game.get_player_from_client_address(client_address)
+                    message = profanity.censor(input_data['message'])
+                    output_data = {'action': action, 'message': message, 'player': player, 'players': game.players}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.START_GAME:
                     game_code = input_data['game_code']

@@ -33,7 +33,7 @@ class BuildVillage(Action):
         else:
             self.hexagon_rendering.draw_board_items()
 
-        text_area = self.get_text_area(in_settling_phase)
+        text_area = self.get_history_text_area(in_settling_phase)
         self.enable_text_area(text_area)
 
         port_text = ''

@@ -24,8 +24,8 @@ class UpgradeSettlement(Action):
             self.hexagon_rendering.handle_leave(event = None)
         else:
             self.hexagon_rendering.draw_board_items()
-        text_area = self.get_text_area(in_settling_phase = False)
+        text_area = self.get_history_text_area(in_settling_phase = False)
         text = f'\n\n{self.data["player"].name} upgraded a village to a city!'
-        self.history_insert(text_area, text, style = 'green_font')
+        self.text_insert(text_area, text, style = 'green_font')
         self.refresh_play_frame_handler()
         self.refresh_status_frame_handler()

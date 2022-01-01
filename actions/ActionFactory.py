@@ -12,6 +12,7 @@ from actions.PlayMonopolyCard import PlayMonopolyCard
 from actions.PlayYearOfPlentyCard import PlayYearOfPlentyCard
 from actions.RemovePlayer import RemovePlayer
 from actions.RollDice import RollDice
+from actions.SendChatMessage import SendChatMessage
 from actions.StartGame import StartGame
 from actions.StartGameProper import StartGameProper
 from actions.SwapCards import SwapCards
@@ -42,6 +43,8 @@ class ActionFactory:
 
     PLAY_MONOPOLY_CARD = 'PLAY_MONOPOLY_CARD'
     PLAY_YEAR_OF_PLENTY_CARD = 'PLAY_YEAR_OF_PLENTY_CARD'
+
+    SEND_CHAT_MESSAGE = 'SEND_CHAT_MESSAGE'
 
     @classmethod
     def get_action(cls, action):
@@ -83,3 +86,5 @@ class ActionFactory:
             return PlayMonopolyCard()
         elif action == cls.PLAY_YEAR_OF_PLENTY_CARD:
             return PlayYearOfPlentyCard()
+        elif action == cls.SEND_CHAT_MESSAGE:
+            return SendChatMessage()
