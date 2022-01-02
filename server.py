@@ -219,7 +219,8 @@ class Server:
                     player.transfer_resources_to_bank({give_type: cost})
                     resource_card = game.resource_cards[input_data['receive_type']].pop()
                     player.hand['resource'].append(resource_card)
-                    output_data = {'action': action, 'player': player}
+                    history_text = f'\n\n{player.name} traded {cost} {give_type} to the bank and received 1 {input_data["receive_type"]} in return.'
+                    output_data = {'action': action, 'history_text': history_text, 'player': player}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.UPGRADE_SETTLEMENT:
                     game_code = input_data['game_code']

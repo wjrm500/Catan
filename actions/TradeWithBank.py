@@ -14,3 +14,5 @@ class TradeWithBank(Action):
     def update_gui(self):
         if self.is_instigating_client():
             self.refresh_play_frame_handler()
+        text_area = self.get_history_text_area(in_settling_phase = False)
+        self.text_insert(text_area, self.data['history_text'])
