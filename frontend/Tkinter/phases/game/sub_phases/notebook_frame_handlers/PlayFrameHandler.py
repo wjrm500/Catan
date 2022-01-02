@@ -185,6 +185,7 @@ class PlayFrameHandler(BaseFrameHandler):
             num_of_resource = d.get(resource_type, 0)
             num_label.set(str(num_of_resource))
         self.highlight_or_unhighlight_cards()
+        self.action_tree_handler.update_trade_with_bank_current_hand_text()
     
     def update_development_cards(self):
         d = dict(Counter([development_card.type for development_card in self.phase.chaperone.player.hand['development']]))

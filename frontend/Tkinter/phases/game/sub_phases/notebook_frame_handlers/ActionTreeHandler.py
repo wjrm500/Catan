@@ -303,11 +303,7 @@ class ActionTreeHandler:
             ### In your hand section
             outer_frame = tkinter.Frame(self.trade_with_bank_overlay, background = Phase.BG_COLOR, padx = 5, pady = 5)
             self.trade_with_bank_current_hand_text = tkinter.StringVar()
-            player = self.play_frame_handler.player
-            resources_text_elements = [f'{num} {type}' for type, num in dict(sorted(dict(Counter([resource_card.type for resource_card in player.hand['resource']])).items())).items()]
-            resources_text = gutils.comma_separate_with_ampersand(resources_text_elements)
-            text = f'You currently have {resources_text} in your hand.'
-            self.trade_with_bank_current_hand_text.set(text)
+            self.update_trade_with_bank_current_hand_text()
             outer_frame_bottom = tkinter.Label(outer_frame, textvariable = self.trade_with_bank_current_hand_text, background = Phase.DARKER_BG_COLOR, anchor = tkinter.W, font = ('Arial', 10))
             outer_frame_bottom.pack(fill = 'x', side = tkinter.TOP)
             outer_frame.grid(row = 0, column = 0, sticky = 'ew')
@@ -392,6 +388,14 @@ class ActionTreeHandler:
         summary_text_components.append(' and '.join(give_and_receive_text_components))
         self.trade_with_bank_summary_text.set('{}.'.format(' '.join(summary_text_components)))
     
+    def update_trade_with_bank_current_hand_text(self):
+        if hasattr(self, 'trade_with_bank_current_hand_text'):
+            player = self.play_frame_handler.player
+            resources_text_elements = [f'{num} {type}' for type, num in dict(sorted(dict(Counter([resource_card.type for resource_card in player.hand['resource']])).items())).items()]
+            resources_text = gutils.comma_separate_with_ampersand(resources_text_elements)
+            text = f'You currently have {resources_text} in your hand.'
+            self.trade_with_bank_current_hand_text.set(text)
+
     def activate_confirm_button_if_give_and_receive(self):
         if self.give_type != '' and self.receive_type != '':
             self.trade_with_bank_confirm_button.configure({'background': '#90EE90', 'foreground': '#000000'}) ### LightGreen | Black
