@@ -86,6 +86,12 @@ class Chaperone:
                 for player in sorted(game.players, key = lambda player: player.victory_points(), reverse = True):
                     tkinter.Label(frame, text = f'{player.name.ljust(max_player_name_len)}   {player.victory_points()}', background = Phase.BG_COLOR, font = ('Courier New', 10)).pack()
                 
+                history_text_area = self.current_phase.notebook_frame_handlers['history'].text_area
+                history_text_area.config(state = 'normal')
+                history_text_area.insert('end', f'\n\n{winner.name} won the game!', 'green_font')
+                history_text_area.yview('end')
+                history_text_area.config(state = 'disabled')
+                
                 if self.main: ### TODO: Delete next couple of lines in production version?
                     headings = ['datetime', 'winner', 'player_scores', 'num_hexagons', 'rounds_completed', 'longest_road_holder', 'longest_road', 'largest_army_holder', 'largest_army']
                     filename = 'scores.txt'
