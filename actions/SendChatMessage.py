@@ -23,4 +23,4 @@ class SendChatMessage(Action):
         name_text = self.data['player'].name
         self.text_insert(text_area, name_text, f'{self.data["player"].name}_font')
         message_text = f': {self.data["message"]}'
-        self.text_insert(text_area, message_text)
+        self.text_insert(text_area, message_text, 'ordinary_font')
