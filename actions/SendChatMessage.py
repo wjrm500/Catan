@@ -24,3 +24,10 @@ class SendChatMessage(Action):
         self.text_insert(text_area, name_text, f'{self.data["player"].name}_font')
         message_text = f': {self.data["message"]}'
         self.text_insert(text_area, message_text, 'ordinary_font')
+
+        nb = self.game_phase.notebook
+        current_tab = nb.select()
+        if nb.index(current_tab) != 3:
+            self.chaperone.unread_chat_messages += 1
+            chat_tab = nb.tabs()[-1]
+            nb.tab(chat_tab, text = f'Chat ({num_unread})' if (num_unread := self.chaperone.unread_chat_messages) > 0 else 'Chat')

@@ -27,6 +27,7 @@ class Chaperone:
         self.settling_phase_text = ''
         self.winner_announced = False
         self.winner = None
+        self.unread_chat_messages = 0
     
     def get_player_from_id(self, id):
         return next(player for player in self.players if player.id == id)

@@ -32,6 +32,15 @@ class MainGamePhase(GamePhase):
             self.notebook.add(frame, text = frame_name.title())
             self.notebook_frame_handlers[frame_name] = frame_handler
         self.notebook.pack(fill = 'both', padx = 10, pady = 10)
+        self.notebook.bind('<<NotebookTabChanged>>', self.update_chat_tab)
+    
+    def update_chat_tab(self, event):
+        nb = self.notebook
+        current_tab = nb.select()
+        if nb.index(current_tab) == 3:
+            self.chaperone.unread_chat_messages = 0
+            chat_tab = nb.tabs()[-1]
+            nb.tab(chat_tab, text = f'Chat ({num_unread})' if (num_unread := self.chaperone.unread_chat_messages) > 0 else 'Chat')
     
     def frame_handler_by_name(self, notebook, frame_name):
         if frame_name == 'play':
