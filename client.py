@@ -8,14 +8,16 @@ from frontend.Tkinter.Chaperone import Chaperone
 from frontend.Tkinter.phases.setup.sub_phases.HomePhase import HomePhase
 
 class Client:
-    LOCAL_HOST = '127.0.0.1'
-    LOCAL_PORT = 9090
+    # LOCAL_HOST = '127.0.0.1'
+    # LOCAL_PORT = 9090
+    REMOTE_HOST = '13.212.173.98'
+    REMOTE_PORT = 9090
 
     def __init__(self):
         self.interface = ClientServerInterface()
         self.games = {}
-        self.host = self.LOCAL_HOST
-        self.port = self.LOCAL_PORT
+        self.host = self.REMOTE_HOST
+        self.port = self.REMOTE_PORT
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
         self.queue = multiprocessing.Queue()

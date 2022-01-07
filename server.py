@@ -1,3 +1,4 @@
+import os
 from better_profanity import profanity
 from collections import Counter
 import random
@@ -13,14 +14,16 @@ from backend.mechanics.Game import Game
 from frontend.GeneralUtils import GeneralUtils as gutils
 
 class Server:
-    LOCAL_HOST = '127.0.0.1'
-    LOCAL_PORT = 9090
+    # LOCAL_HOST = '127.0.0.1'
+    # LOCAL_PORT = 9090
+    REMOTE_HOST = ''
+    REMOTE_PORT = 9090
 
     def __init__(self):
         self.interface = ClientServerInterface()
         self.games = {}
-        self.host = self.LOCAL_HOST
-        self.port = self.LOCAL_PORT
+        self.host = self.REMOTE_HOST
+        self.port = self.REMOTE_PORT
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.host, self.port))
         self.socket.listen()
@@ -74,6 +77,8 @@ class Server:
                             player.set_longest_road() ### Settlement might have broken road
                         if game.longest_road['road_length'] < 5:
                             game.longest_road = {'player': None, 'road_length': 0} ### Previous longest road holder may no longer own that title
+                    if 'desert' in [hexagon.resource_type for hexagon in node.hexagons] or node.on_coast: ### Return game token if new village on desert hex or coast
+                        active_player.num_game_tokens += 1
                     output_data = {'action': action, 'node_id': node.id, 'player': active_player, 'players': game.players, 'village_id': village.id}
                     self.broadcast_to_game(game.code, output_data)
                 elif action == ActionFactory.BUY_DEVELOPMENT_CARD:
@@ -143,7 +148,7 @@ class Server:
                     player = game.get_player_from_client_address(client_address)
                     resource_type = input_data['resource_type']
                     num_received = 0
-                    for other_player in game.players:
+                    for other_player in game.players: ### TODO: Does this include current player? If so is this correct?
                         other_player.hand['resource'], cards_to_give = gutils.filter_list(other_player.hand['resource'], lambda card: card.type != resource_type)
                         player.hand['resource'].extend(cards_to_give)
                         num_received += len(cards_to_give)
