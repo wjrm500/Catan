@@ -145,16 +145,17 @@ class Server:
                 elif action == ActionFactory.PLAY_MONOPOLY_CARD:
                     game_code = input_data['game_code']
                     game = self.games[game_code]
-                    player = game.get_player_from_client_address(client_address)
+                    active_player = game.get_player_from_client_address(client_address)
                     resource_type = input_data['resource_type']
                     num_received = 0
-                    for other_player in game.players: ### TODO: Does this include current player? If so is this correct?
+                    for other_player in game.players:
+                        if other_player == active_player: continue
                         other_player.hand['resource'], cards_to_give = gutils.filter_list(other_player.hand['resource'], lambda card: card.type != resource_type)
-                        player.hand['resource'].extend(cards_to_give)
+                        active_player.hand['resource'].extend(cards_to_give)
                         num_received += len(cards_to_give)
-                    card_to_remove = next(card for card in player.hand['development'] if card.type == 'monopoly')
-                    player.hand['development'].remove(card_to_remove)
-                    output_data = {'action': action, 'num_received': num_received, 'player': player, 'players': game.players, 'resource_type': resource_type}
+                    card_to_remove = next(card for card in active_player.hand['development'] if card.type == 'monopoly')
+                    active_player.hand['development'].remove(card_to_remove)
+                    output_data = {'action': action, 'num_received': num_received, 'player': active_player, 'players': game.players, 'resource_type': resource_type}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.PLAY_YEAR_OF_PLENTY_CARD:
                     game_code = input_data['game_code']
