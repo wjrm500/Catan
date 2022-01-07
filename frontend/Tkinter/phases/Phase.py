@@ -46,7 +46,7 @@ class Phase(abc.ABC):
         button_bg_color = ColorUtils.darken_hex(self.BG_COLOR, 0.5)
         if platform.system() == 'Windows':
             return tkinter.Button(where, text = text, font = self.get_font(), foreground = 'white', background = button_bg_color, width = 15, height = 1)
-        return ttk.Button(where, text = text, font = self.get_font(), foreground = 'white', background = button_bg_color, width = 15, height = 1)
+        return ttk.Button(where, text = text)
     
     def render_outer_frame(self):
         outer_frame = tkinter.Frame(self.root, background = self.BG_COLOR)
