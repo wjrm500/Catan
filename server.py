@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import os
 from better_profanity import profanity
 from collections import Counter
@@ -14,16 +15,14 @@ from backend.mechanics.Game import Game
 from frontend.GeneralUtils import GeneralUtils as gutils
 
 class Server:
-    # LOCAL_HOST = '127.0.0.1'
-    # LOCAL_PORT = 9090
-    REMOTE_HOST = ''
-    REMOTE_PORT = 9090
+    HOST = ''
+    PORT = 9090
 
     def __init__(self):
         self.interface = ClientServerInterface()
         self.games = {}
-        self.host = self.REMOTE_HOST
-        self.port = self.REMOTE_PORT
+        self.host = self.HOST
+        self.port = self.PORT
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.host, self.port))
         self.socket.listen()
