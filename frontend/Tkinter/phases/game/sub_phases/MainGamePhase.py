@@ -18,6 +18,12 @@ class MainGamePhase(GamePhase):
         super().setup_inner_frame_top_right('MAIN GAME PHASE')
     
     def setup_inner_frame_middle_left(self):
+        self.notification_text_frame = tkinter.Frame(self.inner_frame_middle_left, background = 'lightblue', height = 10)
+        self.notification_text_frame.pack(side = tkinter.TOP)
+        self.notification_text_variable = tkinter.StringVar()
+        self.notification_text_variable.set('')
+        self.notification_text = tkinter.Label(self.notification_text_frame, background = 'lightblue', textvariable = self.notification_text_variable, font = ('Arial', 12, 'bold'))
+        self.notification_text.pack(fill = 'x', expand = True)
         canvas_mode = HexagonRendering.CANVAS_MODE_DEFAULT
         return super().setup_inner_frame_middle_left(canvas_mode)
     

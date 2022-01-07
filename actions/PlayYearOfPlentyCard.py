@@ -24,7 +24,7 @@ class PlayYearOfPlentyCard(Action):
                 history_frame_handler = self.game_phase.notebook_frame_handlers['history']
                 self.game_phase.notebook.select(history_frame_handler.get())
         else:
-            text = f'\n\n{self.data["player"].name} took 1 {self.data["resource_type"]} from the bank!'
+            text = f'\n\n{self.data["player"].name} took 1 {self.data["resource_type"]} from the bank.'
             play_frame_handler = self.game_phase.notebook_frame_handlers['play']
             if self.is_instigating_client():
                 if self.data['year_of_plenty_turn_index'] == 0:

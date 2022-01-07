@@ -1,5 +1,4 @@
-from frontend.Tkinter.phases.Phase import Phase
-
+from frontend.GeneralUtils import GeneralUtils as gutils
 
 class Action:
     def __init__(self):
@@ -54,6 +53,12 @@ class Action:
         self.enable_text_area(text_area)
         text_area.insert('end', text, style)
         self.disable_text_area(text_area)
+        if not gutils.safe_isinstance(self.game_phase, 'SettlingPhase'):
+            fg_color = 'black'
+            if style and any(color in style for color in ['green', 'purple', 'red']):
+                fg_color = style.split('_')[0]
+            self.game_phase.notification_text.configure({'foreground': fg_color})
+            self.game_phase.notification_text_variable.set('Latest action: ' + text.lstrip('\n'))
     
     def refresh_status_frame_handler(self):
         status_frame_handler = self.game_phase.notebook_frame_handlers['status']

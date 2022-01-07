@@ -96,7 +96,7 @@ class GamePhase(Phase, abc.ABC):
     
     def setup_inner_frame_middle_left(self, canvas_mode):
         self.canvas = tkinter.Canvas(self.inner_frame_middle_left, background = 'lightblue', bd = 0, highlightthickness = 0)
-        self.canvas.pack(expand = True)
+        self.canvas.pack(fill = tkinter.BOTH, expand = True)
         self.hexagon_rendering = HexagonRendering(self)
         self.hexagon_rendering.canvas_mode = canvas_mode
     
