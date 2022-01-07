@@ -14,6 +14,8 @@ class EndTurn(Action):
         frame_handler = game_phase.frame_handler_by_name(game_phase.notebook, 'play')
         if game_phase.client_active():
             frame_handler.start_turn()
+            play_frame_handler = game_phase.notebook_frame_handlers['play']
+            game_phase.notebook.select(play_frame_handler.get())
             game_phase.instruction_text.set("It's your turn!")
             game_phase.instruction.configure({'background': '#90EE90'}) ### LightGreen
         elif chaperone.player.id == data['player'].id:
