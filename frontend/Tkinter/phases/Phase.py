@@ -1,6 +1,8 @@
 import abc
 from PIL import Image, ImageTk
+import platform
 import tkinter
+from tkinter import ttk
 
 from frontend.ColorUtils import ColorUtils
 
@@ -42,7 +44,9 @@ class Phase(abc.ABC):
     
     def render_button(self, where, text):
         button_bg_color = ColorUtils.darken_hex(self.BG_COLOR, 0.5)
-        return tkinter.Button(where, text = text, font = self.get_font(), foreground = 'white', background = button_bg_color, width = 15, height = 1)
+        if platform.system() == 'Windows':
+            return tkinter.Button(where, text = text, font = self.get_font(), foreground = 'white', background = button_bg_color, width = 15, height = 1)
+        return ttk.Button(where, text = text, font = self.get_font(), foreground = 'white', background = button_bg_color, width = 15, height = 1)
     
     def render_outer_frame(self):
         outer_frame = tkinter.Frame(self.root, background = self.BG_COLOR)
