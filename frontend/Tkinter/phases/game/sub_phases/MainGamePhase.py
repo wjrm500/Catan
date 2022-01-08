@@ -18,11 +18,14 @@ class MainGamePhase(GamePhase):
         super().setup_inner_frame_top_right('MAIN GAME PHASE')
     
     def setup_inner_frame_middle_left(self):
+        self.root.update_idletasks()
+        frame_width = self.inner_frame_middle_left.winfo_width()
+        print(f'Frame width: {frame_width}')
         self.notification_text_frame = tkinter.Frame(self.inner_frame_middle_left, background = 'lightblue', height = 10)
         self.notification_text_frame.pack(side = tkinter.TOP)
         self.notification_text_variable = tkinter.StringVar()
         self.notification_text_variable.set('')
-        self.notification_text = tkinter.Label(self.notification_text_frame, background = 'lightblue', textvariable = self.notification_text_variable, font = ('Arial', 12, 'bold'))
+        self.notification_text = tkinter.Label(self.notification_text_frame, background = 'lightblue', textvariable = self.notification_text_variable, font = ('Arial', 12, 'bold'), wraplength = frame_width)
         self.notification_text.pack(fill = 'x', expand = True)
         canvas_mode = HexagonRendering.CANVAS_MODE_DEFAULT
         return super().setup_inner_frame_middle_left(canvas_mode)
@@ -90,15 +93,14 @@ class MainGamePhase(GamePhase):
         return super().setup_inner_frame_bottom_left(instruction_text, label_bg_color)
     
     def run(self):
-        self.root.bind('<Configure>', self.resize_card_labels, '+')
+        self.root.bind('<Configure>', self.resize_notification_wrap_length, '+')
         self.root.bind('<Configure>', lambda evt: self.notebook.config(height = self.inner_frame_middle_right.winfo_height()), '+')
         super().run()
-    
-    def resize_card_labels(self, event):
-        play_frame_handler = self.notebook_frame_handlers['play']
-        frame_width = play_frame_handler.get().winfo_width()
-        for label in play_frame_handler.labels:
-            label.configure({'width': round(frame_width / 50), 'wraplength': round(frame_width / 8)})
+        
+    def resize_notification_wrap_length(self, event):
+        self.root.update_idletasks()
+        frame_width = self.inner_frame_middle_left.winfo_width()
+        self.notification_text.configure(wraplength = frame_width)
     
     def activate_button(self):
         self.button_text.set('End turn')

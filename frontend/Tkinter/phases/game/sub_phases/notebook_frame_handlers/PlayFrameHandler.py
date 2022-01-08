@@ -39,7 +39,10 @@ class PlayFrameHandler(BaseFrameHandler):
         self.dice_roll_overlay = tkinter.Frame(self.frame, background = Phase.BG_COLOR)
         self.dice_roll_overlay.place(in_ = self.frame, anchor = tkinter.CENTER, relheight = 1, relwidth = 1, relx = 0.5, rely = 0.5)
 
-        self.dice_roll_box = tkinter.Frame(self.dice_roll_overlay, background = Phase.DARKER_BG_COLOR, height = 250, width = 300)
+        self.root.update_idletasks()
+        frame_height = self.frame.winfo_height()
+        frame_width = self.frame.winfo_width()
+        self.dice_roll_box = tkinter.Frame(self.dice_roll_overlay, background = Phase.DARKER_BG_COLOR, height = frame_height / 2, width = frame_width * (2 / 3))
         self.dice_roll_box.place(in_ = self.dice_roll_overlay, anchor = tkinter.CENTER, relx = 0.5, rely = 0.5)
 
         self.dice_roll_text = tkinter.StringVar()
@@ -95,6 +98,9 @@ class PlayFrameHandler(BaseFrameHandler):
         self.action_frame = self.action_tree_handler.create_action_frame(self.frame)
         self.action_cost_frame = self.action_tree_handler.create_action_cost_frame(self.frame)
         self.highlight_or_unhighlight_cards()
+
+        self.root.bind('<Configure>', self.resize_card_labels, '+')
+        self.root.bind('<Configure>', self.resize_dice_roll_overlay, '+')
     
     def roll_dice(self, event):
         self.dice_rolled += 1
@@ -197,3 +203,16 @@ class PlayFrameHandler(BaseFrameHandler):
     def update_movable_pieces(self):
         for movable_piece, num_label_text in self.movable_piece_label_texts.items():
             num_label_text.set(str(self.player.num_tokens_available(movable_piece)))
+    
+    def resize_card_labels(self, event):
+        frame_width = self.get().winfo_width()
+        for label in self.labels:
+            label.configure({'width': round(frame_width / 50), 'wraplength': round(frame_width / 8)})
+    
+    def resize_dice_roll_overlay(self, event):
+        if hasattr(self, 'dice_roll_overlay') and self.dice_roll_overlay.winfo_exists():
+            self.root.update_idletasks()
+            frame_height = self.frame.winfo_height()
+            frame_width = self.frame.winfo_width()
+            self.dice_roll_box.configure({'height': frame_height / 2, 'width': frame_width * (2 / 3)})
+        
