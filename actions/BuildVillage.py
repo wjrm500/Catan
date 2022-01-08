@@ -33,9 +33,6 @@ class BuildVillage(Action):
         else:
             self.hexagon_rendering.draw_board_items()
 
-        text_area = self.get_history_text_area(in_settling_phase)
-        self.enable_text_area(text_area)
-
         port_text = ''
         if (port := self.node.port):
             a_an = 'an' if port.type.startswith(tuple('aeiou')) else 'a'
@@ -44,11 +41,10 @@ class BuildVillage(Action):
         def fun(d, x): d[x[0]] = d.get(x[0], 0) + x[1]; return d
         d = functools.reduce(fun, [(hexagon.resource_type, hexagon.num_pips) for hexagon in self.node.hexagons], {})
         nominal_values = ' + '.join(f'{v} {k}' for k, v in d.items() if k != 'desert')
-        text_to_insert = f'{self.data["player"].name} built a village{port_text}! This village has a nominal value of {nominal_value} ({nominal_values}).'
-        text_area.insert('end', f'\n\n{text_to_insert}', 'green_font')
-
-        self.disable_text_area(text_area)
-
+        text_to_insert = f'\n\n{self.data["player"].name} built a village{port_text}! This village has a nominal value of {nominal_value} ({nominal_values}).'
+        text_area = self.get_history_text_area(in_settling_phase)
+        self.text_insert(text_area, text_to_insert, 'green_font')
+        
         if in_settling_phase:
             self.hexagon_rendering.canvas_mode = HexagonRendering.CANVAS_MODE_BUILD_ROAD
             self.game_phase.instruction_text.set('Build a road!')
