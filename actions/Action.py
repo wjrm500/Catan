@@ -53,7 +53,7 @@ class Action:
         self.enable_text_area(text_area)
         text_area.insert('end', text, style)
         self.disable_text_area(text_area)
-        if not gutils.safe_isinstance(self.game_phase, 'SettlingPhase'):
+        if not gutils.safe_isinstance(self.game_phase, 'SettlingPhase') and text_area is self.game_phase.notebook_frame_handlers['history'].text_area:
             fg_color = 'black'
             if style and any(color in style for color in ['green', 'purple', 'red']):
                 fg_color = style.split('_')[0]
