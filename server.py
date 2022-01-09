@@ -212,7 +212,7 @@ class Server:
                     swap_card_resource_types = input_data['swap_card_resource_types']
                     give_resource_card_dict = dict(Counter(swap_card_resource_types))
                     active_player.transfer_resources_to_player(give_resource_card_dict.copy(), random_opponent)
-                    active_player.num_game_tokens -= 1
+                    active_player.num_game_tokens -= active_player.game_token_cost()
                     output_data = {'action': action, 'give_resource_card_dict': give_resource_card_dict, 'player': active_player, 'players': game.players, 'random_opponent': random_opponent, 'receive_resource_card_dict': receive_resource_card_dict}
                     self.broadcast_to_game(game_code, output_data)
                 elif action == ActionFactory.TRADE_WITH_BANK:
