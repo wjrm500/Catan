@@ -8,9 +8,9 @@ def is_tool(name):
 def start_script():
     try:
         if is_tool('python3.9'):
-            subprocess.run('python3.9 server.py')
+            subprocess.run('python3.9 server.py', shell = True)
         else:
-            subprocess.run('python server.py')
+            subprocess.run('python server.py', shell = True)
     except Exception as ex:
         handle_crash(ex)
 
