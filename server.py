@@ -1,7 +1,6 @@
-from argparse import ArgumentParser
-import os
 from better_profanity import profanity
 from collections import Counter
+import datetime
 import random
 import socket
 import threading
@@ -273,5 +272,14 @@ class Server:
         for client in self.games[game_code].clients.values():
             self.broadcast_to_client(client, message)
 
-server = Server()
-server.serve()
+def serve():
+    try:
+        server = Server()
+        server.serve()
+    except Exception as ex:
+        datetime_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        with open('errors.txt', 'a') as file:
+            file.write(f'{datetime_now} - {ex.message}\n')
+        serve()
+
+serve()
