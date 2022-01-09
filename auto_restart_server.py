@@ -11,11 +11,11 @@ def start_script():
             subprocess.run(f'python3.9 server.py')
         else:
             subprocess.run(f'python server.py')
-    except Exception as e:
-        handle_crash(e)
+    except Exception as ex:
+        handle_crash(ex)
 
-def handle_crash(e):
-    print(e.message)
+def handle_crash(ex):
+    print(ex)
     sleep(2)
     start_script()
 

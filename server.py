@@ -279,7 +279,7 @@ def serve():
     except Exception as ex:
         datetime_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         with open('errors.txt', 'a') as file:
-            file.write(f'{datetime_now} - {ex.message}\n')
+            file.write(f'{datetime_now} - {ex}\n')
         serve()
 
 serve()
