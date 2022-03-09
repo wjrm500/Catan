@@ -21,7 +21,10 @@ class ExistingGamePhase(SetupPhase):
     
     def submit_form(self, event):
         ip_address = self.ip_address_input.get()
-        self.chaperone.client.connect(ip_address)
+        try:
+            self.chaperone.client.connect(ip_address)
+        except:
+            self.display_error_text('Invalid IP address')
         self.chaperone.join_existing_game(ip_address)
     
     def display_error_text(self, error_text):
