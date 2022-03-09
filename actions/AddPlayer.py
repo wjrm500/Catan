@@ -26,8 +26,7 @@ class AddPlayer(Action):
             list_item.pack(side = tkinter.TOP, pady = (10, 5) if i == 0 else (5, 5))
         if hasattr(lobby_phase, 'proceed_button'):
             lobby_phase.proceed_button.destroy()
-        # if self.chaperone.main and len(self.chaperone.players) > 1:
-        if self.chaperone.main and len(self.chaperone.players) > 0: ### TODO: Replace with commented line above - temporary change for testing
+        if self.chaperone.main and self.chaperone.player in self.chaperone.players and len(self.chaperone.players) > 1:
             lobby_phase.proceed_button = lobby_phase.render_button(where = lobby_phase.inner_frame, text = 'Start game')
             lobby_phase.proceed_button.pack(side = tkinter.TOP, pady = 10)
             lobby_phase.proceed_button.bind('<Motion>', lambda evt: lobby_phase.root.configure(cursor = lobby_phase.CURSOR_HAND))
