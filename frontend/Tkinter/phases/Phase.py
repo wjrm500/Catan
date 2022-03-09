@@ -1,16 +1,17 @@
 import abc
+import base64
+from io import BytesIO
 from PIL import Image, ImageTk
 import platform
 import tkinter
 from tkinter import ttk
 
+import img2str_catan_logo
 from frontend.ColorUtils import ColorUtils
 
 class Phase(abc.ABC):
     BG_COLOR = '#ADD8E6'
     DARKER_BG_COLOR = ColorUtils.darken_hex(BG_COLOR, 0.2)
-    CATAN_LOGO_IMG_FILEPATH = './frontend/assets/images/catan_logo.png'
-    CELEBRATION_IMG_FILEPATH = './frontend/assets/images/celebration.png'
     CURSOR_DEFAULT = 'left_ptr'
     CURSOR_HAND = 'hand2'
     FONT_NAME = 'Arial'
@@ -74,7 +75,9 @@ class Phase(abc.ABC):
         canvas_width = where.winfo_width() * width
         canvas_height = where.winfo_height() * height
         canvas = tkinter.Canvas(where, width = canvas_width, height = canvas_height, background = self.BG_COLOR, bd = 0, highlightthickness = 0)
-        img = Image.open(self.CATAN_LOGO_IMG_FILEPATH)
+        byte_data = base64.b64decode(img2str_catan_logo.image_bytes)
+        image_data = BytesIO(byte_data)
+        img = Image.open(image_data)
         resized_image_wh = max(canvas_width, canvas_height)
         img.thumbnail((resized_image_wh, resized_image_wh), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(img)

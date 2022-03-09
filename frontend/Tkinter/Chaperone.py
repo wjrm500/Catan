@@ -1,4 +1,6 @@
+import base64
 from datetime import datetime
+from io import BytesIO
 import os
 from PIL import Image, ImageTk
 import tkinter
@@ -8,6 +10,7 @@ from actions.ActionFactory import ActionFactory
 from frontend.GeneralUtils import GeneralUtils as gutils
 from frontend.Tkinter.Style import Style
 from frontend.Tkinter.phases.Phase import Phase
+import img2str_celebration
 
 class Chaperone:
     def __init__(self, client, queue):
@@ -75,7 +78,9 @@ class Chaperone:
 
                 canvas = tkinter.Canvas(frame, background = Phase.BG_COLOR, height = 75, width = 75, bd = 0, highlightthickness = 0)
                 canvas.pack()
-                image = Image.open(Phase.CELEBRATION_IMG_FILEPATH)
+                byte_data = base64.b64decode(img2str_celebration.image_bytes)
+                image_data = BytesIO(byte_data)
+                image = Image.open(image_data)
                 resized_image = image.resize((75, 75), Image.ANTIALIAS)
                 new_image = ImageTk.PhotoImage(resized_image)
                 self.root.celebration_image = new_image ### Prevent garbage collection
