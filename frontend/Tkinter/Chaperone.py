@@ -23,11 +23,17 @@ class Chaperone:
         self.players = []
         self.player = None
         self.main = False ### User is main client i.e. created game
-        self.game_code = ''
         self.settling_phase_text = ''
         self.winner_announced = False
         self.winner = None
         self.unread_chat_messages = 0
+        self.in_game = False
+    
+    def set_host(self, host):
+        self.host = host
+    
+    def get_host(self):
+        return self.host
     
     def get_player_from_id(self, id):
         return next(player for player in self.players if player.id == id)
@@ -132,7 +138,6 @@ class Chaperone:
     def add_player(self, name):
         data = {
             'action': ActionFactory.ADD_PLAYER,
-            'game_code': self.game_code,
             'player': name
         }
         self.client.interface.send_data(self.client.socket, data) ### Tried using a decorator for this (as appears in other methods but couldn't get it to work)
@@ -144,24 +149,22 @@ class Chaperone:
         }
         self.client.interface.send_data(self.client.socket, data)
 
-    def join_existing_game(self, game_code):
+    def join_existing_game(self, ip_address):
         data = {
             'action': ActionFactory.JOIN_EXISTING_GAME,
-            'game_code': game_code
+            'ip_address': ip_address
         }
         self.client.interface.send_data(self.client.socket, data)
     
     def start_game(self):
         data = {
-            'action': ActionFactory.START_GAME,
-            'game_code': self.game_code
+            'action': ActionFactory.START_GAME
         }
         self.client.interface.send_data(self.client.socket, data)
     
     def build_village(self, node):
         data = {
             'action': ActionFactory.BUILD_VILLAGE,
-            'game_code': self.game_code,
             'node_id': node.id
         }
         self.client.interface.send_data(self.client.socket, data)
@@ -170,7 +173,6 @@ class Chaperone:
         data = {
             'action': ActionFactory.BUILD_ROAD,
             'from_development_card': from_development_card,
-            'game_code': self.game_code,
             'line_id': line.id,
             'road_building_turn_index': road_building_turn_index
         }
@@ -178,22 +180,19 @@ class Chaperone:
 
     def start_game_proper(self):
         data = {
-            'action': ActionFactory.START_GAME_PROPER,
-            'game_code': self.game_code
+            'action': ActionFactory.START_GAME_PROPER
         }
         self.client.interface.send_data(self.client.socket, data)
     
     def roll_dice(self):
         data = {
-            'action': ActionFactory.ROLL_DICE,
-            'game_code': self.game_code
+            'action': ActionFactory.ROLL_DICE
         }
         self.client.interface.send_data(self.client.socket, data)
     
     def end_turn(self):
         data = {
-            'action': ActionFactory.END_TURN,
-            'game_code': self.game_code
+            'action': ActionFactory.END_TURN
         }
         self.client.interface.send_data(self.client.socket, data)
     
@@ -201,7 +200,6 @@ class Chaperone:
         data = {
             'action': ActionFactory.PLACE_ROBBER,
             'from_development_card': from_development_card,
-            'game_code': self.game_code,
             'hexagon_id': hexagon.id
         }
         self.client.interface.send_data(self.client.socket, data)
@@ -209,7 +207,6 @@ class Chaperone:
     def trade_with_bank(self, give_type, receive_type):
         data = {
             'action': ActionFactory.TRADE_WITH_BANK,
-            'game_code': self.game_code,
             'give_type': give_type,
             'receive_type': receive_type
         }
@@ -217,15 +214,13 @@ class Chaperone:
 
     def buy_development_card(self):
         data = {
-            'action': ActionFactory.BUY_DEVELOPMENT_CARD,
-            'game_code': self.game_code
+            'action': ActionFactory.BUY_DEVELOPMENT_CARD
         }
         self.client.interface.send_data(self.client.socket, data)
     
     def play_monopoly_card(self, resource_type):
         data = {
             'action': ActionFactory.PLAY_MONOPOLY_CARD,
-            'game_code': self.game_code,
             'resource_type': resource_type
         }
         self.client.interface.send_data(self.client.socket, data)
@@ -233,7 +228,6 @@ class Chaperone:
     def play_year_of_plenty_card(self, resource_type, year_of_plenty_turn_index):
         data = {
             'action': ActionFactory.PLAY_YEAR_OF_PLENTY_CARD,
-            'game_code': self.game_code,
             'resource_type': resource_type,
             'year_of_plenty_turn_index': year_of_plenty_turn_index
         }
@@ -242,22 +236,19 @@ class Chaperone:
     def upgrade_settlement(self, node):
         data = {
             'action': ActionFactory.UPGRADE_SETTLEMENT,
-            'game_code': self.game_code,
             'node_id': node.id
         }
         self.client.interface.send_data(self.client.socket, data)
     
     def move_robber_to_desert(self):
         data = {
-            'action': ActionFactory.MOVE_ROBBER_TO_DESERT,
-            'game_code': self.game_code
+            'action': ActionFactory.MOVE_ROBBER_TO_DESERT
         }
         self.client.interface.send_data(self.client.socket, data)
     
     def swap_cards(self, swap_card_resource_types):
         data = {
             'action': ActionFactory.SWAP_CARDS,
-            'game_code': self.game_code,
             'swap_card_resource_types': swap_card_resource_types
         }
         self.client.interface.send_data(self.client.socket, data)
@@ -265,7 +256,6 @@ class Chaperone:
     def send_chat_message(self, message):
         data = {
             'action': ActionFactory.SEND_CHAT_MESSAGE,
-            'game_code': self.game_code,
             'message': message
         }
         self.client.interface.send_data(self.client.socket, data)

@@ -17,7 +17,7 @@ class AddPlayer(Action):
     
     def update_gui(self):
         lobby_phase = self.chaperone.current_phase
-        lobby_phase.game_code_text.set('Game code: {}'.format(self.chaperone.game_code))
+        lobby_phase.ip_address_text.set('IP address: {}'.format(self.chaperone.get_host()))
         if hasattr(lobby_phase, 'existing_players_list'):
             for list_item in lobby_phase.existing_players_list:
                 list_item.destroy()

@@ -20,10 +20,10 @@ class LobbyPhase(SetupPhase):
             'highlightcolor': self.DARKER_BG_COLOR, 
             'highlightthickness': 1
         }
-        self.game_code_text = tkinter.StringVar()
-        self.game_code_text.set(f'Game code: {self.chaperone.game_code}')
-        self.game_code_label = self.render_label(where = self.inner_frame, text = self.game_code_text, config = {'background': '#eeeeee', 'font': ('Arial', '10', 'normal')})
-        self.game_code_label.pack(side = tkinter.TOP, pady = 20)
+        self.ip_address_text = tkinter.StringVar()
+        self.ip_address_text.set(f'IP address: {self.chaperone.get_host()}')
+        self.ip_address_label = self.render_label(where = self.inner_frame, text = self.ip_address_text, config = {'background': '#eeeeee', 'font': ('Arial', '10', 'normal')})
+        self.ip_address_label.pack(side = tkinter.TOP, pady = 20)
         self.new_player_panel = self.render_new_player_panel(where = self.split_panel, config = player_panel_config)
         self.existing_players_panel = self.render_existing_players_panel(where = self.split_panel, config = player_panel_config)
         self.split_panel.pack(side = tkinter.TOP, pady = 20)

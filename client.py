@@ -23,9 +23,10 @@ class Client:
         self.serve_thread.start()
     
     def connect(self, host = None):
-        time.sleep(1)
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        time.sleep(0.1)
         host = host or socket.gethostbyname(socket.gethostname())
+        self.chaperone.set_host(host)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host, self.PORT))
         self.receive_thread = threading.Thread(target = self.receive)
         self.receive_thread.start()
