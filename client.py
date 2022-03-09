@@ -1,32 +1,34 @@
-from argparse import ArgumentParser
 import multiprocessing
 import socket
 import threading
+import time
 
 from ClientServerInterface import ClientServerInterface
 from actions.ActionFactory import ActionFactory
 from frontend.Tkinter.Chaperone import Chaperone
 from frontend.Tkinter.phases.setup.sub_phases.HomePhase import HomePhase
+import server
 
 class Client:
-    LOCAL_HOST = '127.0.0.1'
-    LOCAL_PORT = 9090
-    REMOTE_HOST = '13.212.173.98'
-    REMOTE_PORT = 9090
+    HOST = ''
+    PORT = 9090
 
-    def __init__(self, locally_hosted):
+    def __init__(self):
         self.interface = ClientServerInterface()
-        self.games = {}
-        self.host = self.LOCAL_HOST if locally_hosted else self.REMOTE_HOST
-        self.port = self.LOCAL_PORT if locally_hosted else self.REMOTE_PORT
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
         self.queue = multiprocessing.Queue()
-        self.receive_thread = threading.Thread(target = self.receive)
-        # self.gui_thread = threading.Thread(target = self.gui)
-        self.receive_thread.start()
         self.gui()
-        # self.gui_thread.start()
+    
+    def serve(self):
+        self.serve_thread = threading.Thread(target = server.serve)
+        self.serve_thread.start()
+    
+    def connect(self, host = None):
+        time.sleep(1)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = host or socket.gethostbyname(socket.gethostname())
+        self.socket.connect((host, self.PORT))
+        self.receive_thread = threading.Thread(target = self.receive)
+        self.receive_thread.start()
     
     def receive(self):
         while True:
@@ -41,7 +43,4 @@ class Client:
         self.chaperone = Chaperone(self, self.queue)
         self.chaperone.start_phase(HomePhase)
 
-parser = ArgumentParser()
-parser.add_argument('-l', '--local', dest = 'locally_hosted', help = 'Is server hosted locally?', action = 'store_true')
-args = parser.parse_args()
-client = Client(args.locally_hosted)
+client = Client()

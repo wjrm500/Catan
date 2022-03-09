@@ -32,6 +32,8 @@ class NewGamePhase(SetupPhase):
             if not num_hexagons in range(self.MIN_HEXAGONS, self.MAX_HEXAGONS + 1):
                 error = 'Number of hexagons must be between {} and {}'.format(self.MIN_HEXAGONS, self.MAX_HEXAGONS)
         if not error:
+            self.chaperone.client.serve()
+            self.chaperone.client.connect()
             self.chaperone.create_new_game(num_hexagons)
         else:
             self.error_text = self.render_error_text(self.inner_frame, error)

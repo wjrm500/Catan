@@ -14,18 +14,16 @@ from backend.mechanics.Game import Game
 from frontend.GeneralUtils import GeneralUtils as gutils
 
 class Server:
-    HOST = ''
     PORT = 9090
 
     def __init__(self):
         self.interface = ClientServerInterface()
         self.games = {}
-        self.host = self.HOST
-        self.port = self.PORT
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((self.host, self.port))
+        self.host = socket.gethostbyname(socket.gethostname())
+        self.socket.bind((self.host, self.PORT))
         self.socket.listen()
-        print(f'Listening for incoming connections at {(self.host, self.port)}')
+        print(f'Listening for incoming connections at {(self.host, self.PORT)}')
     
     def serve(self):
         while True:
@@ -280,6 +278,4 @@ def serve():
         datetime_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         with open('errors.txt', 'a') as file:
             file.write(f'{datetime_now} - {ex}\n')
-        serve()
-
-serve()
+        # serve()
