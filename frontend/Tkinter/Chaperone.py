@@ -12,6 +12,8 @@ from frontend.Tkinter.Style import Style
 from frontend.Tkinter.phases.Phase import Phase
 import img2str_celebration
 
+RECORD_SCORES = False
+
 class Chaperone:
     def __init__(self, client, queue):
         self.client = client
@@ -104,7 +106,7 @@ class Chaperone:
                 history_text_area.yview('end')
                 history_text_area.config(state = 'disabled')
                 
-                if self.main: ### TODO: Delete next couple of lines in production version?
+                if self.main and RECORD_SCORES: ### TODO: Delete next couple of lines in production version?
                     headings = ['datetime', 'winner', 'player_scores', 'num_hexagons', 'rounds_completed', 'longest_road_holder', 'longest_road', 'largest_army_holder', 'largest_army']
                     filename = 'scores.txt'
                     file_existed = os.path.exists(filename)
