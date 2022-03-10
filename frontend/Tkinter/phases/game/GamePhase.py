@@ -1,4 +1,6 @@
 import abc
+import base64
+from io import BytesIO
 from config import config
 from functools import partial
 from PIL import Image, ImageTk
@@ -8,6 +10,7 @@ from frontend.ColorUtils import ColorUtils
 
 from frontend.Tkinter.phases.Phase import Phase
 from frontend.Tkinter.rendering.HexagonRendering import HexagonRendering
+import img2str_catan_logo
 
 class GamePhase(Phase, abc.ABC):
     def __init__(self, chaperone):
@@ -86,7 +89,9 @@ class GamePhase(Phase, abc.ABC):
         block_under_title.pack(side = tkinter.BOTTOM, fill = 'x')
         canvas = tkinter.Canvas(self.inner_frame_top_right, background = self.BG_COLOR, width = 130, bd = 0, highlightthickness = 0)
         canvas.pack(anchor = tkinter.S, side = tkinter.LEFT)
-        image = Image.open(Phase.CATAN_LOGO_IMG_FILEPATH)
+        byte_data = base64.b64decode(img2str_catan_logo.image_bytes)
+        image_data = BytesIO(byte_data)
+        image = Image.open(image_data)
         resized_image = image.resize((120, 36), Image.ANTIALIAS)
         new_image = ImageTk.PhotoImage(resized_image)
         self.root.new_image = new_image ### Prevent garbage collection
