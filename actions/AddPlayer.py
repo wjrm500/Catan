@@ -32,3 +32,7 @@ class AddPlayer(Action):
             lobby_phase.proceed_button.bind('<Motion>', lambda evt: lobby_phase.root.configure(cursor = lobby_phase.CURSOR_HAND))
             lobby_phase.proceed_button.bind('<Leave>', lambda evt: lobby_phase.root.configure(cursor = lobby_phase.CURSOR_DEFAULT))
             lobby_phase.proceed_button.bind('<Button-1>', lobby_phase.start_game)
+        if self.chaperone.player not in self.chaperone.players and len(self.chaperone.players) == 4:
+            lobby_phase.new_player_label_text.set('All slots have been taken')
+            lobby_phase.new_player_input.config(state = 'disabled')
+            lobby_phase.add_new_player_button.config(state = 'disabled')
