@@ -10,4 +10,5 @@ class StartGame(Action):
         chaperone.distributor = data['distributor']
         chaperone.update_players(data['players'])
         chaperone.root.after(100, chaperone.check_queue) ### Whenever starting new phase in callback, need to call this, otherwise queue no longer checked
-        chaperone.start_phase(SettlingPhase)
+        if chaperone.player in chaperone.players:
+            chaperone.start_phase(SettlingPhase)
