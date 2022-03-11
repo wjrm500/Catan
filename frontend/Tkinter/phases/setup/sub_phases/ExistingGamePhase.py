@@ -23,9 +23,9 @@ class ExistingGamePhase(SetupPhase):
         ip_address = self.ip_address_input.get()
         try:
             self.chaperone.client.connect(ip_address)
+            self.chaperone.join_existing_game(ip_address)
         except:
             self.display_error_text('Invalid IP address')
-        self.chaperone.join_existing_game(ip_address)
     
     def display_error_text(self, error_text):
         if hasattr(self, 'error_text'):

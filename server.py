@@ -94,7 +94,9 @@ class Server:
                 elif action == ActionFactory.JOIN_EXISTING_GAME:
                     output_data = {'action': action}
                     game.add_client(client)
-                    output_data.update({'players': game.players})
+                    output_data.update({'players': game.players, 'too_many_players': False})
+                    if len(game.players) == 4:
+                        output_data['too_many_players'] = True
                     self.broadcast_to_game(output_data)
                 elif action == ActionFactory.MOVE_ROBBER_TO_DESERT:
                     hexagon = next(iter(sorted([hexagon for hexagon in game.distributor.hexagons if hexagon.resource_type == 'desert'], key = lambda x: random.random())))
