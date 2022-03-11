@@ -1,6 +1,9 @@
 .env
 __pycache__/
- *.pyc
- .vscode
- todos.txt
- .gitignore
+*.pyc
+.vscode
+*.txt
+.gitignore
+build/
+dist/
+venv/
