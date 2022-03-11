@@ -197,8 +197,9 @@ class Server:
                     output_data = {'action': action, 'city_id': city.id, 'node_id': node.id, 'player': player, 'players': game.players}
                     self.broadcast_to_game(output_data)
             except Exception as e:
-                print(str(e))
-                self.broadcast_to_game({'action': ActionFactory.END_GAME})
+                # print(str(e))
+                if client_address in [player.client_address for player in self.game.players]:
+                    self.broadcast_to_game({'action': ActionFactory.END_GAME})
                 client.shutdown(2)
                 client.close()
                 break
